@@ -1,8 +1,8 @@
 ---
 id: tutorials-overview
 slug: overview
-title: Tutorials Overview
-sidebar_label: Tutorials Overview
+title: 教程概览
+sidebar_label: 教程概览
 hide_title: true
 ---
 
@@ -53,7 +53,7 @@ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain
 
 See [the "Learn Modern Redux" show notes page](https://www.learnwithjason.dev/let-s-learn-modern-redux) for a transcript and links to the example app source.
 
-<LiteYouTubeEmbed 
+<LiteYouTubeEmbed
     id="9zySeP5vH9c"
     title="Learn Modern Redux - Redux Toolkit, React-Redux Hooks, and RTK Query"
 />
@@ -69,10 +69,10 @@ The [Redux Essentials tutorial](https://redux.js.org/tutorials/essentials/part-1
 If you prefer a video course, you can [watch this RTK Query video course by Lenz Weber-Tronic, the creator of RTK Query, for free at Egghead](https://egghead.io/courses/rtk-query-basics-query-endpoints-data-flow-and-typescript-57ea3c43?af=7pnhj6) or take a look at the first lesson right here:
 
 <div style={{position:"relative",paddingTop:"56.25%"}}>
-  <iframe 
-    src="https://app.egghead.io/lessons/redux-course-introduction-and-application-walk-through-for-rtk-query-basics/embed?af=7pnhj6" 
+  <iframe
+    src="https://app.egghead.io/lessons/redux-course-introduction-and-application-walk-through-for-rtk-query-basics/embed?af=7pnhj6"
     title="RTK Query Video course at Egghead: Course Introduction and Application Walk through for RTK Query Basics"
-    frameborder="0" 
+    frameborder="0"
     allowfullscreen
     style={{position:"absolute",top:0,left:0,width:"100%",height:"100%"}}
   ></iframe>

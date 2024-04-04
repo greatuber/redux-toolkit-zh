@@ -1,7 +1,7 @@
 ---
 id: immer-reducers
-title: Writing Reducers with Immer
-sidebar_label: Writing Reducers with Immer
+title: 使用 Immer 编写 Reducers
+sidebar_label: 使用 Immer 编写 Reducers
 hide_title: true
 ---
 

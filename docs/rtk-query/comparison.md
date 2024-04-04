@@ -1,7 +1,7 @@
 ---
 id: comparison
-title: Comparison with Other Tools
-sidebar_label: Comparison with Other Tools
+title: 与其他工具的比较
+sidebar_label: 与其他工具的比较
 hide_title: true
 description: 'RTK Query > Comparison: Compares features and tradeoffs vs other similar tools'
 ---

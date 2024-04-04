@@ -1,7 +1,7 @@
 ---
 id: migrating-rtk-2
-title: Migrating to RTK 2.0 and Redux 5.0
-sidebar_label: Migrating to RTK 2.0 and Redux 5.0
+title: 迁移到 RTK 2.0 和 Redux 5.0
+sidebar_label: 迁移到 RTK 2.0 和 Redux 5.0
 hide_title: true
 toc_max_heading_level: 4
 ---

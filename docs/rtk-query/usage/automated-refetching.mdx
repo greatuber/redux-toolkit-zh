@@ -1,7 +1,7 @@
 ---
 id: automated-refetching
-title: Automated Re-fetching
-sidebar_label: Automated Re-fetching
+title: 自动重新获取
+sidebar_label: 自动重新获取
 hide_title: true
 description: 'RTK Query > Usage > Automated Refetching: cache invalidation management'
 ---
@@ -541,7 +541,7 @@ e.g. `['Post'] / [{ type: 'Post' }]`
 
 Will `invalidate` any `provided` tag with the matching type, including general and specific tags.
 
-Example:  
+Example:
 If a general tag of `Post` was invalidated, endpoints whose data `provided` the following tags would all have their data invalidated:
 
 - `['Post']`
@@ -778,11 +778,11 @@ The example below demonstrates an example with the following behaviour:
 
 - Provides an `UNAUTHORIZED` cache tag if a query fails with an error code of `401 UNAUTHORIZED`
 - Provides an `UNKNOWN_ERROR` cache tag if a query fails with a different error
-- Enables a 'login' mutation, which when _successful_, will `invalidate` the data with the `UNAUTHORIZED` tag.  
+- Enables a 'login' mutation, which when _successful_, will `invalidate` the data with the `UNAUTHORIZED` tag.
   This will trigger the `postById` endpoint to re-fire if:
   1. The last call for `postById` had encountered an unauthorized error, and
   2. A component is still subscribed to the cached data
-- Enables a 'refetchErroredQueries' mutation which when _called_, will `invalidate` the data with the `UNKNOWN_ERROR` tag.  
+- Enables a 'refetchErroredQueries' mutation which when _called_, will `invalidate` the data with the `UNKNOWN_ERROR` tag.
   This will trigger the `postById` endpoint to re-fire if:
   1. The last call for `postById` had encountered an unknown error, and
   2. A component is still subscribed to the cached data

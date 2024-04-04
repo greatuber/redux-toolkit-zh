@@ -1,7 +1,7 @@
 ---
 id: code-generation
-title: Code Generation
-sidebar_label: Code Generation
+title: 代码生成
+sidebar_label: 代码生成
 hide_title: true
 description: 'RTK Query > Usage > Code Generation: automated creation of API code'
 ---
@@ -64,7 +64,7 @@ npx @rtk-query/codegen-openapi openapi-config.ts
 
 #### Generating tags
 
-If your OpenAPI specification uses [tags](https://swagger.io/docs/specification/grouping-operations-with-tags/), you can specify the `tag` option to the codegen.  
+If your OpenAPI specification uses [tags](https://swagger.io/docs/specification/grouping-operations-with-tags/), you can specify the `tag` option to the codegen.
 That will result in all generated endpoints having `providesTags`/`invalidatesTags` declarations for the `tags` of their respective operation definition.
 
 Note that this will only result in string tags with no ids, so it might lead to scenarios where too much is invalidated and unneccessary requests are made on mutation.

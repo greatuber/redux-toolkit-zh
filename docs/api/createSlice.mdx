@@ -9,11 +9,13 @@ hide_title: true
 
 # `createSlice`
 
-`createSlice`是一个函数，它接受一个初始状态，一个reducer函数的对象，以及一个"slice名称"，并自动生成与reducers和状态对应的action创建器和action类型。
+A function that accepts an initial state, an object of reducer functions, and a "slice name",
+and automatically generates action creators and action types that correspond to the reducers and state.
 
-这个API是编写Redux逻辑的标准方法。
+This API is the standard approach for writing Redux logic.
 
-在内部，它使用[`createAction`](./createAction.mdx)和[`createReducer`](./createReducer.mdx)，所以你也可以使用[Immer](../usage/immer-reducers.md)来编写"变异"的不可变更新：
+Internally, it uses [`createAction`](./createAction.mdx) and [`createReducer`](./createReducer.mdx), so
+you may also use [Immer](../usage/immer-reducers.md) to write "mutating" immutable updates:
 
 ```ts
 import { createSlice } from '@reduxjs/toolkit'
@@ -23,7 +25,7 @@ interface CounterState {
   value: number
 }
 
-const initialState = { value: 0 } 满足 CounterState 作为 CounterState
+const initialState = { value: 0 } satisfies CounterState as CounterState
 
 const counterSlice = createSlice({
   name: 'counter',
@@ -45,27 +47,26 @@ export const { increment, decrement, incrementByAmount } = counterSlice.actions
 export default counterSlice.reducer
 ```
 
-## 参数
+## Parameters
 
-`createSlice`接受一个单独的配置对象参数，有以下选项：
+`createSlice` accepts a single configuration object parameter, with the following options:
 
 ```ts no-transpile
 function createSlice({
-    // 一个名称，用于action类型
+    // A name, used in action types
     name: string,
-    // reducer的初始状态
+    // The initial state for the reducer
     initialState: State,
-    // "case reducers"的对象。键名将用于生成actions。
+    // An object of "case reducers". Key names will be used to generate actions.
     reducers: Record<string, ReducerFunction | ReducerAndPrepareObject>,
-    // 用于添加更多reducers的"builder回调"函数
+    // A "builder callback" function used to add more reducers
     extraReducers?: (builder: ActionReducerMapBuilder<State>) => void,
-    // slice reducer的位置偏好，由`combineSlices`和`slice.selectors`使用。默认为`name`。
+    // A preference for the slice reducer's location, used by `combineSlices` and `slice.selectors`. Defaults to `name`.
     reducerPath?: string,
-    // 选择器的对象，它们接收slice的状态作为第一个参数。
+    // An object of selectors, which receive the slice's state as their first parameter.
     selectors?: Record<string, (sliceState: State, ...args: any[]) => any>,
 })
 ```
-
 
 ### `initialState`
 

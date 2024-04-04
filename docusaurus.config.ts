@@ -72,15 +72,15 @@ const config: Config = {
       items: [
         {
           to: "introduction/getting-started",
-          label: "Getting Started",
+          label: "开始使用",
           position: "right",
         },
-        { to: "tutorials/overview", label: "Tutorials", position: "right" },
-        { to: "usage/usage-guide", label: "Usage Guide", position: "right" },
+        { to: "tutorials/overview", label: "教程", position: "right" },
+        { to: "usage/usage-guide", label: "使用指南", position: "right" },
         { to: "api/configureStore", label: "API", position: "right" },
-        { to: "rtk-query/overview", label: "RTK Query", position: "right" },
+        { to: "rtk-query/overview", label: "RTK 查询", position: "right" },
         {
-          href: "https://github.com/reduxjs/redux-toolkit",
+          href: "https://github.com/ouweiya/redux-toolkit-zh",
           label: "GitHub",
           position: "right",
         },
@@ -94,29 +94,29 @@ const config: Config = {
       },
       links: [
         {
-          title: "Docs",
+          title: "文档",
           items: [
             {
-              label: "Getting Started",
+              label: "开始使用",
               to: "introduction/getting-started",
             },
             {
-              label: "Tutorials",
+              label: "教程",
               to: "tutorials/overview",
             },
             {
-              label: "Usage Guide",
+              label: "使用指南",
               to: "usage/usage-guide",
             },
             {
-              label: "API Reference",
+              label: "API参考",
               to: "api/configureStore",
             },
-            { to: "rtk-query/overview", label: "RTK Query" },
+            { to: "rtk-query/overview", label: "RTK 查询" },
           ],
         },
         {
-          title: "Community",
+          title: "社区",
           items: [
             {
               label: "Stack Overflow",
@@ -129,7 +129,7 @@ const config: Config = {
           ],
         },
         {
-          title: "More",
+          title: "更多",
           items: [
             {
               label: "GitHub",
@@ -148,7 +148,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © 2015–${new Date().getFullYear()} Dan Abramov and the Redux documentation authors.`,
+      copyright: `版权所有 © 2015–${new Date().getFullYear()} Dan Abramov 和 Redux 文档的作者。`,
     },
     prism: {
       theme: prismThemes.vsDark,

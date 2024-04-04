@@ -1,7 +1,7 @@
 ---
 id: typescript
-title: TypeScript Quick Start
-sidebar_label: TypeScript Quick Start
+title: TypeScript 快速开始
+sidebar_label: TypeScript 快速开始
 hide_title: true
 ---
 

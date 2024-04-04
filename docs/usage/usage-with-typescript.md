@@ -1,7 +1,7 @@
 ---
 id: usage-with-typescript
-title: Usage With TypeScript
-sidebar_label: Usage With TypeScript
+title: 与 TypeScript 一起使用
+sidebar_label: 与 TypeScript 一起使用
 hide_title: true
 ---
 

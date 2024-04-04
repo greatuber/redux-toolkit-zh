@@ -1,7 +1,7 @@
 ---
 id: usage-guide
-title: Usage Guide
-sidebar_label: Usage Guide
+title: 使用指南
+sidebar_label: 使用指南
 hide_title: true
 ---
 

@@ -138,9 +138,21 @@ a.contents__link.contents__link--active {
   font-weight: 600;
 }
 
-a:visited {
+/* a:visited {
   color: var(--ifm-color-primary);
+} */
+
+/* .menu__link:visited {
+  color: var(--ifm-menu-color);
 }
+.navbar__link:visited {
+  color: var(--ifm-navbar-link-color);
+}
+
+.footer__link-item:visited {
+  color: var(--ifm-footer-link-color);
+} */
+
 .navbar .navbar__inner {
   flex-wrap: nowrap;
 }
@@ -264,7 +276,7 @@ table.checkbox-table tbody td {
 }
 
 body {
-  font-family: 'Roboto', 'Microsoft YaHei', sans-serif;
+  font-family: "Roboto", "Microsoft YaHei", sans-serif;
   font-size: 16px;
   /* font-family: 'Roboto Regular', 'Microsoft YaHei', sans-serif; */
   /* font-family: "Optimistic Text", "-apple-system", ui-sans-serif, system-ui,

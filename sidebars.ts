@@ -15,7 +15,7 @@ const sidebars: SidebarsConfig = {
   docs: [
     {
       type: 'category',
-      label: 'Introduction',
+      label: '介绍',
       collapsed: false,
       items: [
         'introduction/getting-started',
@@ -25,7 +25,7 @@ const sidebars: SidebarsConfig = {
 
     {
       type: 'category',
-      label: 'Tutorials',
+      label: '教程',
       collapsed: false,
       items: [
         'tutorials/tutorials-overview',
@@ -36,12 +36,12 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'Using Redux Toolkit',
+      label: '使用 Redux Toolkit',
       collapsed: false,
       items: [
         {
           type: 'category',
-          label: 'Migrations',
+          label: '迁移',
           items: ['usage/migrating-to-modern-redux', 'usage/migrating-rtk-2'],
         },
         'usage/usage-guide',
@@ -52,12 +52,12 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'API Reference',
+      label: 'API 参考',
       collapsed: true,
       items: [
         {
           type: 'category',
-          label: 'Store Setup',
+          label: '商店设置',
           collapsed: false,
           items: [
             'api/configureStore',
@@ -73,7 +73,7 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: 'category',
-          label: 'Reducers and Actions',
+          label: 'Reducers 和 Actions',
           collapsed: false,
           items: [
             'api/createReducer',
@@ -86,21 +86,21 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: 'category',
-          label: 'Other',
+          label: '其他',
           collapsed: false,
           items: [
             'api/createSelector',
             'api/matching-utilities',
             'api/other-exports',
             'api/codemods',
-            { type: 'link', label: 'Error Messages', href: '/errors' },
+            { type: 'link', label: '错误信息', href: '/errors' },
           ],
         },
       ],
     },
     {
       type: 'category',
-      label: 'RTK Query',
+      label: 'RTK 查询',
       collapsed: false,
       items: [
         'rtk-query/overview',
@@ -109,7 +109,7 @@ const sidebars: SidebarsConfig = {
         'rtk-query/usage-with-typescript',
         {
           type: 'category',
-          label: 'Using RTK Query',
+          label: '使用 RTK 查询',
           collapsed: true,
           items: [
             'rtk-query/usage/queries',
@@ -135,7 +135,7 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: 'category',
-          label: 'API Reference',
+          label: 'API 参考',
           collapsed: true,
           items: [
             'rtk-query/api/createApi',
@@ -144,7 +144,7 @@ const sidebars: SidebarsConfig = {
             'rtk-query/api/setupListeners',
             {
               type: 'category',
-              label: 'Generated API Slices',
+              label: '生成 API 切片',
               collapsed: false,
               items: [
                 'rtk-query/api/created-api/overview',
