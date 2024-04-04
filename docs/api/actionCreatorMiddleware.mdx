@@ -1,0 +1,68 @@
+---
+id: actionCreatorMiddleware
+title: Action Creator Middleware
+sidebar_label: Action Creator Middleware
+hide_title: true
+---
+
+&nbsp;
+
+# Action Creator 中间件
+
+这是一个自定义的中间件，用于检测是否错误地分派了 action 创建器，而不是在分派之前调用它。
+
+一个常见的错误是调用 `dispatch(actionCreator)` 而不是 `dispatch(actionCreator())`。
+这种情况下代码往往能"运行"，因为 action 创建器有静态的 `type` 属性，但可能会导致意外的行为。
+
+## 选项
+
+```ts no-transpile
+export interface ActionCreatorInvariantMiddlewareOptions {
+  /**
+   * 用于识别一个值是否为 action 创建器的函数。
+   * 默认检查是否为具有静态 type 属性和 match 方法的函数。
+   */
+  isActionCreator?: (action: unknown) => action is Function & { type?: unknown }
+}
+```
+
+## 导出
+
+### `createActionCreatorInvariantMiddleware`
+
+使用给定的选项创建 action 创建器检查中间件的实例。
+
+你可能不需要自己调用这个，因为 `getDefaultMiddleware` 已经这样做了。
+示例：
+
+```ts
+// 文件: reducer.ts noEmit
+
+export default function (state = {}, action: any) {
+  return state
+}
+
+// 文件: store.ts
+
+import {
+  configureStore,
+  createActionCreatorInvariantMiddleware,
+  Tuple,
+} from '@reduxjs/toolkit'
+import reducer from './reducer'
+
+// 扩展中间件以考虑所有具有静态 type 属性的函数为 action 创建器
+const isActionCreator = (
+  action: unknown,
+): action is Function & { type: unknown } =>
+  typeof action === 'function' && 'type' in action
+
+const actionCreatorMiddleware = createActionCreatorInvariantMiddleware({
+  isActionCreator,
+})
+
+const store = configureStore({
+  reducer,
+  middleware: () => new Tuple(actionCreatorMiddleware),
+})
+```
