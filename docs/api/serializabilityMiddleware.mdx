@@ -7,86 +7,84 @@ hide_title: true
 
 &nbsp;
 
-# Serializability Middleware
+# 可序列化中间件
 
-A custom middleware that detects if any non-serializable values have been included in state or dispatched actions, modeled after `redux-immutable-state-invariant`. Any detected non-serializable values will be logged to the console.
+这是一个自定义中间件，可以检测状态或分派的操作中是否包含任何非可序列化的值，其模型来自`redux-immutable-state-invariant`。任何检测到的非可序列化的值都将被记录到控制台。
 
-This middleware is added to the store by default by [`configureStore`](./configureStore.mdx) and [`getDefaultMiddleware`](./getDefaultMiddleware.mdx).
+这个中间件默认由[`configureStore`](./configureStore.mdx)和[`getDefaultMiddleware`](./getDefaultMiddleware.mdx)添加到存储中。
 
-You can customize the behavior of this middleware by passing any of the supported options as the `serializableCheck` value for `getDefaultMiddleware`.
+你可以通过将任何支持的选项作为`getDefaultMiddleware`的`serializableCheck`值来自定义此中间件的行为。
 
-## Options
+## 选项
 
 ```ts no-transpile
 interface SerializableStateInvariantMiddlewareOptions {
   /**
-   * The function to check if a value is considered serializable. This
-   * function is applied recursively to every value contained in the
-   * state. Defaults to `isPlain()`.
+   * 检查一个值是否被认为是可序列化的函数。
+   * 这个函数会递归应用到状态中的每一个值。
+   * 默认为`isPlain()`。
    */
   isSerializable?: (value: any) => boolean
   /**
-   * The function that will be used to retrieve entries from each
-   * value.  If unspecified, `Object.entries` will be used. Defaults
-   * to `undefined`.
+   * 将用于从每个值中检索条目的函数。
+   * 如果未指定，将使用`Object.entries`。
+   * 默认为`undefined`。
    */
   getEntries?: (value: any) => [string, any][]
 
   /**
-   * An array of action types to ignore when checking for serializability.
-   * Defaults to []
+   * 在检查可序列化性时忽略的操作类型的数组。
+   * 默认为[]
    */
   ignoredActions?: string[]
 
   /**
-   * An array of dot-separated path strings or regular expressions to ignore
-   * when checking for serializability, Defaults to
-   * ['meta.arg', 'meta.baseQueryMeta']
+   * 在检查可序列化性时忽略的由点分隔的路径字符串或正则表达式的数组。
+   * 默认为['meta.arg', 'meta.baseQueryMeta']
    */
   ignoredActionPaths?: (string | RegExp)[]
 
   /**
-   * An array of dot-separated path strings or regular expressions to ignore
-   * when checking for serializability, Defaults to []
+   * 在检查可序列化性时忽略的由点分隔的路径字符串或正则表达式的数组。
+   * 默认为[]
    */
   ignoredPaths?: (string | RegExp)[]
   /**
-   * Execution time warning threshold. If the middleware takes longer
-   * than `warnAfter` ms, a warning will be displayed in the console.
-   * Defaults to 32ms.
+   * 执行时间警告阈值。如果中间件的执行时间超过`warnAfter`毫秒，
+   * 控制台将显示警告。默认为32ms。
    */
   warnAfter?: number
 
   /**
-   * Opt out of checking state. When set to `true`, other state-related params will be ignored.
+   * 选择不检查状态。当设置为`true`时，将忽略其他与状态相关的参数。
    */
   ignoreState?: boolean
 
   /**
-   * Opt out of checking actions. When set to `true`, other action-related params will be ignored.
+   * 选择不检查操作。当设置为`true`时，将忽略其他与操作相关的参数。
    */
   ignoreActions?: boolean
 }
 ```
 
-## Exports
+## 导出
 
 ### `createSerializableStateInvariantMiddleware`
 
-Creates an instance of the serializability check middleware, with the given options.
+使用给定的选项创建一个可序列化检查中间件的实例。
 
-You will most likely not need to call this yourself, as `getDefaultMiddleware` already does so.
+你最可能不需要自己调用这个，因为`getDefaultMiddleware`已经这样做了。
 
-Example:
+示例：
 
 ```ts
-// file: reducer.ts noEmit
+// 文件：reducer.ts noEmit
 
 export default function (state = {}, action: any) {
   return state
 }
 
-// file: store.ts
+// 文件：store.ts
 
 import { Iterable } from 'immutable'
 import {
@@ -97,7 +95,7 @@ import {
 } from '@reduxjs/toolkit'
 import reducer from './reducer'
 
-// Augment middleware to consider Immutable.JS iterables serializable
+// 增强中间件以将Immutable.JS迭代器视为可序列化
 const isSerializable = (value: any) =>
   Iterable.isIterable(value) || isPlain(value)
 
@@ -117,17 +115,17 @@ const store = configureStore({
 
 ### `isPlain`
 
-Checks whether the given value is considered a "plain value" or not.
+检查给定的值是否被认为是"普通值"。
 
-Currently implemented as:
+目前的实现为：
 
 ```ts
-// file: src/isPlainObject.ts noEmit
+// 文件：src/isPlainObject.ts noEmit
 
 declare function isPlainObject(value: unknown): value is object
 export default isPlainObject
 
-// file: src/serializableStateInvariantMiddleware.ts
+// 文件：src/serializableStateInvariantMiddleware.ts
 import isPlainObject from './isPlainObject'
 
 export function isPlain(val: any) {
@@ -143,4 +141,4 @@ export function isPlain(val: any) {
 }
 ```
 
-This will accept all standard JS objects, arrays, and primitives, but return false for `Date`s, `Map`s, and other similar class instances.
+这将接受所有标准的JS对象、数组和原始值，但对于`Date`、`Map`和其他类似的类实例，返回false。

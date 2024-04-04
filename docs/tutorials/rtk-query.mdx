@@ -7,57 +7,57 @@ hide_title: true
 
 &nbsp;
 
-# RTK Query Quick Start
+# RTK Query 快速入门
 
-:::tip What You'll Learn
+:::tip 你将学到什么
 
-- How to set up and use Redux Toolkit's "RTK Query" data fetching functionality
-
-:::
-
-:::info Prerequisites
-
-- Understanding of [Redux terms and concepts](https://redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow)
+- 如何设置和使用 Redux Toolkit 的 "RTK Query" 数据获取功能
 
 :::
 
-## Introduction
+:::info 先决条件
 
-Welcome to the Redux Toolkit Query tutorial! **This tutorial will briefly introduce you to Redux Toolkit's "RTK Query" data fetching capability and teach you how to start using it correctly**.
+- 理解 [Redux 术语和概念](https://redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow)
+
+:::
+
+## 介绍
+
+欢迎来到 Redux Toolkit Query 教程！**本教程将简要介绍 Redux Toolkit 的 "RTK Query" 数据获取功能，并教你如何正确开始使用它**。
 
 :::info
 
-For a more in-depth tutorial on RTK Query, see the full ["Redux Essentials" tutorial](https://redux.js.org/tutorials/essentials/part-7-rtk-query-basics) on the Redux core docs site.
+对于 RTK Query 的更深入教程，请参阅 Redux 核心文档网站上的完整 ["Redux Essentials" 教程](https://redux.js.org/tutorials/essentials/part-7-rtk-query-basics)。
 
 :::
 
-RTK Query is an advanced data fetching and caching tool, designed to simplify common cases for loading data in a web application. RTK Query itself is built on top of the Redux Toolkit core, and leverages RTK's APIs like [`createSlice`](../api/createSlice.mdx) and [`createAsyncThunk`](../api/createAsyncThunk.mdx) to implement its capabilities.
+RTK Query 是一个高级的数据获取和缓存工具，旨在简化在 web 应用程序中加载数据的常见情况。RTK Query 本身是建立在 Redux Toolkit 核心之上的，并利用 RTK 的 APIs，如 [`createSlice`](../api/createSlice.mdx) 和 [`createAsyncThunk`](../api/createAsyncThunk.mdx) 来实现其功能。
 
-RTK Query is included in the `@reduxjs/toolkit` package as an additional addon. You are not required to use the RTK Query APIs when you use Redux Toolkit, but we think many users will benefit from RTK Query's data fetching and caching in their apps.
+RTK Query 包含在 `@reduxjs/toolkit` 包中作为一个额外的插件。当你使用 Redux Toolkit 时，你不需要使用 RTK Query APIs，但我们认为许多用户将从他们的应用程序中的 RTK Query 数据获取和缓存中受益。
 
-### How to Read This Tutorial
+### 如何阅读本教程
 
-For this tutorial, we assume that you're using Redux Toolkit with React, but you can also use it with other UI layers as well. The examples are based on [a typical Create-React-App folder structure](https://create-react-app.dev/docs/folder-structure) where all the application code is in a `src`, but the patterns can be adapted to whatever project or folder setup you're using.
+对于本教程，我们假设你正在使用 Redux Toolkit 与 React，但你也可以将其与其他 UI 层一起使用。示例基于 [典型的 Create-React-App 文件结构](https://create-react-app.dev/docs/folder-structure)，其中所有的应用程序代码都在 `src` 中，但这些模式可以适应你正在使用的任何项目或文件设置。
 
-## Setting up your store and API service
+## 设置你的存储和 API 服务
 
-To see how RTK Query works, let's walk through a basic usage example. For this example, we'll assume you're using React and want to make use of RTK Query's auto-generated React hooks.
+为了看到 RTK Query 如何工作，让我们通过一个基本的使用示例来进行演示。对于这个示例，我们假设你正在使用 React，并希望使用 RTK Query 自动生成的 React 钩子。
 
-### Create an API service
+### 创建一个 API 服务
 
-First, we'll create a service definition that queries the publicly available [PokeAPI](https://pokeapi.co/).
+首先，我们将创建一个查询公开可用的 [PokeAPI](https://pokeapi.co/) 的服务定义。
 
 ```ts title="src/services/pokemon.ts"
-// file: services/types.ts noEmit
+// 文件: services/types.ts noEmit
 export type Pokemon = {}
 
-// file: services/pokemon.ts
-// Need to use the React-specific entry point to import createApi
+// 文件: services/pokemon.ts
+// 需要使用 React-specific 的入口点来导入 createApi
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Pokemon } from './types'
 
 // highlight-start
-// Define a service using a base URL and expected endpoints
+// 使用基础 URL 和预期的端点定义服务
 export const pokemonApi = createApi({
   reducerPath: 'pokemonApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://pokeapi.co/api/v2/' }),
@@ -70,28 +70,29 @@ export const pokemonApi = createApi({
 //highlight-end
 
 // highlight-start
-// Export hooks for usage in functional components, which are
-// auto-generated based on the defined endpoints
+// 导出用于在功能组件中使用的钩子，这些钩子是
+// 根据定义的端点自动生成的
 export const { useGetPokemonByNameQuery } = pokemonApi
 // highlight-end
 ```
 
-With RTK Query, you usually define your entire API definition in one place. This is most likely different from what you see with other libraries such as `swr` or `react-query`, and there are several reasons for that. Our perspective is that it's _much_ easier to keep track of how requests, cache invalidation, and general app configuration behave when they're all in one central location in comparison to having X number of custom hooks in different files throughout your application.
+使用 RTK Query，你通常在一个地方定义你的整个 API 定义。这可能与你在其他库如 `swr` 或 `react-query` 中看到的有所不同，有几个原因。我们的观点是，与在你的应用程序的不同文件中有 X 数量的自定义钩子相比，当它们都在一个中心位置时，更容易跟踪请求、缓存失效和一般应用配置的行为。
 
 :::tip
 
-Typically, you should only have one API slice per base URL that your application needs to communicate with. For example, if your site fetches data from both `/api/posts` and `/api/users`, you would have a single API slice with `/api/` as the base URL, and separate endpoint definitions for `posts` and `users`. This allows you to effectively take advantage of [automated re-fetching](../rtk-query/usage/automated-refetching.mdx) by defining [tag](../rtk-query/usage/automated-refetching.mdx#tags) relationships across endpoints.
+通常，你应该只有一个 API 切片，每个你的应用需要通信的基础 URL。例如，如果你的网站从 `/api/posts` 和 `/api/users` 获取数据，你将有一个单一的 API 切片，以 `/api/` 作为基础 URL，并为 `posts` 和 `users` 定义单独的端点。这使你能够有效地利用 [自动重新获取](../rtk-query/usage/automated-refetching.mdx) 通过定义跨端点的 [标签](../rtk-query/usage/automated-refetching.mdx#tags) 关系。
 
-For maintainability purposes, you may wish to split up endpoint definitions across multiple files, while still maintaining a single API slice which includes all of these endpoints. See [code splitting](../rtk-query/usage/code-splitting.mdx) for how you can use the `injectEndpoints` property to inject API endpoints from other files into a single API slice definition.
+出于可维护性的目的，你可能希望在多个文件中分割端点定义，同时仍然保持一个包含所有这些端点的单一 API 切片。请参阅 [代码分割](../rtk-query/usage/code-splitting.mdx) 了解如何使用 `injectEndpoints` 属性将其他文件中的 API 端点注入到单一的 API 切片定义中。
 
 :::
 
-### Add the service to your store
 
-An RTKQ service generates a "slice reducer" that should be included in the Redux root reducer, and a custom middleware that handles the data fetching. Both need to be added to the Redux store.
+### 将服务添加到你的存储中
+
+RTKQ 服务生成一个应该包含在 Redux 根 reducer 中的 "slice reducer"，以及处理数据获取的自定义中间件。这两者都需要添加到 Redux 存储中。
 
 ```ts title="src/store.ts"
-// file: services/pokemon.ts noEmit
+// 文件: services/pokemon.ts noEmit
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const pokemonApi = createApi({
@@ -104,51 +105,51 @@ export const pokemonApi = createApi({
   }),
 })
 
-// file: store.ts
+// 文件: store.ts
 import { configureStore } from '@reduxjs/toolkit'
-// Or from '@reduxjs/toolkit/query/react'
+// 或者从 '@reduxjs/toolkit/query/react' 导入
 import { setupListeners } from '@reduxjs/toolkit/query'
 import { pokemonApi } from './services/pokemon'
 
 export const store = configureStore({
   reducer: {
     // highlight-start
-    // Add the generated reducer as a specific top-level slice
+    // 将生成的 reducer 添加为特定的顶级 slice
     [pokemonApi.reducerPath]: pokemonApi.reducer,
     // highlight-end
   },
   // highlight-start
-  // Adding the api middleware enables caching, invalidation, polling,
-  // and other useful features of `rtk-query`.
+  // 添加 api 中间件启用缓存，失效，轮询，
+  // 和其他 `rtk-query` 的有用特性。
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(pokemonApi.middleware),
   // highlight-end
 })
 
-// optional, but required for refetchOnFocus/refetchOnReconnect behaviors
-// see `setupListeners` docs - takes an optional callback as the 2nd arg for customization
+// 可选，但对于 refetchOnFocus/refetchOnReconnect 行为是必需的
+// 查看 `setupListeners` 文档 - 接受一个可选的回调作为第二个参数进行自定义
 setupListeners(store.dispatch)
 ```
 
-### Wrap your application with the `Provider`
+### 使用 `Provider` 包裹你的应用程序
 
-If you haven't already done so, follow the standard pattern for providing the Redux store to the rest of your React application component tree:
+如果你还没有这样做，遵循为你的 React 应用程序组件树提供 Redux 存储的标准模式：
 
 ```ts title="src/index.tsx"
-// file: App.tsx noEmit
+// 文件: App.tsx noEmit
 import React from 'react'
 export default function App() {
   return <div>...</div>
 }
 
-// file: store.ts noEmit
+// 文件: store.ts noEmit
 import { configureStore } from '@reduxjs/toolkit'
 
 export const store = configureStore({
   reducer: {},
 })
 
-// file: index.tsx
+// 文件: index.tsx
 import * as React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
@@ -165,12 +166,12 @@ render(
 )
 ```
 
-## Use the query in a component
+## 在组件中使用查询
 
-Once a service has been defined, you can import the hooks to make a request.
+一旦定义了服务，你就可以导入钩子来发起请求。
 
 ```ts title="src/App.tsx"
-// file: services/pokemon.ts noEmit
+// 文件: services/pokemon.ts noEmit
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const pokemonApi = createApi({
@@ -185,25 +186,25 @@ export const pokemonApi = createApi({
 
 export const { useGetPokemonByNameQuery } = pokemonApi
 
-// file: App.tsx
+// 文件: App.tsx
 import * as React from 'react'
 // highlight-next-line
 import { useGetPokemonByNameQuery } from './services/pokemon'
 
 export default function App() {
   // highlight-start
-  // Using a query hook automatically fetches data and returns query values
+  // 使用查询钩子自动获取数据并返回查询值
   const { data, error, isLoading } = useGetPokemonByNameQuery('bulbasaur')
-  // Individual hooks are also accessible under the generated endpoints:
+  // 也可以在生成的端点下访问单独的钩子：
   // const { data, error, isLoading } = pokemonApi.endpoints.getPokemonByName.useQuery('bulbasaur')
   // highlight-end
 
   return (
     <div className="App">
       {error ? (
-        <>Oh no, there was an error</>
+        <>哦，出错了</>
       ) : isLoading ? (
-        <>Loading...</>
+        <>加载中...</>
       ) : data ? (
         <>
           <h3>{data.species.name}</h3>
@@ -215,9 +216,9 @@ export default function App() {
 }
 ```
 
-When making a request, you're able to track the state in several ways. You can always check `data`, `status`, and `error` to determine the right UI to render. In addition, `useQuery` also provides utility booleans like `isLoading`, `isFetching`, `isSuccess`, and `isError` for the latest request.
+在发起请求时，你可以通过多种方式跟踪状态。你可以始终检查 `data`，`status` 和 `error` 来确定要渲染的正确 UI。此外，`useQuery` 还提供了像 `isLoading`，`isFetching`，`isSuccess` 和 `isError` 这样的实用布尔值，用于最新的请求。
 
-#### Basic Example
+#### 基础示例
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/basic?fontsize=12&runonclick=1&hidenavigation=1&theme=dark"
@@ -233,11 +234,11 @@ When making a request, you're able to track the state in several ways. You can a
   sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"
 ></iframe>
 
-Okay, that's interesting... but what if you wanted to show multiple pokemon at the same time? What happens if multiple components load the same pokemon?
+好的，这很有趣... 但是如果你想同时显示多个宠物小精灵怎么办？如果多个组件加载同一个宠物小精灵会发生什么？
 
-#### Advanced example
+#### 高级示例
 
-RTK Query ensures that any component that subscribes to the same query will always use the same data. RTK Query automatically de-dupes requests so you don't have to worry about checking in-flight requests and performance optimizations on your end. Let's evaluate the sandbox below - make sure to check the Network panel in your browser's dev tools. You will see 3 requests, even though there are 4 subscribed components - `bulbasaur` only makes one request, and the loading state is synchronized between the two components. For fun, try changing the value of the dropdown from `Off` to `1s` to see this behavior continue when a query is re-ran.
+RTK Query 确保订阅同一查询的任何组件都将始终使用相同的数据。RTK Query 自动去重请求，因此你无需担心检查正在进行的请求和你端的性能优化。让我们评估下面的沙箱 - 确保检查你浏览器的开发者工具中的网络面板。你会看到 3 个请求，尽管有 4 个订阅的组件 - `bulbasaur` 只发起一个请求，两个组件之间的加载状态是同步的。为了好玩，尝试将下拉框的值从 `Off` 改为 `1s`，看看当查询重新运行时这种行为是否继续。
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/advanced?file=/src/App.tsx?fontsize=12&runonclick=1&hidenavigation=1&theme=dark"

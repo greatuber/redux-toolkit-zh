@@ -9,9 +9,9 @@ hide_title: true
 
 # `autoBatchEnhancer`
 
-A Redux store enhancer that looks for one or more "low-priority" dispatched actions in a row, and queues a callback to run subscriber notifications on a delay. It then notifies subscribers either when the queued callback runs, or when the next "normal-priority" action is dispatched, whichever is first.
+这是一个Redux存储增强器，它会寻找一行或多行被派发的"低优先级"动作，并在延迟上排队一个回调来运行订阅者通知。然后，它会在排队的回调运行时，或者当下一个"正常优先级"的动作被派发时，通知订阅者，以先到者为准。
 
-## Basic Usage
+## 基本使用
 
 ```ts
 import {
@@ -30,17 +30,17 @@ const counterSlice = createSlice({
   initialState: { value: 0 } satisfies CounterState as CounterState,
   reducers: {
     incrementBatched: {
-      // Batched, low-priority
+      // 批处理，低优先级
       reducer(state) {
         state.value += 1
       },
       // highlight-start
-      // Use the `prepareAutoBatched` utility to automatically
-      // add the `action.meta[SHOULD_AUTOBATCH]` field the enhancer needs
+      // 使用 `prepareAutoBatched` 实用程序自动
+      // 添加增强器需要的 `action.meta[SHOULD_AUTOBATCH]` 字段
       prepare: prepareAutoBatched<void>(),
       // highlight-end
     },
-    // Not batched, normal priority
+    // 未批处理，正常优先级
     decrementUnbatched(state) {
       state.value -= 1
     },
@@ -48,7 +48,7 @@ const counterSlice = createSlice({
 })
 const { incrementBatched, decrementUnbatched } = counterSlice.actions
 
-// includes batch enhancer by default, as of RTK 2.0
+// 默认包含批处理增强器，从RTK 2.0开始
 const store = configureStore({
   reducer: counterSlice.reducer,
 })
@@ -58,7 +58,7 @@ const store = configureStore({
 
 ### `autoBatchEnhancer`
 
-```ts title="autoBatchEnhancer signature" no-transpile
+```ts title="autoBatchEnhancer 签名" no-transpile
 export type SHOULD_AUTOBATCH = string
 type AutoBatchOptions =
   | { type: 'tick' }
@@ -70,11 +70,11 @@ export type autoBatchEnhancer = (options?: AutoBatchOptions) => StoreEnhancer
 ```
 
 :::tip
-As of RTK 2.0, the `autoBatchEnhancer` is included by default when calling `configureStore`.
+从RTK 2.0开始，调用 `configureStore` 时默认包含 `autoBatchEnhancer`。
 
-This means to configure it, you should instead pass an callback that receives `getDefaultEnhancers` and calls it with your desired settings.
+这意味着要配置它，你应该传递一个回调，该回调接收 `getDefaultEnhancers` 并用你想要的设置调用它。
 
-```ts title="Configuring autoBatchEnhancer with getDefaultEnhancers"
+```ts title="使用 getDefaultEnhancers 配置 autoBatchEnhancer"
 import { configureStore } from '@reduxjs/toolkit'
 
 const store = configureStore({
@@ -88,31 +88,31 @@ const store = configureStore({
 
 :::
 
-Creates a new instance of the autobatch store enhancer.
+创建一个新的 autobatch 存储增强器实例。
 
-Any action that is tagged with `action.meta[SHOULD_AUTOBATCH] = true` will be treated as "low-priority", and a notification callback will be queued. The enhancer will delay notifying subscribers until either:
+任何带有 `action.meta[SHOULD_AUTOBATCH] = true` 标签的动作都将被视为"低优先级"，并将排队一个通知回调。增强器将延迟通知订阅者，直到以下任一情况发生：
 
-- The queued callback runs and triggers the notifications
-- A "normal-priority" action (any action _without_ `action.meta[SHOULD_AUTOBATCH] = true`) is dispatched in the same tick
+- 排队的回调运行并触发通知
+- 在同一刻派发一个"正常优先级"的动作（任何没有 `action.meta[SHOULD_AUTOBATCH] = true` 的动作）
 
-`autoBatchEnhancer` accepts options to configure how the notification callback is queued:
+`autoBatchEnhancer` 接受选项来配置如何排队通知回调：
 
-- `{type: 'raf'}`: queues using `requestAnimationFrame` (default)
-- `{type: 'tick'}`: queues using `queueMicrotask`
-- `{type: 'timer', timeout: number}`: queues using `setTimeout`
-- `{type: 'callback', queueNotification: (notify: () => void) => void}`: lets you provide your own callback, such as a debounced or throttled function
+- `{type: 'raf'}`：使用 `requestAnimationFrame` 排队（默认）
+- `{type: 'tick'}`：使用 `queueMicrotask` 排队
+- `{type: 'timer', timeout: number}`：使用 `setTimeout` 排队
+- `{type: 'callback', queueNotification: (notify: () => void) => void}`：让你提供自己的回调，例如一个防抖或节流函数
 
-The default behavior is to queue the notifications using `requestAnimationFrame`.
+默认行为是使用 `requestAnimationFrame` 排队通知。
 
-The `SHOULD_AUTOBATCH` value is meant to be opaque - it's currently a string for simplicity, but could be a `Symbol` in the future.
+`SHOULD_AUTOBATCH` 值应该是不透明的 - 它目前是一个字符串，为了简单起见，但在未来可能是一个 `Symbol`。
 
 ### `prepareAutoBatched`
 
-```ts title="prepareAutoBatched signature" no-transpile
+```ts title="prepareAutoBatched 签名" no-transpile
 type prepareAutoBatched = <T>() => (payload: T) => { payload: T; meta: unknown }
 ```
 
-Creates a function that accepts a `payload` value, and returns an object with `{payload, meta: {[SHOULD_AUTOBATCH]: true}}`. This is meant to be used with RTK's `createSlice` and its "`prepare` callback" syntax:
+创建一个函数，该函数接受一个 `payload` 值，并返回一个带有 `{payload, meta: {[SHOULD_AUTOBATCH]: true}}` 的对象。这是为了与RTK的 `createSlice` 及其 "`prepare` 回调"语法一起使用：
 
 ```ts no-transpile
 createSlice({
@@ -131,27 +131,27 @@ createSlice({
 })
 ```
 
-## Batching Approach and Background
+## 批处理方法和背景
 
-The post [A Comparison of Redux Batching Techniques](https://blog.isquaredsoftware.com/2020/01/blogged-answers-redux-batching-techniques/) describes four different approaches for "batching Redux actions/dispatches"
+文章 [A Comparison of Redux Batching Techniques](https://blog.isquaredsoftware.com/2020/01/blogged-answers-redux-batching-techniques/) 描述了四种不同的"批处理 Redux 动作/派发"的方法：
 
-- a higher-order reducer that accepts multiple actions nested inside one real action, and iterates over them together
-- an enhancer that wraps `dispatch` and debounces the notification callback
-- an enhancer that wraps `dispatch` to accept an array of actions
-- React's `unstable_batchedUpdates()`, which just combines multiple queued renders into one but doesn't affect subscriber notifications
+- 一个高阶 reducer，它接受一个真实动作中嵌套的多个动作，并一起迭代它们
+- 一个包装 `dispatch` 并防抖通知回调的增强器
+- 一个包装 `dispatch` 以接受动作数组的增强器
+- React 的 `unstable_batchedUpdates()`，它只是将多个排队的渲染合并为一个，但不影响订阅者通知
 
-This enhancer is a variation of the "debounce" approach, but with a twist.
+这个增强器是"防抖"方法的一个变体，但有一个转折。
 
-Instead of _just_ debouncing _all_ subscriber notifications, it watches for any actions with a specific `action.meta[SHOULD_AUTOBATCH]: true` field attached.
+它不仅仅是防抖所有订阅者通知，而是观察任何带有特定 `action.meta[SHOULD_AUTOBATCH]: true` 字段的动作。
 
-When it sees an action with that field, it queues a callback. The reducer is updated immediately, but the enhancer does _not_ notify subscribers right way. If other actions with the same field are dispatched in succession, the enhancer will continue to _not_ notify subscribers. Then, when the queued callback runs, it finally notifies all subscribers, similar to how React batches re-renders.
+当它看到带有该字段的动作时，它会排队一个回调。reducer 立即更新，但增强器不会立即通知订阅者。如果在连续的动作中派发了带有相同字段的其他动作，增强器将继续不通知订阅者。然后，当排队的回调运行时，它最终会通知所有订阅者，类似于 React 如何批处理重新渲染。
 
-The additional twist is also inspired by React's separation of updates into "low-priority" and "immediate" behavior (such as a render queued by an AJAX request vs a render queued by a user input that should be handled synchronously).
+额外的转折也受到了 React 将更新分为"低优先级"和"立即"行为（如由 AJAX 请求排队的渲染 vs 应同步处理的用户输入排队的渲染）的启发。
 
-If some low-pri actions have been dispatched and a notification microtask is queued, then a _normal_ priority action (without the field) is dispatched, the enhancer will go ahead and notify all subscribers synchronously as usual, and _not_ notify them at the end of the tick.
+如果已经派发了一些低优先级的动作并排队了一个通知微任务，然后派发了一个正常优先级的动作（没有该字段），增强器将像往常一样同步通知所有订阅者，并在刻度结束时不通知他们。
 
-This allows Redux users to selectively tag certain actions for effective batching behavior, making this purely opt-in on a per-action basis, while retaining normal notification behavior for all other actions.
+这允许 Redux 用户选择性地为某些动作标记以实现有效的批处理行为，使这完全是每个动作的选择，同时保留所有其他动作的正常通知行为。
 
-### RTK Query and Batching
+### RTK 查询和批处理
 
-RTK Query already marks several of its key internal action types as batchable. By adding the `autoBatchEnhancer` to the store setup, it improves the overall UI performance, especially when rendering large lists of components that use the RTKQ query hooks.
+RTK Query 已经将其几个关键的内部动作类型标记为可批处理。通过将 `autoBatchEnhancer` 添加到存储设置中，它提高了整体的 UI 性能，特别是在渲染使用 RTKQ 查询钩子的大型组件列表时。

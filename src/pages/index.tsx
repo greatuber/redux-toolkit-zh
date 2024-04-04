@@ -84,8 +84,8 @@ const features = [
 const otherLibraries = [
   {
     content: "一个可预测的JavaScript应用状态容器",
-    title: "Redux",
-    link: "https://redux.js.org",
+    title: "Redux 中文",
+    link: "https://cn.redux.js.org",
     image: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -100,8 +100,8 @@ const otherLibraries = [
   },
   {
     content: "Redux的官方React绑定",
-    title: "React-Redux",
-    link: "https://react-redux.js.org",
+    title: "React-Redux 中文",
+    link: "https://cn.react-redux.js.org",
     image: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -188,7 +188,7 @@ function Home() {
                     className={classnames("col col--6", styles.feature)}
                   >
                     <h2 className="text--center">
-                      <a href={link} className={styles.featureAnchor}>
+                      <a target="_blank" href={link} className={styles.featureAnchor}>
                         {title}
                         {image}
                       </a>

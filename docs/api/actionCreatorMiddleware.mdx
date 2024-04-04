@@ -9,10 +9,10 @@ hide_title: true
 
 # Action Creator 中间件
 
-这是一个自定义的中间件，用于检测是否错误地分派了 action 创建器，而不是在分派之前调用它。
+这是一个自定义中间件，用于检测是否错误地分派了 action 创建器，而不是在分派之前调用它。
 
 一个常见的错误是调用 `dispatch(actionCreator)` 而不是 `dispatch(actionCreator())`。
-这种情况下代码往往能"运行"，因为 action 创建器有静态的 `type` 属性，但可能会导致意外的行为。
+这种情况下代码似乎“能工作”，因为 action 创建器有静态的 `type` 属性，但可能会导致意外的行为。
 
 ## 选项
 
@@ -30,9 +30,9 @@ export interface ActionCreatorInvariantMiddlewareOptions {
 
 ### `createActionCreatorInvariantMiddleware`
 
-使用给定的选项创建 action 创建器检查中间件的实例。
+使用给定的选项创建一个 action 创建器检查中间件的实例。
 
-你可能不需要自己调用这个，因为 `getDefaultMiddleware` 已经这样做了。
+你最可能不需要自己调用这个，因为 `getDefaultMiddleware` 已经这样做了。
 示例：
 
 ```ts
@@ -51,7 +51,7 @@ import {
 } from '@reduxjs/toolkit'
 import reducer from './reducer'
 
-// 扩展中间件以考虑所有具有静态 type 属性的函数为 action 创建器
+// 扩展中间件，认为所有具有静态 type 属性的函数都是 action 创建器
 const isActionCreator = (
   action: unknown,
 ): action is Function & { type: unknown } =>

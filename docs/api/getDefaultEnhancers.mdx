@@ -9,21 +9,21 @@ hide_title: true
 
 # `getDefaultEnhancers`
 
-Returns an array containing the default list of enhancers.
+返回一个包含默认增强器列表的数组。
 
-## Intended Usage
+## 预期用法
 
-By default, [`configureStore`](./configureStore.mdx) adds some enhancers to the Redux store setup automatically.
+默认情况下，[`configureStore`](./configureStore.mdx) 会自动向 Redux store 设置中添加一些增强器。
 
 ```js
 const store = configureStore({
   reducer: rootReducer,
 })
 
-// Store has enhancers added, because the enhancer list was not customized
+// Store 已添加增强器，因为增强器列表未进行自定义
 ```
 
-If you want to customise the list of enhancers, you can supply an array of enhancer functions to `configureStore`:
+如果你想自定义增强器列表，你可以向 `configureStore` 提供一个增强器函数的数组：
 
 ```js
 const store = configureStore({
@@ -31,14 +31,12 @@ const store = configureStore({
   enhancers: () => new Tuple(offline(offlineConfig)),
 })
 
-// store specifically has the offline enhancer applied
+// store 特别应用了离线增强器
 ```
 
-However, when you supply the `enhancer` option, you are responsible for defining _all_ the enhancers you want added
-to the store (with the exception of the [devtools](./configureStore#devtools)). `configureStore` will not add any extra enhancers beyond what you listed, **including the middleware enhancer**.
+然而，当你提供 `enhancer` 选项时，你需要定义你想添加到 store 的 _所有_ 增强器（除了 [devtools](./configureStore#devtools)）。`configureStore` 不会添加你列出的任何额外增强器，**包括中间件增强器**。
 
-`getDefaultEnhancers` is useful if you want to add some custom enhancers, but also still want to have the default
-enhancers added as well:
+如果你想添加一些自定义增强器，但也仍然想添加默认增强器，`getDefaultEnhancers` 就很有用：
 
 ```ts no-transpile
 import { configureStore } from '@reduxjs/toolkit'
@@ -53,38 +51,38 @@ const store = configureStore({
     getDefaultEnhancers().concat(offline(offlineConfig)),
 })
 
-// Store has all of the default middleware + enhancers added, _plus_ the offline enhancer
+// Store 添加了所有默认的中间件 + 增强器，_以及_ 离线增强器
 ```
 
-## Included Default Enhancers
+## 包含的默认增强器
 
-The resulting array will always contain the `applyMiddleware` enhancer created based on the `configureStore`'s `middleware` field.
+结果数组将始终包含基于 `configureStore` 的 `middleware` 字段创建的 `applyMiddleware` 增强器。
 
-Additionally, the [`autoBatchEnhancer`](./autoBatchEnhancer.mdx) is included, to allow for "batching" of low priority action updates. This is used by [RTK Query](/rtk-query/overview.md) and should improve performance when using it.
+此外，还包括 [`autoBatchEnhancer`](./autoBatchEnhancer.mdx)，以允许对低优先级的动作更新进行"批处理"。这被 [RTK Query](/rtk-query/overview.md) 使用，并应在使用时提高性能。
 
-Currently, the return value is
+目前，返回值是
 
 ```js
 const enhancers = [applyMiddleware, autoBatchEnhancer]
 ```
 
-## Customising the Included Enhancers
+## 自定义包含的增强器
 
-`getDefaultEnhancers` accepts an options object that allows customizing each enhancer (excluding the middleware enhancer) in two ways:
+`getDefaultEnhancers` 接受一个选项对象，该对象允许以两种方式自定义每个增强器（不包括中间件增强器）：
 
-- Each enhancer can be excluded from the result array by passing `false` for its corresponding field
-- Each enhancer can have its options customized by passing the matching options object for its corresponding field
+- 通过为其对应字段传递 `false`，可以从结果数组中排除每个增强器
+- 通过为其对应字段传递匹配的选项对象，可以自定义每个增强器的选项
 
-This example shows customising the autoBatch enhancer:
+这个例子展示了如何自定义 autoBatch 增强器：
 
 ```ts
-// file: reducer.ts noEmit
+// 文件: reducer.ts noEmit
 
 export default function rootReducer(state = {}, action: any) {
   return state
 }
 
-// file: store.ts
+// 文件: store.ts
 import rootReducer from './reducer'
 import { configureStore } from '@reduxjs/toolkit'
 
@@ -97,11 +95,11 @@ const store = configureStore({
 })
 ```
 
-## API Reference
+## API 参考
 
 ```ts no-transpile
 interface AutoBatchOptions {
-  // see "autoBatchEnhancer" page for options
+  // 参见 "autoBatchEnhancer" 页面的选项
 }
 
 interface GetDefaultEnhancersOptions {

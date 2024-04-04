@@ -9,19 +9,19 @@ hide_title: true
 
 # `createListenerMiddleware`
 
-## Overview
+## 概述
 
-A Redux middleware that lets you define "listener" entries that contain an "effect" callback with additional logic, and a way to specify when that callback should run based on dispatched actions or state changes.
+这是一个Redux中间件，它允许你定义包含额外逻辑的"监听器"条目和一个回调"效果"，以及基于派发的动作或状态变化时应运行该回调的方式。
 
-It's intended to be a lightweight alternative to more widely used Redux async middleware like sagas and observables. While similar to thunks in level of complexity and concept, it can be used to replicate some common saga usage patterns.
+它旨在作为更广泛使用的Redux异步中间件（如sagas和observables）的轻量级替代品。虽然在复杂性和概念上类似于thunks，但它可以用来复制一些常见的saga使用模式。
 
-Conceptually, you can think of this as being similar to React's `useEffect` hook, except that it runs logic in response to Redux store updates instead of component props/state updates.
+从概念上讲，你可以将其视为类似于React的`useEffect`钩子，只是它在响应Redux存储更新而不是组件props/state更新时运行逻辑。
 
-Listener effect callbacks have access to `dispatch` and `getState`, similar to thunks. The listener also receives a set of async workflow functions like `take`, `condition`, `pause`, `fork`, and `unsubscribe`, which allow writing more complex async logic.
+监听器效果回调可以访问`dispatch`和`getState`，类似于thunks。监听器还接收一组异步工作流函数，如`take`，`condition`，`pause`，`fork`和`unsubscribe`，这些函数允许编写更复杂的异步逻辑。
 
-Listeners can be defined statically by calling `listenerMiddleware.startListening()` during setup, or added and removed dynamically at runtime with special `dispatch(addListener())` and `dispatch(removeListener())` actions.
+监听器可以通过在设置期间调用`listenerMiddleware.startListening()`静态定义，或者可以通过特殊的`dispatch(addListener())`和`dispatch(removeListener())`动作在运行时动态添加和删除。
 
-### Basic Usage
+### 基本使用
 
 ```js
 import { configureStore, createListenerMiddleware } from '@reduxjs/toolkit'
@@ -32,41 +32,41 @@ import todosReducer, {
   todoDeleted,
 } from '../features/todos/todosSlice'
 
-// Create the middleware instance and methods
+// 创建中间件实例和方法
 const listenerMiddleware = createListenerMiddleware()
 
-// Add one or more listener entries that look for specific actions.
-// They may contain any sync or async logic, similar to thunks.
+// 添加一个或多个查找特定动作的监听器条目。
+// 它们可能包含任何同步或异步逻辑，类似于thunks。
 listenerMiddleware.startListening({
   actionCreator: todoAdded,
   effect: async (action, listenerApi) => {
-    // Run whatever additional side-effect-y logic you want here
+    // 在这里运行你想要的任何额外的副作用逻辑
     console.log('Todo added: ', action.payload.text)
 
-    // Can cancel other running instances
+    // 可以取消其他正在运行的实例
     listenerApi.cancelActiveListeners()
 
-    // Run async logic
+    // 运行异步逻辑
     const data = await fetchData()
 
-    // Pause until action dispatched or state changed
+    // 暂停，直到动作被派发或状态改变
     if (await listenerApi.condition(matchSomeAction)) {
-      // Use the listener API methods to dispatch, get state,
-      // unsubscribe the listener, start child tasks, and more
+      // 使用监听器API方法来派发，获取状态，
+      // 取消监听器，启动子任务等等
       listenerApi.dispatch(todoAdded('Buy pet food'))
 
-      // Spawn "child tasks" that can do more work and return results
+      // 生成"子任务"，可以做更多的工作并返回结果
       const task = listenerApi.fork(async (forkApi) => {
-        // Can pause execution
+        // 可以暂停执行
         await forkApi.delay(5)
-        // Complete the child by returning a value
+        // 通过返回一个值来完成子任务
         return 42
       })
 
       const result = await task.result
-      // Unwrap the child result in the listener
+      // 在监听器中解包子结果
       if (result.status === 'ok') {
-        // Logs the `42` result value that was returned
+        // 记录返回的结果值`42`
         console.log('Child succeeded: ', result.value)
       }
     }
@@ -77,9 +77,9 @@ const store = configureStore({
   reducer: {
     todos: todosReducer,
   },
-  // Add the listener middleware to the store.
-  // NOTE: Since this can receive actions with functions inside,
-  // it should go before the serializability check middleware
+  // 将监听器中间件添加到存储中。
+  // 注意：由于这可以接收包含函数的动作，
+  // 它应该在可序列化检查中间件之前
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listenerMiddleware.middleware),
 })
@@ -87,7 +87,7 @@ const store = configureStore({
 
 ## `createListenerMiddleware`
 
-Creates an instance of the middleware, which should then be added to the store via `configureStore`'s `middleware` parameter.
+创建一个中间件实例，然后应通过`configureStore`的`middleware`参数添加到存储中。
 
 ```ts no-transpile
 const createListenerMiddleware = (options?: CreateMiddlewareOptions) =>
@@ -108,14 +108,14 @@ interface ListenerErrorInfo {
 }
 ```
 
-### Middleware Options
+### 中间件选项
 
-- `extra`: an optional "extra argument" that will be injected into the `listenerApi` parameter of each listener. Equivalent to [the "extra argument" in the Redux Thunk middleware](https://redux.js.org/usage/writing-logic-thunks#injecting-config-values-into-thunks)
-- `onError`: an optional error handler that gets called with synchronous and async errors raised by `listener` and synchronous errors thrown by `predicate`.
+- `extra`：一个可选的"额外参数"，将被注入到每个监听器的`listenerApi`参数中。等同于[Redux Thunk中间件中的"额外参数"](https://redux.js.org/usage/writing-logic-thunks#injecting-config-values-into-thunks)
+- `onError`：一个可选的错误处理器，当`listener`引发同步和异步错误，以及`predicate`抛出同步错误时被调用。
 
-## Listener Middleware Instance
+## 监听器中间件实例
 
-The "listener middleware instance" returned from `createListenerMiddleware` is an object similar to the "slice" objects generated by `createSlice`. The instance object is _not_ the actual Redux middleware itself. Rather, it contains the middleware and some instance methods used to add and remove listener entries within the middleware.
+从`createListenerMiddleware`返回的"监听器中间件实例"是一个对象，类似于`createSlice`生成的"slice"对象。实例对象并非实际的Redux中间件本身。相反，它包含中间件和一些实例方法，用于在中间件内添加和删除监听器条目。
 
 ```ts no-transpile
 interface ListenerMiddlewareInstance<
@@ -138,18 +138,18 @@ interface ListenerMiddlewareInstance<
 
 ### `middleware`
 
-The actual Redux middleware. Add this to the Redux store via [the `configureStore.middleware` option](./configureStore.mdx#middleware).
+实际的Redux中间件。通过[the `configureStore.middleware` option](./configureStore.mdx#middleware)将其添加到Redux存储中。
 
-Since the listener middleware can receive "add" and "remove" actions containing functions, this should normally be added as the first middleware in the chain so that it is before the serializability check middleware.
+由于监听器中间件可以接收包含函数的"add"和"remove"动作，因此通常应将其作为链中的第一个中间件添加，以便在可序列化检查中间件之前。
 
 ```js
 const store = configureStore({
   reducer: {
     todos: todosReducer,
   },
-  // Add the listener middleware to the store.
-  // NOTE: Since this can receive actions with functions inside,
-  // it should go before the serializability check middleware
+  // 将监听器中间件添加到存储中。
+  // 注意：由于这可以接收包含函数的动作，
+  // 它应该在可序列化检查中间件之前
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listenerMiddleware.middleware),
 })
@@ -157,27 +157,27 @@ const store = configureStore({
 
 ### `startListening`
 
-Adds a new listener entry to the middleware. Typically used to "statically" add new listeners during application setup.
+向中间件添加新的监听器条目。通常用于在应用程序设置期间"静态"添加新的监听器。
 
 ```ts no-transpile
 const startListening = (options: AddListenerOptions) => UnsubscribeListener
 
 interface AddListenerOptions {
-  // Four options for deciding when the listener will run:
+  // 决定监听器何时运行的四个选项：
 
-  // 1) Exact action type string match
+  // 1) 精确的动作类型字符串匹配
   type?: string
 
-  // 2) Exact action type match based on the RTK action creator
+  // 2) 基于RTK动作创建器的精确动作类型匹配
   actionCreator?: ActionCreator
 
-  // 3) Match one of many actions using an RTK matcher
+  // 3) 使用RTK匹配器匹配多个动作
   matcher?: Matcher
 
-  // 4) Return true based on a combination of action + state
+  // 4) 基于动作+状态的组合返回true
   predicate?: ListenerPredicate
 
-  // The actual callback to run when the action is matched
+  // 当动作匹配时运行的实际回调
   effect: (action: Action, listenerApi: ListenerApi) => void | Promise<void>
 }
 
@@ -196,48 +196,48 @@ interface UnsubscribeListenerOptions {
 }
 ```
 
-**You must provide exactly _one_ of the four options for deciding when the listener will run: `type`, `actionCreator`, `matcher`, or `predicate`**. Every time an action is dispatched, each listener will be checked to see if it should run based on the current action vs the comparison option provided.
+**你必须提供决定监听器何时运行的四个选项中的一个：`type`，`actionCreator`，`matcher`或`predicate`**。每次派发一个动作时，都会检查每个监听器是否应该基于当前动作与提供的比较选项运行。
 
-These are all acceptable:
+这些都是可以接受的：
 
 ```js
-// 1) Action type string
+// 1) 动作类型字符串
 listenerMiddleware.startListening({ type: 'todos/todoAdded', effect })
-// 2) RTK action creator
+// 2) RTK动作创建器
 listenerMiddleware.startListening({ actionCreator: todoAdded, effect })
-// 3) RTK matcher function
+// 3) RTK匹配函数
 listenerMiddleware.startListening({
   matcher: isAnyOf(todoAdded, todoToggled),
   effect,
 })
-// 4) Listener predicate
+// 4) 监听器谓词
 listenerMiddleware.startListening({
   predicate: (action, currentState, previousState) => {
-    // return true when the listener should run
+    // 当监听器应该运行时返回true
   },
   effect,
 })
 ```
 
-Note that the `predicate` option actually allows matching solely against state-related checks, such as "did `state.x` change" or "the current value of `state.x` matches some criteria", regardless of the actual action.
+注意，`predicate`选项实际上允许仅根据与状态相关的检查进行匹配，例如"是否改变了`state.x`"或"当前的`state.x`值匹配某些标准"，而不考虑实际的动作。
 
-The ["matcher" utility functions included in RTK](./matching-utilities.mdx) are acceptable as either the `matcher` or `predicate` option.
+RTK中包含的["matcher"实用函数](./matching-utilities.mdx)可以作为`matcher`或`predicate`选项。
 
-The return value is an `unsubscribe()` callback that will remove this listener. By default, unsubscribing will _not_ cancel any active instances of the listener. However, you may also pass in `{cancelActive: true}` to cancel running instances.
+返回值是一个`unsubscribe()`回调，将删除此监听器。默认情况下，取消订阅将不会取消任何活动的监听器实例。但是，你也可以传入`{cancelActive: true}`来取消正在运行的实例。
 
-If you try to add a listener entry but another entry with this exact function reference already exists, no new entry will be added, and the existing `unsubscribe` method will be returned.
+如果你试图添加一个监听器条目，但是已经存在一个具有此确切函数引用的条目，那么不会添加新的条目，而是返回现有的`unsubscribe`方法。
 
-The `effect` callback will receive the current action as its first argument, as well as a "listener API" object similar to the "thunk API" object in `createAsyncThunk`.
+`effect`回调将接收当前动作作为其第一个参数，以及一个类似于`createAsyncThunk`中的"thunk API"对象的"listener API"对象。
 
-All listener predicates and callbacks are checked _after_ the root reducer has already processed the action and updated the state. The `listenerApi.getOriginalState()` method can be used to get the state value that existed before the action that triggered this listener was processed.
+所有监听器谓词和回调都在根reducer已经处理了动作并更新了状态之后进行检查。`listenerApi.getOriginalState()`方法可以用来获取在触发此监听器的动作被处理之前存在的状态值。
 
 ### `stopListening`
 
-Removes a given listener entry.
+移除给定的监听器条目。
 
-It accepts the same arguments as `startListening()`. It checks for an existing listener entry by comparing the function references of `listener` and the provided `actionCreator/matcher/predicate` function or `type` string.
+它接受与 `startListening()` 相同的参数。它通过比较 `listener` 和提供的 `actionCreator/matcher/predicate` 函数或 `type` 字符串的函数引用来检查是否存在现有的监听器条目。
 
-By default, this does _not_ cancel any active running instances. However, you may also pass in `{cancelActive: true}` to cancel running instances.
+默认情况下，这并 _不_ 取消任何正在运行的实例。然而，你也可以传入 `{cancelActive: true}` 来取消正在运行的实例。
 
 ```ts no-transpile
 const stopListening = (
@@ -249,56 +249,56 @@ interface UnsubscribeListenerOptions {
 }
 ```
 
-Returns `true` if the listener entry has been removed, or `false` if no subscription matching the input provided has been found.
+如果监听器条目已被移除，则返回 `true` ，如果没有找到与提供的输入匹配的订阅，则返回 `false`。
 
 ```js
-// Examples:
-// 1) Action type string
+// 示例：
+// 1) Action 类型字符串
 listenerMiddleware.stopListening({
   type: 'todos/todoAdded',
   listener,
   cancelActive: true,
 })
-// 2) RTK action creator
+// 2) RTK action 创建器
 listenerMiddleware.stopListening({ actionCreator: todoAdded, effect })
-// 3) RTK matcher function
+// 3) RTK 匹配函数
 listenerMiddleware.stopListening({ matcher, effect, cancelActive: true })
-// 4) Listener predicate
+// 4) 监听器谓词
 listenerMiddleware.stopListening({ predicate, effect })
 ```
 
 ### `clearListeners`
 
-Removes all current listener entries. It also cancels all active running instances of those listeners as well.
+移除所有当前的监听器条目。它还会取消所有这些监听器的正在运行的实例。
 
-This is most likely useful for test scenarios where a single middleware or store instance might be used in multiple tests, as well as some app cleanup situations.
+这在测试场景中可能非常有用，其中单个中间件或存储实例可能在多个测试中使用，以及一些应用程序清理情况。
 
 ```ts no-transpile
 const clearListeners = () => void;
 ```
 
-## Action Creators
+## Action 创建器
 
-In addition to adding and removing listeners by directly calling methods on the listener instance, you can dynamically add and remove listeners at runtime by dispatching special "add" and "remove" actions. These are exported from the main RTK package as standard RTK-generated action creators.
+除了通过直接在监听器实例上调用方法来添加和移除监听器外，你还可以通过分发特殊的 "add" 和 "remove" 动作在运行时动态地添加和移除监听器。这些都是从主 RTK 包中导出的标准 RTK 生成的动作创建器。
 
 ### `addListener`
 
-A standard RTK action creator, imported from the package. Dispatching this action tells the middleware to dynamically add a new listener at runtime. It accepts exactly the same options as `startListening()`
+一个标准的 RTK 动作创建器，从包中导入。分发这个动作告诉中间件在运行时动态地添加一个新的监听器。它接受与 `startListening()` 完全相同的选项。
 
-Dispatching this action returns an `unsubscribe()` callback from `dispatch`.
+分发这个动作会从 `dispatch` 返回一个 `unsubscribe()` 回调。
 
 ```js
-// Per above, provide `predicate` or any of the other comparison options
+// 如上所述，提供 `predicate` 或任何其他比较选项
 const unsubscribe = store.dispatch(addListener({ predicate, effect }))
 ```
 
 ### `removeListener`
 
-A standard RTK action creator, imported from the package. Dispatching this action tells the middleware to dynamically remove a listener at runtime. Accepts the same arguments as `stopListening()`.
+一个标准的 RTK 动作创建器，从包中导入。分发这个动作告诉中间件在运行时动态地移除一个监听器。接受与 `stopListening()` 相同的参数。
 
-By default, this does _not_ cancel any active running instances. However, you may also pass in `{cancelActive: true}` to cancel running instances.
+默认情况下，这并 _不_ 取消任何正在运行的实例。然而，你也可以传入 `{cancelActive: true}` 来取消正在运行的实例。
 
-Returns `true` if the listener entry has been removed, `false` if no subscription matching the input provided has been found.
+如果监听器条目已被移除，则返回 `true` ，如果没有找到与提供的输入匹配的订阅，则返回 `false`。
 
 ```js
 const wasRemoved = store.dispatch(
@@ -308,15 +308,15 @@ const wasRemoved = store.dispatch(
 
 ### `clearAllListeners`
 
-A standard RTK action creator, imported from the package. Dispatching this action tells the middleware to remove all current listener entries. It also cancels all active running instances of those listeners as well.
+一个标准的 RTK 动作创建器，从包中导入。分发这个动作告诉中间件移除所有当前的监听器条目。它还会取消所有这些监听器的正在运行的实例。
 
 ```js
 store.dispatch(clearAllListeners())
 ```
 
-## Listener API
+## 监听器 API
 
-The `listenerApi` object is the second argument to each listener callback. It contains several utility functions that may be called anywhere inside the listener's logic.
+`listenerApi` 对象是每个监听器回调的第二个参数。它包含了一些可以在监听器逻辑的任何地方调用的实用函数。
 
 ```ts no-transpile
 export interface ListenerEffectAPI<
@@ -324,68 +324,67 @@ export interface ListenerEffectAPI<
   Dispatch extends ReduxDispatch<UnknownAction>,
   ExtraArgument = unknown,
 > extends MiddlewareAPI<Dispatch, State> {
-  // NOTE: MiddlewareAPI contains `dispatch` and `getState` already
+  // 注意：MiddlewareAPI 已经包含了 `dispatch` 和 `getState`
 
   /**
-   * Returns the store state as it existed when the action was originally dispatched, _before_ the reducers ran.
-   * This function can **only** be invoked **synchronously**, it throws error otherwise.
+   * 返回当动作最初被分发时的存储状态，_在_ reducers 运行之前。
+   * 这个函数只能**同步**调用，否则会抛出错误。
    */
   getOriginalState: () => State
   /**
-   * Removes the listener entry from the middleware and prevent future instances of the listener from running.
-   * It does **not** cancel any active instances.
+   * 从中间件中移除监听器条目并阻止未来的监听器实例运行。
+   * 它并**不**取消任何正在运行的实例。
    */
   unsubscribe(): void
   /**
-   * It will subscribe a listener if it was previously removed, noop otherwise.
+   * 如果监听器之前被移除，它将订阅一个监听器，否则无操作。
    */
   subscribe(): void
   /**
-   * Returns a promise that resolves when the input predicate returns `true` or
-   * rejects if the listener has been cancelled or is completed.
+   * 返回一个 promise，当输入的谓词返回 `true` 或
+   * 如果监听器被取消或完成时拒绝。
    *
-   * The return value is `true` if the predicate succeeds or `false` if a timeout is provided and expires first.
+   * 如果谓词成功，返回值是 `true`，如果提供了超时并且首先过期，返回值是 `false`。
    */
   condition: ConditionFunction<State>
   /**
-   * Returns a promise that resolves when the input predicate returns `true` or
-   * rejects if the listener has been cancelled or is completed.
+   * 返回一个 promise，当输入的谓词返回 `true` 或
+   * 如果监听器被取消或完成时拒绝。
    *
-   * The return value is the `[action, currentState, previousState]` combination that the predicate saw as arguments.
+   * 返回值是谓词看到的 `[action, currentState, previousState]` 组合。
    *
-   * The promise resolves to null if a timeout is provided and expires first.
+   * 如果提供了超时并且首先过期，promise 解析为 null。
    */
   take: TakePattern<State>
   /**
-   * Cancels all other running instances of this same listener except for the one that made this call.
+   * 取消除了发出此调用的这个之外的这个相同监听器的所有其他正在运行的实例。
    */
   cancelActiveListeners: () => void
   /**
-   * Cancels the listener instance that made this call.
+   * 取消发出此调用的监听器实例。
    */
   cancel: () => void
   /**
-   * Throws a `TaskAbortError` if this listener has been cancelled
+   * 如果这个监听器已经被取消，抛出一个 `TaskAbortError`
    */
   throwIfCancelled: () => void
   /**
-   * An abort signal whose `aborted` property is set to `true`
-   * if the listener execution is either aborted or completed.
+   * 如果监听器执行被中止或完成，其 `aborted` 属性被设置为 `true` 的中止信号。
    * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal
    */
   signal: AbortSignal
   /**
-   * Returns a promise that resolves after `timeoutMs` or
-   * rejects if the listener has been cancelled or is completed.
+   * 返回一个 promise，当 `timeoutMs` 后解析或
+   * 如果监听器被取消或完成时拒绝。
    */
   delay(timeoutMs: number): Promise<void>
   /**
-   * Queues in the next microtask the execution of a task.
+   * 在下一个微任务中排队执行任务。
    */
   fork<T>(executor: ForkedTaskExecutor<T>): ForkedTask<T>
   /**
-   * Returns a promise that resolves when `waitFor` resolves or
-   * rejects if the listener has been cancelled or is completed.
+   * 返回一个 promise，当 `waitFor` 解析或
+   * 如果监听器被取消或完成时拒绝。
    * @param promise
    */
   pause<M>(promise: Promise<M>): Promise<M>
@@ -393,56 +392,56 @@ export interface ListenerEffectAPI<
 }
 ```
 
-These can be divided into several categories.
+这些可以分为几个类别。
 
-### Store Interaction Methods
+### Store 交互方法
 
-- `dispatch: Dispatch`: the standard `store.dispatch` method
-- `getState: () => State`: the standard `store.getState` method
-- `getOriginalState: () => State`: returns the store state as it existed when the action was originally dispatched, _before_ the reducers ran. (**Note**: this method can only be called synchronously, during the initial dispatch call stack, to avoid memory leaks. Calling it asynchronously will throw an error.)
-- `extra: unknown`: the "extra argument" that was provided as part of the middleware setup, if any
+- `dispatch: Dispatch`：标准的 `store.dispatch` 方法
+- `getState: () => State`：标准的 `store.getState` 方法
+- `getOriginalState: () => State`：返回动作最初被调度时的存储状态，_在_ reducers 运行之前。 (**注意**：此方法只能在初始调度调用堆栈期间同步调用，以避免内存泄漏。异步调用它将抛出错误。)
+- `extra: unknown`：作为中间件设置的一部分提供的 "额外参数"（如果有的话）
 
-`dispatch` and `getState` are exactly the same as in a thunk. `getOriginalState` can be used to compare the original state before the listener was started.
+`dispatch` 和 `getState` 与 thunk 中的完全相同。`getOriginalState` 可用于比较监听器启动前的原始状态。
 
-`extra` can be used to inject a value such as an API service layer into the middleware at creation time, and is accessible here.
+`extra` 可用于在创建时将值（如 API 服务层）注入到中间件中，并在此处可访问。
 
-### Listener Subscription Management
+### 监听器订阅管理
 
-- `unsubscribe: () => void`: removes the listener entry from the middleware, and prevent future instances of the listener from running. (This does _not_ cancel any active instances.)
-- `subscribe: () => void`: will re-subscribe the listener entry if it was previously removed, or no-op if currently subscribed
-- `cancelActiveListeners: () => void`: cancels all other running instances of this same listener _except_ for the one that made this call. (The cancellation will only have a meaningful effect if the other instances are paused using one of the cancellation-aware APIs like `take/cancel/pause/delay` - see "Cancelation and Task Management" in the "Usage" section for more details)
-- `cancel: () => void`: cancels the instance of this listener that made this call.
-- `throwIfCancelled: () => void`: throws a `TaskAbortError` if the current listener instance was cancelled.
-- `signal: AbortSignal`: An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) whose `aborted` property will be set to `true` if the listener execution is aborted or completed.
+- `unsubscribe: () => void`：从中间件中移除监听器条目，并防止未来的监听器实例运行。（这并 _不_ 取消任何活动实例。）
+- `subscribe: () => void`：如果之前已移除监听器条目，将重新订阅它，如果当前已订阅则无操作
+- `cancelActiveListeners: () => void`：取消此同一监听器的所有其他正在运行的实例 _除了_ 发出此调用的那个。（只有当其他实例使用 `take/cancel/pause/delay` 等取消感知 API 暂停时，取消才会有实质性的效果 - 请参阅 "使用" 部分的 "取消和任务管理" 以获取更多详细信息）
+- `cancel: () => void`：取消发出此调用的此监听器实例。
+- `throwIfCancelled: () => void`：如果当前的监听器实例被取消，就抛出一个 `TaskAbortError`。
+- `signal: AbortSignal`：一个 [`AbortSignal`](https://developer.mozilla.org/zh-CN/docs/Web/API/AbortSignal)，如果监听器执行被中止或完成，其 `aborted` 属性将被设置为 `true`。
 
-Dynamically unsubscribing and re-subscribing this listener allows for more complex async workflows, such as avoiding duplicate running instances by calling `listenerApi.unsubscribe()` at the start of a listener, or calling `listenerApi.cancelActiveListeners()` to ensure that only the most recent instance is allowed to complete.
+动态地取消订阅和重新订阅此监听器允许更复杂的异步工作流，例如通过在监听器开始时调用 `listenerApi.unsubscribe()` 来避免重复运行的实例，或者调用 `listenerApi.cancelActiveListeners()` 以确保只允许最近的实例完成。
 
-### Conditional Workflow Execution
+### 条件工作流执行
 
-- `take: (predicate: ListenerPredicate, timeout?: number) => Promise<[Action, State, State] | null>`: returns a promise that will resolve when the `predicate` returns `true`. The return value is the `[action, currentState, previousState]` combination that the predicate saw as arguments. If a `timeout` is provided and expires first, the promise resolves to `null`.
-- `condition: (predicate: ListenerPredicate, timeout?: number) => Promise<boolean>`: Similar to `take`, but resolves to `true` if the predicate succeeds, and `false` if a `timeout` is provided and expires first. This allows async logic to pause and wait for some condition to occur before continuing. See "Writing Async Workflows" below for details on usage.
-- `delay: (timeoutMs: number) => Promise<void>`: returns a cancellation-aware promise that resolves after the timeout, or rejects if cancelled before the expiration
-- `pause: (promise: Promise<T>) => Promise<T>`: accepts any promise, and returns a cancellation-aware promise that either resolves with the argument promise or rejects if cancelled before the resolution
+- `take: (predicate: ListenerPredicate, timeout?: number) => Promise<[Action, State, State] | null>`：返回一个 promise，当 `predicate` 返回 `true` 时解析。返回值是 `predicate` 作为参数看到的 `[action, currentState, previousState]` 组合。如果提供了 `timeout` 并且首先过期，promise 解析为 `null`。
+- `condition: (predicate: ListenerPredicate, timeout?: number) => Promise<boolean>`：类似于 `take`，但如果 `predicate` 成功则解析为 `true`，如果提供了 `timeout` 并且首先过期则解析为 `false`。这允许异步逻辑暂停并等待某些条件发生后再继续。请参阅下面的 "编写异步工作流" 以获取使用详情。
+- `delay: (timeoutMs: number) => Promise<void>`：返回一个取消感知的 promise，该 promise 在超时后解析，或者如果在过期前被取消则拒绝。
+- `pause: (promise: Promise<T>) => Promise<T>`：接受任何 promise，并返回一个取消感知的 promise，该 promise 或者与参数 promise 一起解析，或者如果在解析前被取消则拒绝。
 
-These methods provide the ability to write conditional logic based on future dispatched actions and state changes. Both also accept an optional `timeout` in milliseconds.
+这些方法提供了基于未来调度的动作和状态更改编写条件逻辑的能力。两者都接受一个可选的 `timeout`（以毫秒为单位）。
 
-`take` resolves to a `[action, currentState, previousState]` tuple or `null` if it timed out, whereas `condition` resolves to `true` if it succeeded or `false` if timed out.
+`take` 解析为一个 `[action, currentState, previousState]` 元组或 `null`（如果它超时），而 `condition` 解析为 `true`（如果它成功）或 `false`（如果超时）。
 
-`take` is meant for "wait for an action and get its contents", while `condition` is meant for checks like `if (await condition(predicate))`.
+`take` 用于 "等待一个动作并获取其内容"，而 `condition` 用于像 `if (await condition(predicate))` 这样的检查。
 
-Both these methods are cancellation-aware, and will throw a `TaskAbortError` if the listener instance is cancelled while paused.
+这两种方法都是取消感知的，并且如果在暂停时取消了监听器实例，将抛出一个 `TaskAbortError`。
 
-Note that both `take` and `condition` will only resolve **after the next action** has been dispatched. They do not resolve immediately even if their predicate would return true for the current state.
+请注意，`take` 和 `condition` 只会在调度 **下一个动作** 后解析。即使他们的谓词会为当前状态返回 true，他们也不会立即解析。
 
-### Child Tasks
+### 子任务
 
-- `fork: (executor: (forkApi: ForkApi) => T | Promise<T>) => ForkedTask<T>`: Launches a "child task" that may be used to accomplish additional work. Accepts any sync or async function as its argument, and returns a `{result, cancel}` object that can be used to check the final status and return value of the child task, or cancel it while in-progress.
+- `fork: (executor: (forkApi: ForkApi) => T | Promise<T>) => ForkedTask<T>`：启动一个 "子任务"，可能用于完成额外的工作。接受任何同步或异步函数作为其参数，并返回一个 `{result, cancel}` 对象，可以用来检查子任务的最终状态和返回值，或者在进行中取消它。
 
-Child tasks can be launched, and waited on to collect their return values. The provided `executor` function will be called asynchronously with a `forkApi` object containing `{pause, delay, signal}`, allowing it to pause or check cancellation status. It can also make use of the `listenerApi` from the listener's scope.
+可以启动子任务，并等待收集它们的返回值。提供的 `executor` 函数将异步地用一个包含 `{pause, delay, signal}` 的 `forkApi` 对象调用，允许它暂停或检查取消状态。它也可以使用来自监听器范围的 `listenerApi`。
 
-An example of this might be a listener that forks a child task containing an infinite loop that listens for events from a server. The parent then uses `listenerApi.condition()` to wait for a "stop" action, and cancels the child task.
+这可能是一个监听器的例子，该监听器分叉一个包含无限循环的子任务，该循环从服务器监听事件。然后，父任务使用 `listenerApi.condition()` 等待一个 "stop" 动作，并取消子任务。
 
-The task and result types are:
+任务和结果类型是：
 
 ```ts no-transpile
 interface ForkedTaskAPI {
@@ -477,11 +476,11 @@ export interface ForkedTask<T> {
 }
 ```
 
-## TypeScript Usage
+## TypeScript 使用
 
-The middleware code is fully TS-typed. However, the `startListening` and `addListener` functions do not know what the store's `RootState` type looks like by default, so `getState()` will return `unknown`.
+中间件代码完全是 TS 类型的。然而，`startListening` 和 `addListener` 函数默认不知道存储的 `RootState` 类型是什么，所以 `getState()` 将返回 `unknown`。
 
-To fix this, the middleware provides types for defining "pre-typed" versions of those methods, similar to the pattern used for defing pre-typed React-Redux hooks. We specifically recommend creating the middleware instance in a separate file from the actual `configureStore()` call:
+为了解决这个问题，中间件提供了定义 "预类型" 版本的这些方法的类型，类似于用于定义预类型的 React-Redux 钩子的模式。我们特别推荐在实际 `configureStore()` 调用的单独文件中创建中间件实例：
 
 ```ts no-transpile
 // listenerMiddleware.ts
@@ -498,21 +497,21 @@ export const startAppListening = listenerMiddleware.startListening.withTypes<
 export const addAppListener = addListener.withTypes<RootState, AppDispatch>()
 ```
 
-Then import and use those pre-typed methods in your components.
+然后在你的组件中导入和使用这些预类型的方法。
 
-## Usage Guide
+## 使用指南
 
-### Overall Purpose
+### 总体目标
 
-This middleware lets you run additional logic when some action is dispatched, as a lighter-weight alternative to middleware like sagas and observables that have both a heavy runtime bundle cost and a large conceptual overhead.
+此中间件允许你在某个操作被调度时运行额外的逻辑，作为像 saga 和 observable 这样的中间件的轻量级替代品，这些中间件既有重的运行时包成本，也有大的概念开销。
 
-This middleware is not intended to handle all possible use cases. Like thunks, it provides you with a basic set of primitives (including access to `dispatch` and `getState`), and gives you freedom to write any sync or async logic you want. This is both a strength (you can do anything!) and a weakness (you can do anything, with no guard rails!).
+这个中间件并不打算处理所有可能的用例。像 thunk 一样，它为你提供了一套基本的原语（包括访问 `dispatch` 和 `getState` 的能力），并给你自由编写任何你想要的同步或异步逻辑。这既是优点（你可以做任何事情！）也是缺点（你可以做任何事情，没有任何防护措施！）。
 
-The middleware includes several async workflow primitives that are sufficient to write equivalents to many Redux-Saga effects operators like `takeLatest`, `takeLeading`, and `debounce`, although none of those methods are directly included. (See [the listener middleware tests file for examples of how to write code equivalent to those effects](https://github.com/reduxjs/redux-toolkit/blob/03eafd5236f16574935cdf1c5958e32ee8cf3fbe/packages/toolkit/src/listenerMiddleware/tests/effectScenarios.test.ts#L74-L363).)
+中间件包含了几个异步工作流原语，足以编写许多 Redux-Saga 效果操作符的等价物，如 `takeLatest`，`takeLeading` 和 `debounce`，尽管这些方法都没有直接包含在内。（参见 [listener middleware 测试文件中的示例，了解如何编写等价于这些效果的代码](https://github.com/reduxjs/redux-toolkit/blob/03eafd5236f16574935cdf1c5958e32ee8cf3fbe/packages/toolkit/src/listenerMiddleware/tests/effectScenarios.test.ts#L74-L363)。）
 
-### Standard Usage Patterns
+### 标准使用模式
 
-The most common expected usage is "run some logic after a given action was dispatched". For example, you could set up a simple analytics tracker by looking for certain actions and sending extracted data to the server, including pulling user details from the store:
+最常见的预期用法是 "在给定操作被调度后运行一些逻辑"。例如，你可以通过查找某些操作并将提取的数据发送到服务器来设置一个简单的分析跟踪器，包括从存储中提取用户详细信息：
 
 ```js
 listenerMiddleware.startListening({
@@ -527,12 +526,12 @@ listenerMiddleware.startListening({
 })
 ```
 
-However, the `predicate` option also allows triggering logic when some state value has changed, or when the state matches a particular condition:
+然而，`predicate` 选项也允许在某个状态值发生变化时，或者当状态匹配特定条件时触发逻辑：
 
 ```js
 listenerMiddleware.startListening({
   predicate: (action, currentState, previousState) => {
-    // Trigger logic whenever this field changes
+    // 当此字段发生变化时触发逻辑
     return currentState.counter.value !== previousState.counter.value
   },
   effect,
@@ -540,14 +539,14 @@ listenerMiddleware.startListening({
 
 listenerMiddleware.startListening({
   predicate: (action, currentState, previousState) => {
-    // Trigger logic after every action if this condition is true
+    // 如果此条件为真，则在每个操作后触发逻辑
     return currentState.counter.value > 3
   },
   effect,
 })
 ```
 
-You could also implement a generic API fetching capability, where the UI dispatches a plain action describing the type of resource to be requested, and the middleware automatically fetches it and dispatches a result action:
+你也可以实现一个通用的 API 获取能力，其中 UI 调度一个描述要请求的资源类型的普通操作，中间件自动获取它并调度一个结果操作：
 
 ```js
 listenerMiddleware.startListening({
@@ -562,19 +561,19 @@ listenerMiddleware.startListening({
 })
 ```
 
-(That said, we would recommend use of RTK Query for any meaningful data fetching behavior - this is primarily an example of what you _could_ do in a listener.)
+（话虽如此，我们建议对于任何有意义的数据获取行为，使用 RTK Query - 这主要是一个你 _可以_ 在监听器中做什么的例子。）
 
-The `listenerApi.unsubscribe` method may be used at any time, and will remove the listener from handling any future actions. As an example, you could create a one-shot listener by unconditionally calling `unsubscribe()` in the body - the effect callback would run the first time the relevant action is seen, then immediately unsubscribe and never run again. (The middleware actually uses this technique internally for the `take/condition` methods)
+`listenerApi.unsubscribe` 方法可以在任何时候使用，并将从处理任何未来操作的监听器中移除。作为一个例子，你可以通过在主体中无条件地调用 `unsubscribe()` 来创建一个一次性的监听器 - 效果回调将在第一次看到相关操作时运行，然后立即取消订阅，再也不会运行。（中间件实际上在 `take/condition` 方法中内部使用了这种技术）
 
-### Writing Async Workflows with Conditions
+### 编写带有条件的异步工作流
 
-One of the great strengths of both sagas and observables is their support for complex async workflows, including stopping and starting behavior based on specific dispatched actions. However, the weakness is that both require mastering a complex API with many unique operators (effects methods like `call()` and `fork()` for sagas, RxJS operators for observables), and both add a significant amount to application bundle size.
+saga 和 observable 的一大优点是它们支持复杂的异步工作流，包括根据特定调度的操作停止和开始行为。然而，缺点是两者都需要掌握一个复杂的 API，有许多独特的操作符（像 saga 的 `call()` 和 `fork()` 效果方法，observable 的 RxJS 操作符），并且两者都增加了应用程序包大小的大部分。
 
-While the listener middleware is _not_ meant to fully replace sagas or observables, it does provide a carefully chosen set of APIs to implement long-running async workflows as well.
+虽然监听器中间件 _不_ 打算完全替代 saga 或 observable，但它确实提供了一个精心选择的 API 集，以实现长时间运行的异步工作流。
 
-Listeners can use the `condition` and `take` methods in `listenerApi` to wait until some action is dispatched or state check is met. The `condition` method is directly inspired by [the `condition` function in Temporal.io's workflow API](https://docs.temporal.io/docs/typescript/workflows/#condition) (credit to [@swyx](https://twitter.com/swyx) for the suggestion!), and `take` is inspired by [the `take` effect from Redux-Saga](https://redux-saga.js.org/docs/api#takepattern).
+监听器可以使用 `listenerApi` 中的 `condition` 和 `take` 方法，等待某个操作被调度或满足状态检查。`condition` 方法直接受到 [Temporal.io 的工作流 API 中的 `condition` 函数](https://docs.temporal.io/docs/typescript/workflows/#condition) 的启发（感谢 [@swyx](https://twitter.com/swyx) 的建议！），`take` 受到 [Redux-Saga 中的 `take` 效果](https://redux-saga.js.org/docs/api#takepattern) 的启发。
 
-The signatures are:
+签名是：
 
 ```ts no-transpile
 type ConditionFunction<Action extends ReduxAction, State> = (
@@ -588,16 +587,16 @@ type TakeFunction<Action extends ReduxAction, State> = (
 ) => Promise<[Action, State, State] | null>
 ```
 
-You can use `await condition(somePredicate)` as a way to pause execution of your listener callback until some criteria is met.
+你可以使用 `await condition(somePredicate)` 作为一种暂停执行你的监听器回调，直到满足某些条件的方式。
 
-The `predicate` will be called after every action is processed by the reducers, and should return `true` when the condition should resolve. (It is effectively a one-shot listener itself.) If a `timeout` number (in ms) is provided, the promise will resolve `true` if the `predicate` returns first, or `false` if the timeout expires. This allows you to write comparisons like `if (await condition(predicate, timeout))`.
+`predicate` 将在每个操作被 reducer 处理后被调用，并应在条件应解决时返回 `true`。（它实际上是一个一次性的监听器。）如果提供了一个 `timeout` 数字（以毫秒为单位），那么如果 `predicate` 先返回，promise 将解析为 `true`，如果超时到期，将解析为 `false`。这允许你编写像 `if (await condition(predicate, timeout))` 这样的比较。
 
-This should enable writing longer-running workflows with more complex async logic, such as [the "cancellable counter" example from Redux-Saga](https://github.com/redux-saga/redux-saga/blob/1ecb1bed867eeafc69757df8acf1024b438a79e0/examples/cancellable-counter/src/sagas/index.js).
+这应该使编写更长时间运行的工作流和更复杂的异步逻辑成为可能，例如 [Redux-Saga 中的 "可取消计数器" 示例](https://github.com/redux-saga/redux-saga/blob/1ecb1bed867eeafc69757df8acf1024b438a79e0/examples/cancellable-counter/src/sagas/index.js)。
 
-An example of `condition` usage, from the test suite:
+来自测试套件的 `condition` 使用示例：
 
 ```ts no-transpile
-test('condition method resolves promise when there is a timeout', async () => {
+test('condition 方法在有超时时解析 promise', async () => {
   let finalCount = 0
   let listenerStarted = false
 
@@ -607,7 +606,7 @@ test('condition method resolves promise when there is a timeout', async () => {
     },
     effect: async (action, listenerApi) => {
       listenerStarted = true
-      // Wait for either the counter to hit 3, or 50ms to elapse
+      // 等待计数器达到 3，或者等待 50ms
       const result = await listenerApi.condition(
         (action, currentState: CounterState) => {
           return currentState.value === 3
@@ -615,131 +614,131 @@ test('condition method resolves promise when there is a timeout', async () => {
         50,
       )
 
-      // In this test, we expect the timeout to happen first
+      // 在这个测试中，我们期望首先发生超时
       expect(result).toBe(false)
-      // Save the state for comparison outside the listener
+      // 保存状态以便在监听器外部进行比较
       const latestState = listenerApi.getState()
       finalCount = latestState.value
     },
   })
 
   store.dispatch(increment())
-  // The listener should have started right away
+  // 监听器应该立即开始
   expect(listenerStarted).toBe(true)
 
   store.dispatch(increment())
 
-  // If we wait 150ms, the condition timeout will expire first
+  // 如果我们等待 150ms，条件超时将首先到期
   await delay(150)
-  // Update the state one more time to confirm the listener isn't checking it
+  // 再次更新状态以确认监听器没有检查它
   store.dispatch(increment())
 
-  // Handled the state update before the delay, but not after
+  // 在延迟之前处理了状态更新，但在之后没有处理
   expect(finalCount).toBe(2)
 })
 ```
 
-### Cancellation and Task Management
+### 取消和任务管理
 
-The listener middleware supports cancellation of running listener instances, `take/condition/pause/delay` functions, and "child tasks", with an implementation based on [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
+监听器中间件支持取消正在运行的监听器实例、`take/condition/pause/delay` 函数以及"子任务"，其实现基于 [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)。
 
-The `listenerApi.pause/delay()` functions provide a cancellation-aware way to have the current listener sleep. `pause()` accepts a promise, while `delay` accepts a timeout value. If the listener is cancelled while waiting, a `TaskAbortError` will be thrown. In addition, both `take` and `condition` support cancellation interruption as well.
+`listenerApi.pause/delay()` 函数提供了一种取消感知的方式来让当前的监听器休眠。`pause()` 接受一个 promise，而 `delay` 接受一个超时值。如果在等待时监听器被取消，将会抛出一个 `TaskAbortError`。此外，`take` 和 `condition` 也支持取消中断。
 
-`listenerApi.cancelActiveListeners()` will cancel _other_ existing instances that are running, while `listenerApi.cancel()` can be used to cancel the _current_ instance (which may be useful from a fork, which could be deeply nested and not able to directly throw a promise to break out of the effect execution). `listenerAPi.throwIfCancelled()` can also be useful to bail out of workflows in case cancellation happened while the effect was doing other work.
+`listenerApi.cancelActiveListeners()` 将取消正在运行的 _其他_ 实例，而 `listenerApi.cancel()` 可以用来取消 _当前_ 实例（这可能在一个 fork 中很有用，它可能深度嵌套并且无法直接抛出一个 promise 来跳出效果执行）。`listenerAPi.throwIfCancelled()` 也可能在取消发生时效果正在做其他工作的情况下退出工作流程。
 
-`listenerApi.fork()` can used to launch "child tasks" that can do additional work. These can be waited on to collect their results. An example of this might look like:
+`listenerApi.fork()` 可以用来启动可以做额外工作的"子任务"。这些可以被等待以收集他们的结果。一个例子可能看起来像这样：
 
 ```ts no-transpile
 listenerMiddleware.startListening({
   actionCreator: increment,
   effect: async (action, listenerApi) => {
-    // Spawn a child task and start it immediately
+    // 生成一个子任务并立即启动它
     const task = listenerApi.fork(async (forkApi) => {
-      // Artificially wait a bit inside the child
+      // 在子任务内部人为地等待一会儿
       await forkApi.delay(5)
-      // Complete the child by returning a value
+      // 通过返回一个值来完成子任务
       return 42
     })
 
     const result = await task.result
-    // Unwrap the child result in the listener
+    // 在监听器中解包子任务的结果
     if (result.status === 'ok') {
-      // Logs the `42` result value that was returned
+      // 记录返回的结果值 `42`
       console.log('Child succeeded: ', result.value)
     }
   },
 })
 ```
 
-### Complex Async Workflows
+### 复杂的异步工作流
 
-The provided async workflow primitives (`cancelActiveListeners`, `cancel`, `unsubscribe`, `subscribe`, `take`, `condition`, `pause`, `delay`) can be used to implement behavior that is equivalent to many of the more complex async workflow capabilities found in the Redux-Saga library. This includes effects such as `throttle`, `debounce`, `takeLatest`, `takeLeading`, and `fork/join`. Some examples from the test suite:
+提供的异步工作流原语（`cancelActiveListeners`、`cancel`、`unsubscribe`、`subscribe`、`take`、`condition`、`pause`、`delay`）可以用来实现等效于 Redux-Saga 库中找到的许多更复杂的异步工作流能力的行为。这包括像 `throttle`、`debounce`、`takeLatest`、`takeLeading` 和 `fork/join` 这样的效果。一些来自测试套件的例子：
 
 ```js
 test('debounce / takeLatest', async () => {
-  // Repeated calls cancel previous ones, no work performed
-  // until the specified delay elapses without another call
-  // NOTE: This is also basically identical to `takeLatest`.
-  // Ref: https://redux-saga.js.org/docs/api#debouncems-pattern-saga-args
-  // Ref: https://redux-saga.js.org/docs/api#takelatestpattern-saga-args
+  // 重复调用会取消前一个，没有工作会执行
+  // 直到指定的延迟过去没有其他调用
+  // 注意：这也基本上等同于 `takeLatest`。
+  // 参考：https://redux-saga.js.org/docs/api#debouncems-pattern-saga-args
+  // 参考：https://redux-saga.js.org/docs/api#takelatestpattern-saga-args
 
   listenerMiddleware.startListening({
     actionCreator: increment,
     effect: async (action, listenerApi) => {
-      // Cancel any in-progress instances of this listener
+      // 取消此监听器的任何进行中的实例
       listenerApi.cancelActiveListeners()
 
-      // Delay before starting actual work
+      // 在开始实际工作之前延迟
       await listenerApi.delay(15)
 
-      // do work here
+      // 在这里做工作
     },
   })
 }
 
 test('takeLeading', async () => {
-  // Starts listener on first action, ignores others until task completes
-  // Ref: https://redux-saga.js.org/docs/api#takeleadingpattern-saga-args
+  // 在第一个动作上启动监听器，忽略其他的直到任务完成
+  // 参考：https://redux-saga.js.org/docs/api#takeleadingpattern-saga-args
 
   listenerMiddleware.startListening({
     actionCreator: increment,
     effect: async (action, listenerApi) => {
       listenerCalls++
 
-      // Stop listening for this action
+      // 停止监听此动作
       listenerApi.unsubscribe()
 
-      // Pretend we're doing expensive work
+      // 假装我们正在做昂贵的工作
 
-      // Re-enable the listener
+      // 重新启用监听器
       listenerApi.subscribe()
     },
   })
 })
 
 test('cancelled', async () => {
-  // cancelled allows checking if the current task was cancelled
-  // Ref: https://redux-saga.js.org/docs/api#cancelled
+  // cancelled 允许检查当前任务是否被取消
+  // 参考：https://redux-saga.js.org/docs/api#cancelled
 
   let canceledAndCaught = false
   let canceledCheck = false
 
-  // Example of canceling prior instances conditionally and checking cancellation
+  // 条件取消先前实例并检查取消的示例
   listenerMiddleware.startListening({
     matcher: isAnyOf(increment, decrement, incrementByAmount),
     effect: async (action, listenerApi) => {
       if (increment.match(action)) {
-        // Have this branch wait around to be cancelled by the other
+        // 让这个分支等待被其他的取消
         try {
           await listenerApi.delay(10)
         } catch (err) {
-          // Can check cancellation based on the exception and its reason
+          // 可以根据异常及其原因检查取消
           if (err instanceof TaskAbortError) {
             canceledAndCaught = true
           }
         }
       } else if (incrementByAmount.match(action)) {
-        // do a non-cancellation-aware wait
+        // 做一个不感知取消的等待
         await delay(15)
         if (listenerApi.signal.aborted) {
           canceledCheck = true
@@ -752,12 +751,12 @@ test('cancelled', async () => {
 })
 ```
 
-As a more practical example: [this saga-based "long polling" loop](https://gist.github.com/markerikson/5203e71a69fa9dff203c9e27c3d84154) repeatedly asks the server for a message and then processes each response. The child loop is started on demand when a "start polling" action is dispatched, and the loop is cancelled when a "stop polling" action is dispatched.
+作为一个更实际的例子：[这个基于 saga 的"长轮询"循环](https://gist.github.com/markerikson/5203e71a69fa9dff203c9e27c3d84154) 重复地向服务器请求消息，然后处理每个响应。当一个 "开始轮询" 动作被派发时，子循环被按需启动，当一个 "停止轮询" 动作被派发时，循环被取消。
 
-That approach can be implemented via the listener middleware:
+这种方法可以通过监听器中间件来实现：
 
 ```ts no-transpile
-// Track how many times each message was processed by the loop
+// 跟踪每个消息被循环处理的次数
 const receivedMessages = {
   a: 0,
   b: 0,
@@ -770,16 +769,16 @@ const eventPollingStopped = createAction('serverPolling/stopped')
 listenerMiddleware.startListening({
   actionCreator: eventPollingStarted,
   effect: async (action, listenerApi) => {
-    // Only allow one instance of this listener to run at a time
+    // 一次只允许一个实例的这个监听器运行
     listenerApi.unsubscribe()
 
-    // Start a child job that will infinitely loop receiving messages
+    // 启动一个将无限循环接收消息的子任务
     const pollingTask = listenerApi.fork(async (forkApi) => {
       try {
         while (true) {
-          // Cancellation-aware pause for a new server message
+          // 对新的服务器消息进行取消感知的暂停
           const serverEvent = await forkApi.pause(pollForEvent())
-          // Process the message. In this case, just count the times we've seen this message.
+          // 处理消息。在这种情况下，只是计算我们已经看到这个消息的次数。
           if (serverEvent.type in receivedMessages) {
             receivedMessages[
               serverEvent.type as keyof typeof receivedMessages
@@ -788,35 +787,34 @@ listenerMiddleware.startListening({
         }
       } catch (err) {
         if (err instanceof TaskAbortError) {
-          // could do something here to track that the task was cancelled
+          // 可以在这里做一些事情来跟踪任务被取消
         }
       }
     })
 
-    // Wait for the "stop polling" action
+    // 等待 "停止轮询" 动作
     await listenerApi.condition(eventPollingStopped.match)
     pollingTask.cancel()
   },
 })
 ```
 
-### Adding Listeners Inside Components
+### 在组件中添加监听器
 
-Listeners can be added at runtime via `dispatch(addListener())`. This means that you can add listeners anywhere you have access to `dispatch`, and that includes React components.
+可以通过 `dispatch(addListener())` 在运行时添加监听器。这意味着你可以在任何可以访问 `dispatch` 的地方添加监听器，包括 React 组件。
 
-Since dispatching `addListener` returns an `unsubscribe` callback, this naturally maps to the behavior of React `useEffect` hooks, which let you return a cleanup function. You can add a listener in an effect, and remove the listener when the hook is cleaned up.
+由于分发 `addListener` 会返回一个 `unsubscribe` 回调，这自然对应到 React `useEffect` 钩子的行为，它允许你返回一个清理函数。你可以在效果中添加一个监听器，并在钩子清理时删除监听器。
 
-The basic pattern might look like:
+基本模式可能看起来像这样：
 
 ```js
 useEffect(() => {
-  // Could also just `return dispatch(addListener())` directly, but showing this
-  // as a separate variable to be clear on what's happening
+  // 也可以直接 `return dispatch(addListener())`，但是为了清楚地说明发生了什么，这里将其显示为一个单独的变量
   const unsubscribe = dispatch(
     addListener({
       actionCreator: todoAdded,
       effect: (action, listenerApi) => {
-        // do some useful logic here
+        // 在这里做一些有用的逻辑
       },
     }),
   )
@@ -824,19 +822,19 @@ useEffect(() => {
 }, [])
 ```
 
-While this pattern is _possible_, **we do not necessarily _recommend_ doing this!** The React and Redux communities have always tried to emphasize basing behavior on _state_ as much as possible. Having React components directly tie into the Redux action dispatch pipeline could potentialy lead to codebases that are more difficult to maintain.
+虽然这种模式是 _可能的_，但我们并不一定 _推荐_ 这样做！React 和 Redux 社区一直试图强调尽可能基于 _状态_ 的行为。让 React 组件直接绑定到 Redux 动作分发管道可能会导致代码库更难维护。
 
-At the same time, this _is_ a valid technique, both in terms of API behavior and potential use cases. It's been common to lazy-load sagas as part of a code-split app, and that has often required some complex additional setup work to "inject" sagas. In contrast, `dispatch(addListener())` fits naturally into a React component's lifecycle.
+同时，这 _是_ 一种有效的技术，无论是在 API 行为还是潜在用例方面。在代码分割的应用中懒加载 sagas 是常见的，这通常需要一些复杂的额外设置工作来 "注入" sagas。相比之下，`dispatch(addListener())` 自然地融入到 React 组件的生命周期中。
 
-So, while we're not specifically encouraging use of this pattern, it's worth documenting here so that users are aware of it as a possibility.
+所以，虽然我们并不特别鼓励使用这种模式，但值得在这里记录下来，以便用户了解它作为一种可能性。
 
-### Organizing Listeners in Files
+### 在文件中组织监听器
 
-As a starting point, **it's best to create the listener middleware in a separate file, such as `app/listenerMiddleware.ts`, rather than in the same file as the store**. This avoids any potential circular import problems from other files trying to import `middleware.addListener`.
+作为起点，**最好在一个单独的文件中创建监听器中间件，例如 `app/listenerMiddleware.ts`，而不是在与存储相同的文件中**。这避免了其他文件试图导入 `middleware.addListener` 时可能出现的循环导入问题。
 
-From there, so far we've come up with three different ways to organize listener functions and setup.
+从那里开始，到目前为止，我们已经想出了三种不同的方式来组织监听器函数和设置。
 
-First, you can import effect callbacks from slice files into the middleware file, and add the listeners:
+首先，你可以从切片文件中导入效果回调到中间件文件，并添加监听器：
 
 ```ts no-transpile title="app/listenerMiddleware.ts"
 import { action1, listener1 } from '../features/feature1/feature1Slice'
@@ -846,9 +844,9 @@ listenerMiddleware.startListening({ actionCreator: action1, effect: listener1 })
 listenerMiddleware.startListening({ actionCreator: action2, effect: listener2 })
 ```
 
-This is probably the simplest option, and mirrors how the store setup pulls together all the slice reducers to create the app.
+这可能是最简单的选项，并且反映了如何将所有切片的 reducer 汇集到一起创建应用程序的存储设置。
 
-The second option is the opposite: have the slice files import the middleware and directly add their listeners:
+第二个选项是相反的：让切片文件导入中间件并直接添加它们的监听器：
 
 ```ts no-transpile  title="features/feature1/feature1Slice.ts"
 import { listenerMiddleware } from '../../app/listenerMiddleware'
@@ -864,9 +862,9 @@ listenerMiddleware.startListening({
 })
 ```
 
-This keeps all the logic in the slice, although it does lock the setup into a single middleware instance.
+这将所有逻辑保留在切片中，尽管它确实将设置锁定到一个单独的中间件实例中。
 
-The third option is to create a setup function in the slice, but let the listener file call that on startup:
+第三个选项是在切片中创建一个设置函数，但让监听器文件在启动时调用它：
 
 ```ts no-transpile  title="features/feature1/feature1Slice.ts"
 import type { AppStartListening } from '../../app/listenerMiddleware'
@@ -890,4 +888,4 @@ import { addFeature1Listeners } from '../features/feature1/feature1Slice'
 addFeature1Listeners(listenerMiddleware.startListening)
 ```
 
-Feel free to use whichever of these approaches works best in your app.
+请随意使用在你的应用中最有效的这些方法。

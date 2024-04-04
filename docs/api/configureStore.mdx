@@ -9,32 +9,32 @@ hide_title: true
 
 # `configureStore`
 
-The standard method for creating a Redux store. It uses the low-level Redux core `createStore` method internally, but wraps that to provide good defaults to the store setup for a better development experience.
+创建 Redux 存储的标准方法。它内部使用低级 Redux 核心 `createStore` 方法，但包装了该方法，为存储设置提供良好的默认值，以提供更好的开发体验。
 
-## Purpose and Behavior
+## 目的和行为
 
-A standard Redux store setup typically requires multiple pieces of configuration:
+标准的 Redux 存储设置通常需要多个配置部分：
 
-- Combining the slice reducers into the root reducer
-- Creating the middleware enhancer, usually with the thunk middleware or other side effects middleware, as well as middleware that might be used for development checks
-- Adding the Redux DevTools enhancer, and composing the enhancers together
-- Calling `createStore`
+- 将切片 reducer 合并到根 reducer
+- 创建中间件增强器，通常使用 thunk 中间件或其他副作用中间件，以及可能用于开发检查的中间件
+- 添加 Redux DevTools 增强器，并将增强器组合在一起
+- 调用 `createStore`
 
-Legacy Redux usage patterns typically required several dozen lines of copy-pasted boilerplate to achieve this.
+传统的 Redux 使用模式通常需要复制粘贴几十行样板代码来实现这一点。
 
-Redux Toolkit's `configureStore` simplifies that setup process, by doing all that work for you. One call to `configureStore` will:
+Redux Toolkit 的 `configureStore` 简化了该设置过程，为您完成所有这些工作。一次调用 `configureStore` 将：
 
-- Call `combineReducers` to combine your slices reducers into the root reducer function
-- Add the thunk middleware and called `applyMiddleware`
-- In development, automatically add more middleware to check for common mistakes like accidentally mutating the state
-- Automatically set up the Redux DevTools Extension connection
-- Call `createStore` to create a Redux store using that root reducer and those configuration options
+- 调用 `combineReducers` 将您的切片 reducer 合并到根 reducer 函数
+- 添加 thunk 中间件并调用 `applyMiddleware`
+- 在开发中，自动添加更多中间件以检查常见错误，如意外地改变状态
+- 自动设置 Redux DevTools Extension 连接
+- 调用 `createStore` 使用该根 reducer 和这些配置选项创建 Redux 存储
 
-`configureStore` also offers an improved API and usage patterns compared to the original `createStore` by accepting named fields for `reducer`, `preloadedState`, `middleware`, `enhancers`, and `devtools`, as well as much better TS type inference.
+与原始的 `createStore` 相比，`configureStore` 还提供了改进的 API 和使用模式，接受 `reducer`，`preloadedState`，`middleware`，`enhancers` 和 `devtools` 的命名字段，以及更好的 TS 类型推断。
 
-## Parameters
+## 参数
 
-`configureStore` accepts a single configuration object parameter, with the following options:
+`configureStore` 接受一个单一的配置对象参数，具有以下选项：
 
 ```ts no-transpile
 
@@ -46,41 +46,40 @@ interface ConfigureStoreOptions<
   P = S
 > {
   /**
-   * A single reducer function that will be used as the root reducer, or an
-   * object of slice reducers that will be passed to `combineReducers()`.
+   * 将用作根 reducer 的单个 reducer 函数，或者
+   * 将传递给 `combineReducers()` 的切片 reducer 对象。
    */
   reducer: Reducer<S, A, P> | ReducersMapObject<S, A, P>
 
   /**
-   * An array of Redux middleware to install. If not supplied, defaults to
-   * the set of middleware returned by `getDefaultMiddleware()`.
+   * 要安装的 Redux 中间件数组。如果未提供，则默认为
+   * `getDefaultMiddleware()` 返回的中间件集。
    */
   middleware?: ((getDefaultMiddleware: CurriedGetDefaultMiddleware<S>) => M) | M
 
   /**
-   * Whether to enable Redux DevTools integration. Defaults to `true`.
+   * 是否启用 Redux DevTools 集成。默认为 `true`。
    *
-   * Additional configuration can be done by passing Redux DevTools options
+   * 可以通过传递 Redux DevTools 选项进行额外配置
    */
   devTools?: boolean | DevToolsOptions
 
   /**
-   * The initial state, same as Redux's createStore.
-   * You may optionally specify it to hydrate the state
-   * from the server in universal apps, or to restore a previously serialized
-   * user session. If you use `combineReducers()` to produce the root reducer
-   * function (either directly or indirectly by passing an object as `reducer`),
-   * this must be an object with the same shape as the reducer map keys.
+   * 初始状态，与 Redux 的 createStore 相同。
+   * 您可以选择指定它以从服务器中的通用应用程序中提取状态，
+   * 或恢复以前序列化的用户会话。如果您使用 `combineReducers()` 生成根 reducer
+   * 函数（直接或间接通过将对象作为 `reducer` 传递），
+   * 这必须是一个与 reducer 映射键形状相同的对象。
    */
   preloadedState?: P
 
   /**
-   * The store enhancers to apply. See Redux's `createStore()`.
-   * All enhancers will be included before the DevTools Extension enhancer.
-   * If you need to customize the order of enhancers, supply a callback
-   * function that will receive the getDefaultEnhancers,
-   * and should return a new array (such as `getDefaultEnhancers().concat(offline)`).
-   * If you only need to add middleware, you can use the `middleware` parameter instead.
+   * 要应用的存储增强器。参见 Redux 的 `createStore()`。
+   * 所有增强器都将在 DevTools Extension 增强器之前包含。
+   * 如果您需要自定义增强器的顺序，提供一个回调
+   * 函数，该函数将接收 getDefaultEnhancers，
+   * 并应返回一个新数组（例如 `getDefaultEnhancers().concat(offline)`）。
+   * 如果您只需要添加中间件，可以使用 `middleware` 参数代替。
    */
   enhancers?: (getDefaultEnhancers: GetDefaultEnhancers<M>) => E | E
 }
@@ -96,28 +95,28 @@ function configureStore<
 
 ### `reducer`
 
-If this is a single function, it will be directly used as the root reducer for the store.
+如果这是一个单一的函数，它将直接用作存储的根 reducer。
 
-If it is an object of slice reducers, like `{users : usersReducer, posts : postsReducer}`,
-`configureStore` will automatically create the root reducer by passing this object to the
-[Redux `combineReducers` utility](https://redux.js.org/api/combinereducers).
+如果它是一个切片 reducer 的对象，如 `{users : usersReducer, posts : postsReducer}`，
+`configureStore` 将自动通过将此对象传递给
+[Redux `combineReducers` 实用程序](https://redux.js.org/api/combinereducers) 创建根 reducer。
 
 ### `middleware`
 
-A callback which will receive `getDefaultMiddleware` as its argument,
-and should return a middleware array.
+一个将接收 `getDefaultMiddleware` 作为其参数的回调，
+并应返回一个中间件数组。
 
-If this option is provided, it should return all the middleware functions you
-want added to the store. `configureStore` will automatically pass those to `applyMiddleware`.
+如果提供了此选项，它应返回您
+希望添加到存储的所有中间件函数。`configureStore` 将自动将这些传递给 `applyMiddleware`。
 
-If not provided, `configureStore` will call `getDefaultMiddleware` and use the
-array of middleware functions it returns.
+如果未提供，`configureStore` 将调用 `getDefaultMiddleware` 并使用
+它返回的中间件函数数组。
 
-For more details on how the `middleware` parameter works and the list of middleware that are added by default, see the
-[`getDefaultMiddleware` docs page](./getDefaultMiddleware.mdx).
+有关 `middleware` 参数的工作方式以及默认添加的中间件列表的更多详细信息，请参见
+[`getDefaultMiddleware` 文档页面](./getDefaultMiddleware.mdx)。
 
 :::note Tuple
-Typescript users are required to use a `Tuple` instance (if not using a `getDefaultMiddleware` result, which is already a `Tuple`), for better inference.
+Typescript 用户需要使用 `Tuple` 实例（如果不使用 `getDefaultMiddleware` 结果，它已经是一个 `Tuple`），以获得更好的推断。
 
 ```ts no-transpile
 import { configureStore, Tuple } from '@reduxjs/toolkit'
@@ -128,72 +127,71 @@ configureStore({
 })
 ```
 
-Javascript-only users are free to use a plain array if preferred.
+仅 Javascript 用户可以自由选择使用普通数组。
 
 :::
 
 ### `devTools`
 
-If this is a boolean, it will be used to indicate whether `configureStore` should automatically enable support for [the Redux DevTools browser extension](https://github.com/reduxjs/redux-devtools).
+如果这是一个布尔值，它将用于指示 `configureStore` 是否应自动启用对 [Redux DevTools 浏览器扩展](https://github.com/reduxjs/redux-devtools) 的支持。
 
-If it is an object, then the DevTools Extension will be enabled, and the options object will be passed to `composeWithDevtools()`. See
-the DevTools Extension docs for [`EnhancerOptions`](https://github.com/reduxjs/redux-devtools/blob/main/extension/docs/API/Arguments.md) for
-a list of the specific options that are available.
+如果它是一个对象，那么将启用 DevTools 扩展，并将选项对象传递给 `composeWithDevtools()`。请参阅
+DevTools 扩展文档中的 [`EnhancerOptions`](https://github.com/reduxjs/redux-devtools/blob/main/extension/docs/API/Arguments.md) 以获取
+可用的特定选项列表。
 
-Defaults to `true`.
+默认为 `true`。
 
 #### `trace`
 
-The Redux DevTools Extension recently added [support for showing action stack traces](https://github.com/reduxjs/redux-devtools/blob/main/extension/docs/Features/Trace.md) that show exactly where each action was dispatched.
-Capturing the traces can add a bit of overhead, so the DevTools Extension allows users to configure whether action stack traces are captured by [setting the 'trace' argument](https://github.com/reduxjs/redux-devtools/blob/main/extension/docs/API/Arguments.md#trace).
-If the DevTools are enabled by passing `true` or an object, then `configureStore` will default to enabling capturing action stack traces in development mode only.
+Redux DevTools 扩展最近添加了[支持显示操作堆栈跟踪](https://github.com/reduxjs/redux-devtools/blob/main/extension/docs/Features/Trace.md)的功能，这可以显示每个操作被分派的确切位置。
+捕获这些跟踪可能会增加一些开销，因此 DevTools 扩展允许用户通过[设置 'trace' 参数](https://github.com/reduxjs/redux-devtools/blob/main/extension/docs/API/Arguments.md#trace)来配置是否捕获操作堆栈跟踪。
+如果通过传递 `true` 或一个对象启用了 DevTools，那么 `configureStore` 将默认在开发模式下启用捕获操作堆栈跟踪。
 
 ### `preloadedState`
 
-An optional initial state value to be passed to the Redux `createStore` function.
+一个可选的初始状态值，可以传递给 Redux 的 `createStore` 函数。
 
 ### `enhancers`
 
-A callback function to customize the array of enhancers.
+一个回调函数，用于自定义增强器数组。
 
-Enhancers returned by this callback will be passed to [the Redux `compose` function](https://redux.js.org/api/compose), and the combined enhancer will be passed to `createStore`.
+此回调返回的增强器将被传递给 [Redux 的 `compose` 函数](https://redux.js.org/api/compose)，并且组合的增强器将被传递给 `createStore`。
 
 :::tip Dev Tools
-This should _not_ include the Redux DevTools Extension `composeWithDevTools`, as this is already handled by `configureStore`.
+这不应该包括 Redux DevTools 扩展的 `composeWithDevTools`，因为这已经由 `configureStore` 处理了。
 
-Example: `enhancers: () => new Tuple(offline)` will result in a final setup of `[offline, devToolsExtension]`.
+例如：`enhancers: () => new Tuple(offline)` 将导致最终的设置为 `[offline, devToolsExtension]`。
 :::
 
-If not provided, `configureStore` will call `getDefaultEnhancers` and use the array of enhancers it returns (including `applyMiddleware` with specified middleware).
+如果未提供，`configureStore` 将调用 `getDefaultEnhancers` 并使用它返回的增强器数组（包括指定的中间件的 `applyMiddleware`）。
 
-Where you wish to add onto or customize the default enhancers, you may pass a callback function that will receive `getDefaultEnhancers` as its argument, and should return an enhancer array.
+如果你希望添加或自定义默认的增强器，你可以传递一个回调函数，该函数将接收 `getDefaultEnhancers` 作为其参数，并应返回一个增强器数组。
 
-Example: `enhancers: (defaultEnhancers) => defaultEnhancers.prepend(offline)` will result in a final setup
-of `[offline, applyMiddleware, devToolsExtension]`.
+例如：`enhancers: (defaultEnhancers) => defaultEnhancers.prepend(offline)` 将导致最终的设置为 `[offline, applyMiddleware, devToolsExtension]`。
 
-For more details on how the `enhancer` parameter works and the list of enhancers that are added by default, see the [`getDefaultEnhancers` docs page](./getDefaultEnhancers).
+有关 `enhancer` 参数的工作方式以及默认添加的增强器列表的更多详细信息，请参见 [`getDefaultEnhancers` 文档页面](./getDefaultEnhancers)。
 
 :::caution Middleware
 
-If you don't use `getDefaultEnhancers` and instead return an array, the `applyMiddleware` enhancer will _not_ be used.
+如果你不使用 `getDefaultEnhancers` 而是返回一个数组，`applyMiddleware` 增强器将 _不会_ 被使用。
 
-`configureStore` will warn in console if any middleware are provided (or left as default) but not included in the final list of enhancers.
+如果提供了任何中间件（或保留为默认值）但未包含在最终的增强器列表中，`configureStore` 将在控制台中发出警告。
 
 ```ts no-transpile
-// warns - middleware customised but not included in final enhancers
+// 警告 - 中间件被定制但未包含在最终的增强器中
 configureStore({
   reducer,
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger)
   enhancers: [offline(offlineConfig)],
 })
 
-// fine - default enhancers included
+// 正常 - 包含了默认的增强器
 configureStore({
   reducer,
   enhancers: (getDefaultEnhancers) => getDefaultEnhancers().concat(offline(offlineConfig)),
 })
 
-// also allowed
+// 也允许
 configureStore({
   reducer,
   middleware: () => [],
@@ -201,12 +199,12 @@ configureStore({
 })
 ```
 
-Note that if using Typescript, the `middleware` option is required to be provided _before_ the enhancer option, as the type of `getDefaultEnhancers` depends on its result.
+注意，如果使用 Typescript，`middleware` 选项需要在增强器选项之前提供，因为 `getDefaultEnhancers` 的类型取决于其结果。
 
 :::
 
 :::note Tuple
-Typescript users are required to use a `Tuple` instance (if not using a `getDefaultEnhancer` result, which is already a `Tuple`), for better inference.
+Typescript 用户需要使用 `Tuple` 实例（如果不使用 `getDefaultEnhancer` 的结果，该结果已经是一个 `Tuple`），以便更好的推断。
 
 ```ts no-transpile
 import { configureStore, Tuple } from '@reduxjs/toolkit'
@@ -217,49 +215,49 @@ configureStore({
 })
 ```
 
-Javascript-only users are free to use a plain array if preferred.
+仅使用 Javascript 的用户可以自由选择使用普通数组。
 
 :::
 
-## Usage
+## 使用
 
-### Basic Example
+### 基本示例
 
 ```ts
-// file: reducers.ts noEmit
+// 文件: reducers.ts noEmit
 import type { Reducer } from '@reduxjs/toolkit'
 declare const rootReducer: Reducer<{}>
 export default rootReducer
 
-// file: store.ts
+// 文件: store.ts
 import { configureStore } from '@reduxjs/toolkit'
 
 import rootReducer from './reducers'
 
 const store = configureStore({ reducer: rootReducer })
-// The store now has redux-thunk added and the Redux DevTools Extension is turned on
+// 现在的 store 已经添加了 redux-thunk，并且已经打开了 Redux DevTools 扩展
 ```
 
-### Full Example
+### 完整示例
 
 ```ts no-transpile
-// file: todos/todosReducer.ts noEmit
+// 文件: todos/todosReducer.ts noEmit
 import type { Reducer } from '@reduxjs/toolkit'
 declare const reducer: Reducer<{}>
 export default reducer
 
-// file: visibility/visibilityReducer.ts noEmit
+// 文件: visibility/visibilityReducer.ts noEmit
 import type { Reducer } from '@reduxjs/toolkit'
 declare const reducer: Reducer<{}>
 export default reducer
 
-// file: store.ts
+// 文件: store.ts
 import { configureStore } from '@reduxjs/toolkit'
 
-// We'll use redux-logger just as an example of adding another middleware
+// 我们将使用 redux-logger 作为添加另一个中间件的示例
 import logger from 'redux-logger'
 
-// And use redux-batched-subscribe as an example of adding enhancers
+// 并使用 redux-batched-subscribe 作为添加增强器的示例
 import { batchedSubscribe } from 'redux-batched-subscribe'
 
 import todosReducer from './todos/todosReducer'
@@ -297,9 +295,9 @@ const store = configureStore({
     }).concat(batchedSubscribe(debounceNotify)),
 })
 
-// The store has been created with these options:
-// - The slice reducers were automatically passed to combineReducers()
-// - redux-thunk and redux-logger were added as middleware
-// - The Redux DevTools Extension is disabled for production
-// - The middleware, batched subscribe, and devtools enhancers were composed together
+// 使用这些选项创建了 store：
+// - 切片 reducer 自动传递给 combineReducers()
+// - redux-thunk 和 redux-logger 被添加为中间件
+// - Redux DevTools 扩展在生产环境下被禁用
+// - 中间件，批量订阅和 devtools 增强器被组合在一起
 ```

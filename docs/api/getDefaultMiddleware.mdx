@@ -9,21 +9,21 @@ hide_title: true
 
 # `getDefaultMiddleware`
 
-Returns an array containing the default list of middleware.
+返回一个包含默认中间件列表的数组。
 
-## Intended Usage
+## 预期用法
 
-By default, [`configureStore`](./configureStore.mdx) adds some middleware to the Redux store setup automatically.
+默认情况下，[`configureStore`](./configureStore.mdx) 会自动向 Redux store 设置中添加一些中间件。
 
 ```js
 const store = configureStore({
   reducer: rootReducer,
 })
 
-// Store has middleware added, because the middleware list was not customized
+// Store 已添加中间件，因为中间件列表没有被自定义
 ```
 
-If you want to customize the list of middleware, you can supply an array of middleware functions to `configureStore`:
+如果你想自定义中间件列表，你可以向 `configureStore` 提供一个中间件函数的数组：
 
 ```js
 const store = configureStore({
@@ -31,14 +31,12 @@ const store = configureStore({
   middleware: () => new Tuple(thunk, logger),
 })
 
-// Store specifically has the thunk and logger middleware applied
+// Store 明确地应用了 thunk 和 logger 中间件
 ```
 
-However, when you supply the `middleware` option, you are responsible for defining _all_ the middleware you want added
-to the store. `configureStore` will not add any extra middleware beyond what you listed.
+然而，当你提供 `middleware` 选项时，你需要负责定义你想添加到 store 的所有中间件。`configureStore` 不会添加你列出的任何额外中间件。
 
-`getDefaultMiddleware` is useful if you want to add some custom middleware, but also still want to have the default
-middleware added as well:
+`getDefaultMiddleware` 在你想添加一些自定义中间件，但也仍然想添加默认中间件时非常有用：
 
 ```ts no-transpile
 import { configureStore } from '@reduxjs/toolkit'
@@ -52,36 +50,26 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
 })
 
-// Store has all of the default middleware added, _plus_ the logger middleware
+// Store 添加了所有默认的中间件，_以及_ logger 中间件
 ```
 
-It is preferable to use the chainable `.concat(...)` and `.prepend(...)` methods of the returned `Tuple` instead of the array spread operator, as the latter can lose valuable TS type information under some circumstances.
+优先使用返回的 `Tuple` 的链式 `.concat(...)` 和 `.prepend(...)` 方法，而不是数组扩展运算符，因为后者在某些情况下可能会丢失有价值的 TS 类型信息。
 
-## Included Default Middleware
+## 包含的默认中间件
 
-### Development
+### 开发
 
-One of the goals of Redux Toolkit is to provide opinionated defaults and prevent common mistakes. As part of that,
-`getDefaultMiddleware` includes some middleware that are added **in development builds of your app only** to
-provide runtime checks for three common issues:
+Redux Toolkit 的目标之一是提供有见地的默认值并防止常见错误。作为其中的一部分，`getDefaultMiddleware` 包含一些只在你的应用的开发构建中添加的中间件，以提供对三个常见问题的运行时检查：
 
-- [Immutability check middleware](./immutabilityMiddleware.mdx): deeply compares
-  state values for mutations. It can detect mutations in reducers during a dispatch, and also mutations that occur between
-  dispatches (such as in a component or a selector). When a mutation is detected, it will throw an error and indicate the key
-  path for where the mutated value was detected in the state tree. (Forked from [`redux-immutable-state-invariant`](https://github.com/leoasis/redux-immutable-state-invariant).)
+- [不可变性检查中间件](./immutabilityMiddleware.mdx)：深度比较状态值的变化。它可以在调度期间检测到 reducer 中的变化，也可以在调度之间（如在组件或选择器中）检测到变化。当检测到变化时，它会抛出一个错误，并指出在状态树中检测到变化值的键路径。（从 [`redux-immutable-state-invariant`](https://github.com/leoasis/redux-immutable-state-invariant) 分支出来。）
 
-- [Serializability check middleware](./serializabilityMiddleware.mdx): a custom middleware created specifically for use in Redux Toolkit. Similar in
-  concept to `immutable-state-invariant`, but deeply checks your state tree and your actions for non-serializable values
-  such as functions, Promises, Symbols, and other non-plain-JS-data values. When a non-serializable value is detected, a
-  console error will be printed with the key path for where the non-serializable value was detected.
+- [可序列化性检查中间件](./serializabilityMiddleware.mdx)：专门为 Redux Toolkit 创建的自定义中间件。与 `immutable-state-invariant` 的概念类似，但深度检查你的状态树和你的动作是否包含非序列化值，如函数、Promise、Symbol 和其他非普通 JS 数据值。当检测到非序列化值时，会打印一个控制台错误，并显示检测到非序列化值的键路径。
 
-- [Action creator check middleware](./actionCreatorMiddleware.mdx): another custom middleware created specifically for use in Redux Toolkit.
-  Identifies when an action creator was mistakenly dispatched without being called, and warns to console with the action type.
+- [动作创建者检查中间件](./actionCreatorMiddleware.mdx)：另一个专门为 Redux Toolkit 创建的自定义中间件。识别出动作创建者被错误地调度而没有被调用，并向控制台警告动作类型。
 
-In addition to these development tool middleware, it also adds [`redux-thunk`](https://github.com/reduxjs/redux-thunk)
-by default, since thunks are the basic recommended side effects middleware for Redux.
+除了这些开发工具中间件，它还默认添加了 [`redux-thunk`](https://github.com/reduxjs/redux-thunk)，因为 thunk 是 Redux 推荐的基本副作用中间件。
 
-Currently, the return value is:
+目前，返回值是：
 
 ```js
 const middleware = [
@@ -92,36 +80,35 @@ const middleware = [
 ]
 ```
 
-### Production
+### 生产
 
-Currently, the return value is:
+目前，返回值是：
 
 ```js
 const middleware = [thunk]
 ```
 
-## Customizing the Included Middleware
+## 自定义包含的中间件
 
-`getDefaultMiddleware` accepts an options object that allows customizing each middleware in two ways:
+`getDefaultMiddleware` 接受一个选项对象，允许以两种方式自定义每个中间件：
 
-- Each middleware can be excluded from the result array by passing `false` for its corresponding field
-- Each middleware can have its options customized by passing the matching options object for its corresponding field
+- 通过为其对应的字段传递 `false`，可以从结果数组中排除每个中间件
+- 通过为其对应的字段传递匹配的选项对象，可以自定义每个中间件的选项
 
-This example shows excluding the serializable state check middleware, and passing a specific value for the thunk
-middleware's "extra argument":
+这个例子显示了排除可序列化状态检查中间件，并为 thunk 中间件的 "extra argument" 传递一个特定值：
 
 ```ts
-// file: reducer.ts noEmit
+// 文件: reducer.ts noEmit
 
 export default function rootReducer(state = {}, action: any) {
   return state
 }
 
-// file: api.ts noEmit
+// 文件: api.ts noEmit
 
 export declare const myCustomApiService: any
 
-// file: store.ts
+// 文件: store.ts
 
 import { configureStore } from '@reduxjs/toolkit'
 import rootReducer from './reducer'
@@ -139,7 +126,7 @@ const store = configureStore({
 })
 ```
 
-## API Reference
+## API 参考
 
 ```ts no-transpile
 interface ThunkOptions<E = any> {
@@ -147,15 +134,15 @@ interface ThunkOptions<E = any> {
 }
 
 interface ImmutableStateInvariantMiddlewareOptions {
-  // See "Immutability Middleware" page for definition
+  // 见 "不可变性中间件" 页面的定义
 }
 
 interface SerializableStateInvariantMiddlewareOptions {
-  // See "Serializability Middleware" page for definition
+  // 见 "可序列化性中间件" 页面的定义
 }
 
 interface ActionCreatorInvariantMiddlewareOptions {
-  // See "Action Creator Middleware" page for definition
+  // 见 "动作创建者中间件" 页面的定义
 }
 
 interface GetDefaultMiddlewareOptions {
@@ -169,3 +156,4 @@ function getDefaultMiddleware<S = any>(
   options: GetDefaultMiddlewareOptions = {},
 ): Middleware<{}, S>[]
 ```
+

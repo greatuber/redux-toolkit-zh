@@ -7,7 +7,7 @@ const config: Config = {
   baseUrl: "/redux-toolkit-zh/",
   favicon: "img/favicon/favicon.ico",
   tagline: "用于高效 Redux 开发的官方、固执己见、包含电池的工具集",
-  title: "Redux Toolkit 中文",
+  title: "Redux Toolkit",
   url: "https://ouweiya.github.io",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -64,7 +64,7 @@ const config: Config = {
   themeConfig: {
     image: "img/redux-logo-landscape.png",
     navbar: {
-      title: "Redux Toolkit",
+      title: "Redux Toolkit 中文文档",
       logo: {
         alt: "Redux Logo",
         src: "img/redux.svg",

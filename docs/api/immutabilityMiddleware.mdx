@@ -7,61 +7,61 @@ hide_title: true
 
 &nbsp;
 
-# Immutability Middleware
+# 不变性中间件
 
-A port of the [`redux-immutable-state-invariant`](https://github.com/leoasis/redux-immutable-state-invariant) middleware, customized for use with Redux Toolkit. Any detected mutations will be thrown as errors.
+这是[`redux-immutable-state-invariant`](https://github.com/leoasis/redux-immutable-state-invariant)中间件的一个移植版本，专门用于Redux Toolkit。任何检测到的变异都会被抛出为错误。
 
-This middleware is added to the store by default by [`configureStore`](./configureStore.mdx) and [`getDefaultMiddleware`](./getDefaultMiddleware.mdx).
+这个中间件默认由[`configureStore`](./configureStore.mdx)和[`getDefaultMiddleware`](./getDefaultMiddleware.mdx)添加到存储中。
 
-You can customize the behavior of this middleware by passing any of the supported options as the `immutableCheck` value for `getDefaultMiddleware`.
+你可以通过将任何支持的选项作为`getDefaultMiddleware`的`immutableCheck`值来自定义此中间件的行为。
 
-## Options
+## 选项
 
 ```ts no-transpile
 type IsImmutableFunc = (value: any) => boolean
 
 interface ImmutableStateInvariantMiddlewareOptions {
   /**
-    Callback function to check if a value is considered to be immutable.
-    This function is applied recursively to every value contained in the state.
-    The default implementation will return true for primitive types 
-    (like numbers, strings, booleans, null and undefined).
+    回调函数，用于检查一个值是否被认为是不可变的。
+    这个函数会递归应用到状态中的每一个值。
+    默认实现会对原始类型返回true
+    （如数字、字符串、布尔值、null和undefined）。
    */
   isImmutable?: IsImmutableFunc
-  /** 
-    An array of dot-separated path strings or RegExps that match named nodes from 
-    the root state to ignore when checking for immutability.
-    Defaults to undefined
+  /**
+    一个由点分隔的路径字符串数组或匹配来自
+    根状态的命名节点的RegExps，当检查不变性时忽略。
+    默认为undefined
    */
   ignoredPaths?: (string | RegExp)[]
-  /** Print a warning if checks take longer than N ms. Default: 32ms */
+  /** 如果检查超过N毫秒，则打印警告。默认：32ms */
   warnAfter?: number
 }
 ```
 
-## Exports
+## 导出
 
 ### `createImmutableStateInvariantMiddleware`
 
-Creates an instance of the immutability check middleware, with the given options.
+使用给定的选项创建一个不变性检查中间件的实例。
 
-You will most likely not need to call this yourself, as `getDefaultMiddleware` already does so.
+你最可能不需要自己调用这个，因为`getDefaultMiddleware`已经这样做了。
 
-Example:
+示例：
 
 ```ts
-// file: exampleSlice.ts
+// 文件：exampleSlice.ts
 
 import { createSlice } from '@reduxjs/toolkit'
 
 export const exampleSlice = createSlice({
   name: 'example',
   initialState: {
-    user: 'will track changes',
-    ignoredPath: 'single level',
+    user: '将跟踪更改',
+    ignoredPath: '单级',
     ignoredNested: {
-      one: 'one',
-      two: 'two',
+      one: '一',
+      two: '二',
     },
   },
   reducers: {},
@@ -69,7 +69,7 @@ export const exampleSlice = createSlice({
 
 export default exampleSlice.reducer
 
-// file: store.ts
+// 文件：store.ts
 
 import {
   configureStore,
@@ -85,26 +85,26 @@ const immutableInvariantMiddleware = createImmutableStateInvariantMiddleware({
 
 const store = configureStore({
   reducer: exampleSliceReducer,
-  // Note that this will replace all default middleware
+  // 注意，这将替换所有默认的中间件
   middleware: () => new Tuple(immutableInvariantMiddleware),
 })
 ```
 
-doing the same without removing all other middlewares, using [getDetfaultMiddleware](./getDefaultMiddleware):
+使用[getDefaultMiddleware](./getDefaultMiddleware)在不移除所有其他中间件的情况下做同样的事情：
 
 ```ts
-// file: exampleSlice.ts noEmit
+// 文件：exampleSlice.ts noEmit
 
 import { createSlice } from '@reduxjs/toolkit'
 
 export const exampleSlice = createSlice({
   name: 'example',
   initialState: {
-    user: 'will track changes',
-    ignoredPath: 'single level',
+    user: '将跟踪更改',
+    ignoredPath: '单级',
     ignoredNested: {
-      one: 'one',
-      two: 'two',
+      one: '一',
+      two: '二',
     },
   },
   reducers: {},
@@ -112,14 +112,14 @@ export const exampleSlice = createSlice({
 
 export default exampleSlice.reducer
 
-// file: store.ts
+// 文件：store.ts
 import { configureStore } from '@reduxjs/toolkit'
 
 import exampleSliceReducer from './exampleSlice'
 
 const store = configureStore({
   reducer: exampleSliceReducer,
-  // This replaces the original default middleware with the customized versions
+  // 这将用定制版本替换原始的默认中间件
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       immutableCheck: {
@@ -131,7 +131,7 @@ const store = configureStore({
 
 ### `isImmutableDefault`
 
-Default implementation of the "is this value immutable?" check. Currently implemented as:
+"这个值是不可变的吗?"检查的默认实现。目前实现为：
 
 ```js
 return (
@@ -139,4 +139,4 @@ return (
 )
 ```
 
-This will return true for primitive types (like numbers, strings, booleans, null and undefined)
+这将对原始类型（如数字、字符串、布尔值、null和undefined）返回true
