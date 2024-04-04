@@ -4,7 +4,6 @@ import type * as Preset from "@docusaurus/preset-classic";
 import { linkDocblocks, transpileCodeblocks } from "remark-typescript-tools";
 
 const config: Config = {
-  projectName: "redux-toolkit",
   baseUrl: "/",
   favicon: "img/favicon/favicon.ico",
   tagline:
@@ -16,6 +15,10 @@ const config: Config = {
   },
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
+  onBrokenAnchors: "ignore",
+  organizationName:'ouweiya',
+  projectName:'redux-toolkit-zh',
+  trailingSlash: false,
 
   i18n: {
     defaultLocale: "zh-Hans",
