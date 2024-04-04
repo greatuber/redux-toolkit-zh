@@ -4,20 +4,16 @@ import type * as Preset from "@docusaurus/preset-classic";
 import { linkDocblocks, transpileCodeblocks } from "remark-typescript-tools";
 
 const config: Config = {
-  baseUrl: "/",
+  baseUrl: "/redux-toolkit-zh/",
   favicon: "img/favicon/favicon.ico",
-  tagline:
-    "The official, opinionated, batteries-included toolset for efficient Redux development",
-  title: "Redux Toolkit",
-  url: "https://redux-toolkit.js.org",
-  customFields: {
-    repoUrl: "https://github.com/reduxjs/redux-toolkit",
-  },
+  tagline: "用于高效 Redux 开发的官方、固执己见、包含电池的工具集",
+  title: "Redux Toolkit 中文",
+  url: "https://ouweiya.github.io",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   onBrokenAnchors: "ignore",
-  organizationName:'ouweiya',
-  projectName:'redux-toolkit-zh',
+  organizationName: "ouweiya",
+  projectName: "redux-toolkit-zh",
   trailingSlash: false,
 
   i18n: {
