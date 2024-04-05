@@ -74,26 +74,18 @@ export type ReducerWithInitialState<S extends NotFunction<any>> = Reducer<S> & {
 }
 
 /**
- * A utility function that allows defining a reducer as a mapping from action
- * type to *case reducer* functions that handle these action types. The
- * reducer's initial state is passed as the first argument.
+ * 这是一个实用函数，允许将 reducer 定义为从动作类型到处理这些动作类型的*case reducer*函数的映射。reducer 的初始状态作为第一个参数传递。
  *
  * @remarks
- * The body of every case reducer is implicitly wrapped with a call to
- * `produce()` from the [immer](https://github.com/mweststrate/immer) library.
- * This means that rather than returning a new state object, you can also
- * mutate the passed-in state object directly; these mutations will then be
- * automatically and efficiently translated into copies, giving you both
- * convenience and immutability.
+ * 每个 case reducer 的主体都隐式地用 [immer](https://github.com/mweststrate/immer) 库的 `produce()` 函数进行了包装。
+ * 这意味着你可以直接修改传入的状态对象，而不是返回一个新的状态对象；这些修改将自动且高效地转换为副本，为你提供便利性和不变性。
  *
  * @overloadSummary
- * This function accepts a callback that receives a `builder` object as its argument.
- * That builder provides `addCase`, `addMatcher` and `addDefaultCase` functions that may be
- * called to define what actions this reducer will handle.
+ * 此函数接受一个回调，该回调接收一个 `builder` 对象作为其参数。
+ * 该 builder 提供了 `addCase`，`addMatcher` 和 `addDefaultCase` 函数，可以调用它们来定义此 reducer 将处理哪些动作。
  *
- * @param initialState - `State | (() => State)`: The initial state that should be used when the reducer is called the first time. This may also be a "lazy initializer" function, which should return an initial state value when called. This will be used whenever the reducer is called with `undefined` as its state value, and is primarily useful for cases like reading initial state from `localStorage`.
- * @param builderCallback - `(builder: Builder) => void` A callback that receives a *builder* object to define
- *   case reducers via calls to `builder.addCase(actionCreatorOrType, reducer)`.
+ * @param initialState - `State | (() => State)`: 当 reducer 第一次被调用时应使用的初始状态。这也可以是一个"延迟初始化"函数，当被调用时应返回一个初始状态值。每当 reducer 被调用并且其状态值为 `undefined` 时，都会使用这个函数，这主要用于像从 `localStorage` 读取初始状态这样的情况。
+ * @param builderCallback - `(builder: Builder) => void` 一个接收 *builder* 对象的回调，通过调用 `builder.addCase(actionCreatorOrType, reducer)` 来定义 case reducer。
  * @example
 ```ts
 import {
@@ -121,16 +113,16 @@ const reducer = createReducer(
   (builder) => {
     builder
       .addCase(increment, (state, action) => {
-        // action is inferred correctly here
+        // 在这里正确推断出 action
         state.counter += action.payload;
       })
-      // You can chain calls, or have separate `builder.addCase()` lines each time
+      // 你可以链式调用，或者每次都有单独的 `builder.addCase()` 行
       .addCase(decrement, (state, action) => {
         state.counter -= action.payload;
       })
-      // You can apply a "matcher function" to incoming actions
+      // 你可以对传入的动作应用一个 "匹配函数"
       .addMatcher(isActionWithNumberPayload, (state, action) => {})
-      // and provide a default case if no other handlers matched
+      // 如果没有其他处理器匹配，可以提供一个默认情况
       .addDefaultCase((state, action) => {});
   }
 );

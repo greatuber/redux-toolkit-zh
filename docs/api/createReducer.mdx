@@ -9,13 +9,11 @@ hide_title: true
 
 # `createReducer()`
 
-## Overview
+## 概述
 
-A utility that simplifies creating Redux reducer functions. It uses Immer internally to drastically simplify immutable update logic
-by writing "mutative" code in your reducers, and supports directly mapping specific action types to case reducer functions
-that will update the state when that action is dispatched.
+这是一个简化创建 Redux reducer 函数的实用工具。它内部使用 Immer 来极大地简化不可变更新逻辑，通过在你的 reducer 中编写"可变"代码，并支持直接将特定的 action 类型映射到 case reducer 函数，当该 action 被调度时，将更新状态。
 
-Redux [reducers](https://redux.js.org/basics/reducers) are often implemented using a `switch` statement, with one `case` for every handled action type.
+Redux [reducers](https://redux.js.org/basics/reducers) 通常使用 `switch` 语句实现，每个处理的 action 类型都有一个 `case`。
 
 ```js
 const initialState = { value: 0 }
@@ -34,12 +32,11 @@ function counterReducer(state = initialState, action) {
 }
 ```
 
-This approach works well, but is a bit boilerplate-y and error-prone. For instance, it is easy to forget the `default` case or
-setting the initial state.
+这种方法工作得很好，但是有点模板化且容易出错。例如，很容易忘记 `default` 情况或设置初始状态。
 
-The `createReducer` helper streamlines the implementation of such reducers. It uses a "builder callback" notation to define handlers for specific action types, matching against a range of actions, or handling a default case. This is conceptually similar to a switch statement, but with better TS support.
+`createReducer` 辅助函数简化了这样的 reducer 的实现。它使用"构建器回调"表示法来定义特定 action 类型的处理程序，匹配一系列 action，或处理默认情况。这在概念上类似于 switch 语句，但具有更好的 TS 支持。
 
-With `createReducer`, your reducers instead look like:
+使用 `createReducer`，你的 reducer 看起来像这样：
 
 ```ts
 import { createAction, createReducer } from '@reduxjs/toolkit'
@@ -68,25 +65,25 @@ const counterReducer = createReducer(initialState, (builder) => {
 })
 ```
 
-## Usage with the "Builder Callback" Notation
+## 使用"构建器回调"表示法的用法
 
 [overloadSummary](docblock://createReducer.ts?token=createReducer)
 
-### Parameters
+### 参数
 
 [params](docblock://createReducer.ts?token=createReducer)
 
-### Example Usage
+### 示例用法
 
 [examples](docblock://createReducer.ts?token=createReducer)
 
-### Builder Methods
+### 构建器方法
 
 ### `builder.addCase`
 
 [summary,remarks](docblock://mapBuilders.ts?token=ActionReducerMapBuilder.addCase)
 
-#### Parameters
+#### 参数
 
 [params,examples](docblock://mapBuilders.ts?token=ActionReducerMapBuilder.addCase)
 
@@ -94,7 +91,7 @@ const counterReducer = createReducer(initialState, (builder) => {
 
 [summary,remarks](docblock://mapBuilders.ts?token=ActionReducerMapBuilder.addMatcher)
 
-#### Parameters
+#### 参数
 
 [params,examples](docblock://mapBuilders.ts?token=ActionReducerMapBuilder.addMatcher)
 
@@ -102,15 +99,15 @@ const counterReducer = createReducer(initialState, (builder) => {
 
 [summary,remarks](docblock://mapBuilders.ts?token=ActionReducerMapBuilder.addDefaultCase)
 
-#### Parameters
+#### 参数
 
 [params,examples](docblock://mapBuilders.ts?token=ActionReducerMapBuilder.addDefaultCase)
 
-### Returns
+### 返回
 
-The generated reducer function.
+生成的 reducer 函数。
 
-The reducer will have a `getInitialState` function attached that will return the initial state when called. This may be useful for tests or usage with React's `useReducer` hook:
+reducer 将有一个附加的 `getInitialState` 函数，当调用时，它将返回初始状态。这可能对测试或与 React 的 `useReducer` 钩子的使用有用：
 
 ```js
 const counterReducer = createReducer(0, (builder) => {
@@ -122,13 +119,13 @@ const counterReducer = createReducer(0, (builder) => {
 console.log(counterReducer.getInitialState()) // 0
 ```
 
-### Example Usage
+### 示例用法
 
 [examples](docblock://createReducer.ts?token=createReducer)
 
-## Direct State Mutation
+## 直接状态变更
 
-Redux requires reducer functions to be pure and treat state values as immutable. While this is essential for making state updates predictable and observable, it can sometimes make the implementation of such updates awkward. Consider the following example:
+Redux 要求 reducer 函数是纯的并将状态值视为不可变的。虽然这对于使状态更新可预测和可观察是必要的，但有时可能使这样的更新的实现变得尴尬。考虑以下示例：
 
 ```ts
 import { createAction, createReducer } from '@reduxjs/toolkit'
@@ -159,9 +156,9 @@ const todosReducer = createReducer([] as Todo[], (builder) => {
 })
 ```
 
-The `addTodo` reducer is straightforward if you know the [ES6 spread syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax). However, the code for `toggleTodo` is much less straightforward, especially considering that it only sets a single flag.
+如果你知道 [ES6 扩展语法](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax)，`addTodo` reducer 就很直接。然而，`toggleTodo` 的代码就不那么直接了，尤其是考虑到它只设置了一个单独的标志。
 
-To make things easier, `createReducer` uses [immer](https://github.com/mweststrate/immer) to let you write reducers as if they were mutating the state directly. In reality, the reducer receives a proxy state that translates all mutations into equivalent copy operations.
+为了简化，`createReducer` 使用 [immer](https://github.com/mweststrate/immer) 让你编写 reducer，就像它们直接修改状态一样。实际上，reducer 接收一个代理状态，将所有变更转换为等效的复制操作。
 
 ```ts
 import { createAction, createReducer } from '@reduxjs/toolkit'
@@ -177,14 +174,14 @@ const toggleTodo = createAction<number>('todos/toggle')
 const todosReducer = createReducer([] as Todo[], (builder) => {
   builder
     .addCase(addTodo, (state, action) => {
-      // This push() operation gets translated into the same
-      // extended-array creation as in the previous example.
+      // 这个 push() 操作被转换为与前一个示例中相同的
+      // 扩展数组创建。
       const todo = action.payload
       state.push(todo)
     })
     .addCase(toggleTodo, (state, action) => {
-      // The "mutating" version of this case reducer is much
-      //  more direct than the explicitly pure one.
+      // 这个 case reducer 的"变更"版本比明确纯净的版本
+      // 更直接。
       const index = action.payload
       const todo = state[index]
       todo.completed = !todo.completed
@@ -192,7 +189,7 @@ const todosReducer = createReducer([] as Todo[], (builder) => {
 })
 ```
 
-Writing "mutating" reducers simplifies the code. It's shorter, there's less indirection, and it eliminates common mistakes made while spreading nested state. However, the use of Immer does add some "magic", and Immer has its own nuances in behavior. You should read through [pitfalls mentioned in the immer docs](https://immerjs.github.io/immer/pitfalls) . Most importantly, **you need to ensure that you either mutate the `state` argument or return a new state, _but not both_**. For example, the following reducer would throw an exception if a `toggleTodo` action is passed:
+编写"变更"的 reducer 简化了代码。它更短，间接性更少，消除了在扩展嵌套状态时常见的错误。然而，使用 Immer 添加了一些"魔法"，Immer 在行为上有自己的细微差别。你应该阅读 [在 immer 文档中提到的陷阱](https://immerjs.github.io/immer/pitfalls)。最重要的是，**你需要确保你要么变更 `state` 参数，要么返回一个新的状态，但不能两者都做**。例如，如果传递了一个 `toggleTodo` 动作，以下的 reducer 将抛出一个异常：
 
 ```ts
 import { createAction, createReducer } from '@reduxjs/toolkit'
@@ -209,31 +206,31 @@ const todosReducer = createReducer([] as Todo[], (builder) => {
     const index = action.payload
     const todo = state[index]
 
-    // This case reducer both mutates the passed-in state...
+    // 这个 case reducer 同时变更了传入的状态...
     todo.completed = !todo.completed
 
-    // ... and returns a new value. This will throw an
-    // exception. In this example, the easiest fix is
-    // to remove the `return` statement.
+    // ... 并返回了一个新的值。这将抛出一个
+    // 异常。在这个示例中，最简单的修复方法是
+    // 移除 `return` 语句。
     return [...state.slice(0, index), todo, ...state.slice(index + 1)]
   })
 })
 ```
 
-## Multiple Case Reducer Execution
+## 多个 Case Reducer 执行
 
-Originally, `createReducer` always matched a given action type to a single case reducer, and only that one case reducer would execute for a given action.
+最初，`createReducer` 总是将给定的动作类型匹配到一个单一的 case reducer，并且只有那一个 case reducer 会为给定的动作执行。
 
-Using action matchers changes that behavior, as multiple matchers may handle a single action.
+使用动作匹配器改变了这种行为，因为多个匹配器可能处理一个单一的动作。
 
-For any dispatched action, the behavior is:
+对于任何调度的动作，行为是：
 
-- If there is an exact match for the action type, the corresponding case reducer will execute first
-- Any matchers that return `true` will execute in the order they were defined
-- If a default case reducer is provided, and _no_ case or matcher reducers ran, the default case reducer will execute
-- If no case or matcher reducers ran, the original existing state value will be returned unchanged
+- 如果动作类型有精确匹配，相应的 case reducer 将首先执行
+- 任何返回 `true` 的匹配器将按照它们定义的顺序执行
+- 如果提供了一个默认的 case reducer，并且没有 case 或匹配器 reducer 运行，那么默认的 case reducer 将执行
+- 如果没有 case 或匹配器 reducer 运行，原始的现有状态值将不变地返回
 
-The executing reducers form a pipeline, and each of them will receive the output of the previous reducer:
+执行的 reducer 形成一个管道，每个 reducer 都将接收前一个 reducer 的输出：
 
 ```ts
 import { createReducer } from '@reduxjs/toolkit'
@@ -252,17 +249,17 @@ const reducer = createReducer(0, (builder) => {
 })
 
 console.log(reducer(0, { type: 'increment' }))
-// Returns 7, as the 'increment' case and both matchers all ran in sequence:
+// 返回 7，因为 'increment' case 和两个匹配器都按顺序运行了：
 // - case 'increment": 0 => 1
-// - matcher starts with 'i': 1 => 5
-// - matcher ends with 't': 5 => 7
+// - 匹配器以 'i' 开头: 1 => 5
+// - 匹配器以 't' 结尾: 5 => 7
 ```
 
-## Logging Draft State Values
+## 记录草稿状态值
 
-It's very common for a developer to call `console.log(state)` during the development process. However, browsers display Proxies in a format that is hard to read, which can make console logging of Immer-based state difficult.
+在开发过程中，开发者调用 `console.log(state)` 是非常常见的。然而，浏览器以难以阅读的格式显示代理，这可能使基于 Immer 的状态的控制台记录变得困难。
 
-When using either `createSlice` or `createReducer`, you may use the [`current`](./otherExports.mdx#current) utility that we re-export from the [`immer` library](https://immerjs.github.io/immer/current). This utility creates a separate plain copy of the current Immer `Draft` state value, which can then be logged for viewing as normal.
+当使用 `createSlice` 或 `createReducer` 时，你可以使用我们从 [`immer` 库](https://immerjs.github.io/immer/current) 重新导出的 [`current`](./otherExports.mdx#current) 实用工具。这个实用工具创建了当前 Immer `Draft` 状态值的单独纯复制，然后可以像正常的那样进行记录以供查看。
 
 ```ts
 import { createSlice, current } from '@reduxjs/toolkit'

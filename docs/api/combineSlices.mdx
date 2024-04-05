@@ -9,29 +9,29 @@ hide_title: true
 
 # `combineSlices`
 
-## Overview
+## 概述
 
-A function that combines slices into a single reducer, and enables injection of more reducers after initialisation.
+一个将切片组合成单个 reducer 的函数，并在初始化后启用更多的 reducer 注入。
 
 ```ts
-// file: slices/api.ts noEmit
+// 文件: slices/api.ts noEmit
 import type { Api } from '@reduxjs/toolkit/query'
 
 export declare const api: Api<() => any, {}, 'api', never>
 
-// file: slices/users.ts noEmit
+// 文件: slices/users.ts noEmit
 import type { Slice } from '@reduxjs/toolkit'
 
 export declare const userSlice: Slice<string, {}, 'user'>
 
-// file: slices/index.ts
+// 文件: slices/index.ts
 import { combineSlices } from '@reduxjs/toolkit'
 import { api } from './api'
 import { userSlice } from './users'
 
 export const rootReducer = combineSlices(api, userSlice)
 
-// file: store.ts
+// 文件: store.ts
 import { configureStore } from '@reduxjs/toolkit'
 import { rootReducer } from './slices'
 
@@ -42,8 +42,8 @@ export const store = configureStore({
 
 :::note
 
-A "slice" for `combineSlices` is typically created with [`createSlice`](./createSlice.mdx),
-but can be any "slice-like" object with `reducerPath` and `reducer` properties (meaning RTK Query [API instances](/rtk-query/api/created-api/overview.mdx) are also compatible).
+`combineSlices` 的 "切片" 通常是用 [`createSlice`](./createSlice.mdx) 创建的，
+但也可以是任何带有 `reducerPath` 和 `reducer` 属性的 "类切片" 对象（这意味着 RTK Query [API 实例](/rtk-query/api/created-api/overview.mdx) 也是兼容的）。
 
 ```ts no-transpile
 const withUserReducer = rootReducer.inject({
@@ -54,22 +54,22 @@ const withUserReducer = rootReducer.inject({
 const withApiReducer = rootReducer.inject(fooApi)
 ```
 
-For simplicity, this `{ reducerPath, reducer }` shape will be described in these docs as a "slice".
+为了简单起见，这种 `{ reducerPath, reducer }` 的形状在这些文档中将被描述为 "切片"。
 
 :::
 
-## Parameters
+## 参数
 
-`combineSlices` accepts a set of slices and/or reducer map objects, and combines them into a single reducer.
+`combineSlices` 接受一组切片和/或 reducer 映射对象，并将它们组合成一个单一的 reducer。
 
-Slices will be mounted at their `reducerPath`, and items from reducer map objects will be mounted under their respective key.
+切片将在其 `reducerPath` 下挂载，reducer 映射对象的项将在其各自的键下挂载。
 
 ```ts no-transpile
 const rootReducer = combineSlices(counterSlice, baseApi, {
   user: userSlice.reducer,
   auth: authSlice.reducer,
 })
-// is like
+// 就像
 const rootReducer = combineReducers({
   [counterSlice.reducerPath]: counterSlice.reducer,
   [baseApi.reducerPath]: baseApi.reducer,
@@ -80,15 +80,15 @@ const rootReducer = combineReducers({
 
 :::caution
 
-If multiple slices/map objects have the same reducer path, the reducer provided later in the arguments will override the previous.
+如果多个切片/映射对象有相同的 reducer 路径，后面的参数提供的 reducer 将覆盖前面的。
 
-However, typing will not be able to account for this. It's best to ensure that all of your reducers will aim for a unique location.
+然而，类型系统无法对此进行处理。最好确保所有的 reducer 都指向一个唯一的位置。
 
 :::
 
-## Return Value
+## 返回值
 
-`combineSlices` returns a reducer function, with attached methods.
+`combineSlices` 返回一个带有附加方法的 reducer 函数。
 
 ```ts no-transpile
 interface CombinedSliceReducer<InitialState, DeclaredState = InitialState>
@@ -110,14 +110,14 @@ interface CombinedSliceReducer<InitialState, DeclaredState = InitialState>
 
 ### `withLazyLoadedSlices`
 
-It's recommended to [infer your RootState type from your store](https://redux.js.org/usage/usage-with-typescript#define-root-state-and-dispatch-types), which is inferred from the reducer. However, this can present issues if slices are lazy loaded, and thus not able to be inferred from.
+建议从你的 store [推断你的 RootState 类型](https://redux.js.org/usage/usage-with-typescript#define-root-state-and-dispatch-types)，这是从 reducer 推断出来的。然而，如果切片是懒加载的，那么就无法从中推断出来。
 
-`withLazyLoadedSlices` allows you to declare slices that will be added to state later, which will be included in the final state type.
+`withLazyLoadedSlices` 允许你声明将在后面添加到状态的切片，这将包含在最终的状态类型中。
 
-One possible pattern of managing this would be with declaration merging:
+管理这个的一个可能的模式是使用声明合并：
 
-```ts no-transpile title="Using declaration merging to declare injected slices"
-// file: slices/index.ts
+```ts no-transpile title="使用声明合并来声明注入的切片"
+// 文件: slices/index.ts
 import { combineSlices } from '@reduxjs/toolkit'
 import { staticSlice } from './static'
 
@@ -126,10 +126,10 @@ export interface LazyLoadedSlices {}
 export const rootReducer =
   combineSlices(staticSlice).withLazyLoadedSlices<LazyLoadedSlices>()
 
-// keys in LazyLoadedSlices are marked as optional
+// LazyLoadedSlices 中的键被标记为可选
 export type RootState = ReturnType<typeof rootReducer>
 
-// file: slices/lazySlice.ts
+// 文件: slices/lazySlice.ts
 import type { WithSlice } from '@reduxjs/toolkit'
 import { rootReducer } from '.'
 
@@ -143,17 +143,17 @@ declare module '.' {
 
 const injectedReducer = rootReducer.inject(lazySlice)
 
-// and/or
+// 和/或
 
 const injectedSlice = lazySlice.injectInto(rootReducer)
 ```
 
 :::tip
 
-The above example uses the `WithSlice` utility type for a slice mounted under its `reducerPath`. If the slice is mounted under a different key, you can declare it as a regular key instead.
+上面的例子使用了 `WithSlice` 实用类型，用于在其 `reducerPath` 下挂载的切片。如果切片是在不同的键下挂载的，你可以将其声明为一个常规的键。
 
-```ts no-transpile title="Declaring a slice mounted outside its reducerPath"
-// file: slices/lazySlice.ts
+```ts no-transpile title="声明一个在其 reducerPath 外挂载的切片"
+// 文件: slices/lazySlice.ts
 import { rootReducer } from '.'
 
 const lazySlice = createSlice({
@@ -171,7 +171,7 @@ const injectedReducer = rootReducer.inject({
   reducer: lazySlice.reducer,
 })
 
-// and/or
+// 和/或
 
 const injectedSlice = lazySlice.injectInto(rootReducer, {
   reducerPath: 'customKey',
@@ -182,10 +182,9 @@ const injectedSlice = lazySlice.injectInto(rootReducer, {
 
 ### `inject`
 
-`inject` allows you to add a slice to your set of reducers after initialisation.
-It expects to be passed a slice and an optional config, and returns an updated version of the reducer with the slice included.
+`inject`允许你在初始化后向你的reducers集合中添加一个slice。它期望传入一个slice和一个可选的配置，然后返回一个包含该slice的更新后的reducer。
 
-This is mainly useful for lazy loading reducers.
+这主要用于懒加载reducers。
 
 ```ts no-transpile
 const reducerWithUser = rootReducer.inject(userSlice)
@@ -193,18 +192,17 @@ const reducerWithUser = rootReducer.inject(userSlice)
 
 :::note
 
-`inject` adds the slice to the map of reducers in your original reducer, but doesn't dispatch an action.
+`inject`将slice添加到你原始reducer中的reducers映射中，但不会派发一个动作。
 
-This means that the added reducer state will not show up in your store until the next action is dispatched.
+这意味着，添加的reducer状态将不会在下一个动作被派发之前出现在你的store中。
 
 :::
 
-#### Reducer replacement
+#### Reducer替换
 
-By default, replacing a reducer is not allowed.
-In development mode, a warning will be logged to console if a new reducer instance is attempted to inject into a `reducerPath` that's already injected. (It won't warn if the same reducer instance is injected into the same place twice.)
+默认情况下，不允许替换reducer。在开发模式下，如果尝试将新的reducer实例注入到已经注入的`reducerPath`中，将会在控制台中记录一个警告。（如果同一个reducer实例被注入到同一个位置两次，它不会警告。）
 
-If you wish to allow replacing a reducer with a new instance, you must explicitly pass `overrideExisting: true` as part of your configuration object.
+如果你希望允许用新的实例替换一个reducer，你必须明确地将`overrideExisting: true`作为你的配置对象的一部分传入。
 
 ```ts no-transpile
 const reducerWithUser = rootReducer.inject(userSlice, {
@@ -212,10 +210,9 @@ const reducerWithUser = rootReducer.inject(userSlice, {
 })
 ```
 
-This may be useful for hot reload, or "removing" a reducer by replacing it with a function that always returns `null`.
-Note that for predictable behaviour, your types should account for all of the possible reducers you intend to occupy a path.
+这可能对于热重载或者通过替换它为一个总是返回`null`的函数来"移除"一个reducer很有用。注意，为了可预测的行为，你的类型应该考虑到你打算占用一个路径的所有可能的reducers。
 
-```ts no-transpile title="'Removing' a reducer, by replacing it with a no-op function"
+```ts no-transpile title="'移除'一个reducer，通过替换它为一个无操作函数"
 declare module '.' {
   export interface LazyLoadedSlices {
     removable: RemovableState | null
@@ -238,11 +235,11 @@ const removeReducer = () =>
 
 ### `selector`
 
-As noted previously, an injected reducer can still be undefined in state if no action has been dispatched.
+如前所述，如果没有派发动作，注入的reducer在状态中仍然可能是未定义的。
 
-Dealing with this possibly-optional state can be inconvient when writing selectors, as you may end up with a lot of results being possibly undefined or relying on explicit defaults.
+在编写选择器时，处理这种可能的可选状态可能会很不方便，因为你可能会得到很多可能是未定义的结果，或者依赖于明确的默认值。
 
-`selector` allows you to get around this, by wrapping the reducer state in a `Proxy` that ensures that any currently injected reducers evaluate to their initial state if they're currently `undefined` in state.
+`selector`允许你绕过这个问题，通过将reducer状态包装在一个`Proxy`中，确保任何当前注入的reducers在状态中当前为`undefined`时，它们会评估为它们的初始状态。
 
 ```ts no-transpile
 declare module '.' {
@@ -275,15 +272,15 @@ console.log(
 
 :::caution
 
-The `Proxy` retrieves a reducer's initial state by calling it with a randomly generated action type - don't try to handle this as a special case inside your reducer.
+`Proxy`通过调用一个随机生成的动作类型来获取reducer的初始状态 - 不要试图在你的reducer内部处理这个作为一个特殊情况。
 
 :::
 
-#### Nested combined reducer
+#### 嵌套的组合reducer
 
-The wrapped selector expects to use the state returned by the combined reducer as its first argument.
+包装的选择器期望使用组合reducer返回的状态作为其第一个参数。
 
-If the combined reducer is nested further inside the store state, pass a `selectState` callback as the second argument to `selector`:
+如果组合reducer进一步嵌套在store状态中，将一个`selectState`回调作为第二个参数传递给`selector`：
 
 ```ts no-transpile
 interface RootState {
@@ -311,11 +308,11 @@ console.log(
 
 #### `original`
 
-Similar to [Immer usage](/usage/immer-reducers.md#debugging-and-inspecting-drafted-state), an `original` function is provided to retrieve the original state value provided to the `Proxy`.
+类似于[Immer使用](/usage/immer-reducers.md#debugging-and-inspecting-drafted-state)，提供了一个`original`函数来获取提供给`Proxy`的原始状态值。
 
-This is mainly useful for debugging/inspecting, as `Proxy` instances tend to be displayed in a format that's hard to read.
+这主要用于调试/检查，因为`Proxy`实例往往以难以阅读的格式显示。
 
-The function is attached as a method on the `selector` function:
+该函数作为`selector`函数的一个方法附加：
 
 ```ts no-transpile
 const wrappedSelectCounterValue = withCounter.selector((rootState) => {
@@ -324,17 +321,17 @@ const wrappedSelectCounterValue = withCounter.selector((rootState) => {
 })
 ```
 
-## Slice integration
+## Slice集成
 
 ### `injectInto`
 
-Slice instances returned by [`createSlice`](./createSlice) have an attached `injectInto` method, which receive an injectable reducer from `combineSlices` and returns an "injected" version of that slice.
+由[`createSlice`](./createSlice)返回的Slice实例有一个附加的`injectInto`方法，它接收一个来自`combineSlices`的可注入reducer，并返回该slice的"注入"版本。
 
 ```ts no-transpile
 const injectedCounterSlice = counterSlice.injectInto(rootReducer)
 ```
 
-An optional configuration object can be passed. This follows [`inject`](#inject)'s options with an additional `reducerPath` field, for injecting the slice under a path other than its current `reducerPath` property.
+可以传递一个可选的配置对象。这遵循[`inject`](#inject)的选项，并附加一个`reducerPath`字段，用于将slice注入到除其当前`reducerPath`属性之外的路径。
 
 ```ts no-transpile
 const aCounterSlice = counterSlice.injectInto(rootReducer, {
@@ -344,11 +341,11 @@ const aCounterSlice = counterSlice.injectInto(rootReducer, {
 
 ### `selectors` / `getSelectors`
 
-Similar to [`selector`](#selector), the selectors from an "injected" slice instance behave slightly differently.
+类似于[`selector`](#selector)，来自"注入"的slice实例的选择器的行为稍有不同。
 
-If the slice state is undefined in the store state passed, the selector will instead be called with the slice's initial state.
+如果slice状态在传递的store状态中是未定义的，那么选择器将会被调用并传入slice的初始状态。
 
-`selectors` will also reflect the change in `reducerPath` if one was made during injection.
+如果在注入过程中对`reducerPath`进行了更改，`selectors`也会反映这种更改。
 
 ```ts no-transpile
 console.log(

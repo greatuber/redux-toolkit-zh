@@ -6,62 +6,62 @@ description: 'Usage > Setup > Migrating to Modern Redux: how to modernize legacy
 
 import { DetailedExplanation } from '../components/DetailedExplanation'
 
-:::tip What You'll Learn
+:::tip 你将学到什么
 
-- How to modernize legacy "hand-written" Redux logic to use Redux Toolkit
-- How to modernize legacy React-Redux `connect` components to use the hooks API
-- How to modernize Redux logic and React-Redux components that use TypeScript
+- 如何将传统的"手写" Redux 逻辑升级为使用 Redux Toolkit
+- 如何将传统的 React-Redux `connect` 组件升级为使用 hooks API
+- 如何将使用 TypeScript 的 Redux 逻辑和 React-Redux 组件升级为现代化
 
 :::
 
-## Overview
+## 概述
 
-Redux has been around since 2015, and our recommended patterns for writing Redux code have changed significantly over the years. In the same way that React has evolved from `createClass` to `React.Component` to function components with hooks, Redux has evolved from manual store setup + hand-written reducers with object spreads + React-Redux's `connect`, to Redux Toolkit's `configureStore` + `createSlice` + React-Redux's hooks API.
+Redux 自 2015 年以来一直存在，我们推荐的编写 Redux 代码的模式已经发生了显著的变化。就像 React 从 `createClass` 进化到 `React.Component`，再到带有 hooks 的函数组件，Redux 也从手动设置 store + 手写的带有对象扩展的 reducer + React-Redux 的 `connect`，进化到 Redux Toolkit 的 `configureStore` + `createSlice` + React-Redux 的 hooks API。
 
-Many users are working on older Redux codebases that have been around since before these "modern Redux" patterns existed. Migrating those codebases to today's recommended modern Redux patterns will result in codebases that are much smaller and easier to maintain.
+许多用户正在使用早在这些"现代 Redux"模式存在之前就已经存在的旧版 Redux 代码库。将这些代码库迁移到今天推荐的现代 Redux 模式，将使代码库变得更小，更容易维护。
 
-The good news is that **you can migrate your code to modern Redux incrementally, piece by piece, with old and new Redux code coexisting and working together!**
+好消息是，**你可以逐步、逐块地将你的代码迁移到现代 Redux，旧的和新的 Redux 代码可以共存并一起工作！**
 
-This page covers the general approaches and techniques you can use to modernize an existing legacy Redux codebase.
+本页介绍了你可以用来升级现有的传统 Redux 代码库的一般方法和技术。
 
 :::info
 
-For more details on how "modern Redux" with Redux Toolkit + React-Redux hooks simplifies using Redux, see these additional resources:
+有关使用 Redux Toolkit + React-Redux hooks 简化 Redux 使用的"现代 Redux"的更多细节，请参阅以下额外资源：
 
-- [Why Redux Toolkit is How to use Redux Today](../introduction/why-rtk-is-redux-today.md)
-- [Redux Essentials: Redux Toolkit App Structure](https://redux.js.org/tutorials/essentials/part-2-app-structure)
-- [Redux Fundamentals: Modern Redux with Redux Toolkit](https://redux.js.org/tutorials/fundamentals/part-8-modern-redux)
-- [Presentation: Modern Redux with Redux Toolkit](https://blog.isquaredsoftware.com/2022/06/presentations-modern-redux-rtk/)
+- [为什么 Redux Toolkit 是今天使用 Redux 的方式](../introduction/why-rtk-is-redux-today.md)
+- [Redux 基础知识：Redux Toolkit 应用结构](https://redux.js.org/tutorials/essentials/part-2-app-structure)
+- [Redux 基础知识：使用 Redux Toolkit 的现代 Redux](https://redux.js.org/tutorials/fundamentals/part-8-modern-redux)
+- [演示：使用 Redux Toolkit 的现代 Redux](https://blog.isquaredsoftware.com/2022/06/presentations-modern-redux-rtk/)
 
 :::
 
-## Modernizing Redux Logic with Redux Toolkit
+## 使用 Redux Toolkit 现代化 Redux 逻辑
 
-The general approach to migrating Redux logic is:
+迁移 Redux 逻辑的一般方法是：
 
-- Replace the existing manual Redux store setup with Redux Toolkit's `configureStore`
-- Pick an existing slice reducer and its associated actions. Replace those with RTK's `createSlice`. Repeat for one reducer at a time.
-- As needed, replace existing data fetching logic with RTK Query or `createAsyncThunk`
-- Use RTK's other APIs like `createListenerMiddleware` or `createEntityAdapter` as needed
+- 用 Redux Toolkit 的 `configureStore` 替换现有的手动 Redux store 设置
+- 选择一个现有的 slice reducer 及其关联的 actions。用 RTK 的 `createSlice` 替换它们。每次替换一个 reducer。
+- 根据需要，用 RTK Query 或 `createAsyncThunk` 替换现有的数据获取逻辑
+- 根据需要使用 RTK 的其他 API，如 `createListenerMiddleware` 或 `createEntityAdapter`
 
-**You should always start by replacing the legacy `createStore` call with `configureStore`**. This is a one-time step, and all of the existing reducers and middleware will continue to work as-is. `configureStore` includes development-mode checks for common mistakes like accidental mutations and non-serializable values, so having those in place will help identify any areas of the codebase where those mistakes are happening.
+**你应该始终首先用 `configureStore` 替换传统的 `createStore` 调用**。这是一次性步骤，所有现有的 reducer 和中间件将继续按原样工作。`configureStore` 包括对常见错误（如意外的变异和非序列化值）的开发模式检查，因此有这些检查将帮助识别代码库中发生这些错误的任何区域。
 
 :::info
 
-You can see this general approach in action in [**Redux Fundamentals, Part 8: Modern Redux with Redux Toolkit**](https://redux.js.org/tutorials/fundamentals/part-8-modern-redux).
+你可以在 [**Redux 基础知识，第 8 部分：使用 Redux Toolkit 的现代 Redux**](https://redux.js.org/tutorials/fundamentals/part-8-modern-redux) 中看到这种一般方法的实际应用。
 
 :::
 
-### Store Setup with `configureStore`
+### 使用 `configureStore` 设置 Store
 
-A typical legacy Redux store setup file does several different steps:
+典型的传统 Redux store 设置文件执行了几个不同的步骤：
 
-- Combining the slice reducers into the root reducer
-- Creating the middleware enhancer, usually with the thunk middleware, and possibly other middleware in development mode such as `redux-logger`
-- Adding the Redux DevTools enhancer, and composing the enhancers together
-- Calling `createStore`
+- 将 slice reducer 合并到 root reducer
+- 创建中间件增强器，通常使用 thunk 中间件，可能在开发模式下使用其他中间件，如 `redux-logger`
+- 添加 Redux DevTools 增强器，并将增强器组合在一起
+- 调用 `createStore`
 
-Here's what those steps might look like in an existing application:
+在现有应用程序中，这些步骤可能看起来像这样：
 
 ```js title="src/app/store.js"
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux'
@@ -85,20 +85,20 @@ const composedEnhancers = composeWithDevTools(middlewareEnhancer)
 const store = createStore(rootReducer, composedEnhancers)
 ```
 
-**_All_ of those steps can be replaced with a single call to Redux Toolkit's `configureStore` API**.
+**_所有_ 这些步骤都可以用 Redux Toolkit 的 `configureStore` API 的单个调用来替换**。
 
-RTK's `configureStore` wraps around the original `createStore` method, and handles most of the store setup for us automatically. In fact, we can cut it down to effectively one step:
+RTK 的 `configureStore` 包装了原始的 `createStore` 方法，并自动为我们处理了大部分的 store 设置。实际上，我们可以将其简化为实际上的一个步骤：
 
-```js title="Basic Store Setup: src/app/store.js"
+```js title="基本 Store 设置: src/app/store.js"
 import { configureStore } from '@reduxjs/toolkit'
 
 import postsReducer from '../reducers/postsReducer'
 import usersReducer from '../reducers/usersReducer'
 
 // highlight-start
-// Automatically adds the thunk middleware and the Redux DevTools extension
+// 自动添加 thunk 中间件和 Redux DevTools 扩展
 const store = configureStore({
-  // Automatically calls `combineReducers`
+  // 自动调用 `combineReducers`
   reducer: {
     posts: postsReducer,
     users: usersReducer,
@@ -107,29 +107,29 @@ const store = configureStore({
 // highlight-end
 ```
 
-That one call to `configureStore` did all the work for us:
+这个对 `configureStore` 的一次调用为我们做了所有的工作：
 
-- It called `combineReducers` to combine `postsReducer` and `usersReducer` into the root reducer function, which will handle a root state that looks like `{posts, users}`
-- It called `createStore` to create a Redux store using that root reducer
-- It automatically added the thunk middleware and called `applyMiddleware`
-- It automatically added more middleware to check for common mistakes like accidentally mutating the state
-- It automatically set up the Redux DevTools Extension connection
+- 它调用了 `combineReducers` 将 `postsReducer` 和 `usersReducer` 合并到 root reducer 函数中，该函数将处理一个看起来像 `{posts, users}` 的 root state
+- 它调用了 `createStore` 使用该 root reducer 创建一个 Redux store
+- 它自动添加了 thunk 中间件并调用了 `applyMiddleware`
+- 它自动添加了更多的中间件来检查常见的错误，如意外地改变了 state
+- 它自动设置了 Redux DevTools Extension 连接
 
-If your store setup requires additional steps, such as adding additional middleware, passing in an `extra` argument to the thunk middleware, or creating a persisted root reducer, you can do that as well. Here's a larger example that shows customizing the built-in middleware and turning on Redux-Persist, which demonstrates some of the options for working with `configureStore`:
+如果你的 store 设置需要额外的步骤，如添加额外的中间件，向 thunk 中间件传入一个 `extra` 参数，或创建一个持久化的 root reducer，你也可以这样做。下面是一个更大的示例，展示了如何使用 `configureStore` 自定义内置中间件并开启 Redux-Persist，这展示了一些使用 `configureStore` 的选项：
 
-<DetailedExplanation title="Detailed Example: Custom Store Setup with Persistence and Middleware">
+<DetailedExplanation title="详细示例：带有持久化和中间件的自定义 Store 设置">
 
-This example shows several possible common tasks when setting up a Redux store:
+此示例显示了设置 Redux store 时可能的几个常见任务：
 
-- Combining the reducers separately (sometimes needed due to other architectural constraints)
-- Adding additional middleware, both conditionally and unconditionally
-- Passing an "extra argument" into the thunk middleware, such as an API service layer
-- Using the Redux-Persist library, which requires special handling for its non-serializable action types
-- Turning the devtools off in prod, and setting additional devtools options in development
+- 单独合并 reducer（由于其他架构约束有时需要）
+- 添加额外的中间件，无论是有条件的还是无条件的
+- 将"额外参数"传入 thunk 中间件，如 API 服务层
+- 使用 Redux-Persist 库，该库需要对其非序列化的 action 类型进行特殊处理
+- 在生产环境中关闭 devtools，在开发环境中设置额外的 devtools 选项
 
-None of these are _required_, but they do show up frequently in real-world codebases.
+这些都不是_必需的_，但它们在实际的代码库中经常出现。
 
-```js title="Custom Store Setup: src/app/store.js"
+```js title="自定义 Store 设置: src/app/store.js"
 import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import {
   persistStore,
@@ -153,7 +153,7 @@ import { serviceLayer } from '../features/api/serviceLayer'
 import stateSanitizerForDevtools from './devtools'
 import customMiddleware from './someCustomMiddleware'
 
-// Can call `combineReducers` yourself if needed
+// 如果需要，可以自己调用 `combineReducers`
 const rootReducer = combineReducers({
   posts: postsReducer,
   users: usersReducer,
@@ -169,28 +169,28 @@ const persistConfig = {
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 const store = configureStore({
-  // Can create a root reducer separately and pass that in
+  // 可以单独创建一个 root reducer 并传入
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) => {
     const middleware = getDefaultMiddleware({
-      // Pass in a custom `extra` argument to the thunk middleware
+      // 向 thunk 中间件传入一个自定义的 `extra` 参数
       thunk: {
         extraArgument: { serviceLayer },
       },
-      // Customize the built-in serializability dev check
+      // 自定义内置的序列化 dev 检查
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }).concat(customMiddleware, api.middleware)
 
-    // Conditionally add another middleware in dev
+    // 在 dev 中有条件地添加另一个中间件
     if (process.env.NODE_ENV !== 'production') {
       middleware.push(logger)
     }
 
     return middleware
   },
-  // Turn off devtools in prod, or pass options in dev
+  // 在生产环境中关闭 devtools，或在开发环境中传入选项
   devTools:
     process.env.NODE_ENV === 'production'
       ? false
@@ -202,9 +202,9 @@ const store = configureStore({
 
 </DetailedExplanation>
 
-### Reducers and Actions with `createSlice`
+### 使用 `createSlice` 的 Reducers 和 Actions
 
-A typical legacy Redux codebase has its reducer logic, action creators, and action types spread across separate files, and those files are often in separate folders by type. The reducer logic is written using `switch` statements and hand-written immutable update logic with object spreads and array mapping:
+典型的传统 Redux 代码库将其 reducer 逻辑、action 创建者和 action 类型分布在不同的文件中，这些文件通常按类型分布在不同的文件夹中。reducer 逻辑是使用 `switch` 语句和手写的不可变更新逻辑（使用对象扩展和数组映射）编写的：
 
 ```js title="src/constants/todos.js"
 export const ADD_TODO = 'ADD_TODO'
@@ -258,19 +258,19 @@ export default function todosReducer(state = initialState, action) {
 }
 ```
 
-**Redux Toolkit's `createSlice` API was designed to eliminate all the "boilerplate" with writing reducers, actions, and immutable updates!**
+**Redux Toolkit 的 `createSlice` API 旨在消除编写 reducers、actions 和不可变更新的所有 "样板代码"！**
 
-With Redux Toolkit, there's multiple changes to that legacy code:
+使用 Redux Toolkit，对传统代码有多个更改：
 
-- `createSlice` will eliminate the hand-written action creators and action types entirely
-- All of the uniquely-named fields like `action.text` and `action.id` get replaced by `action.payload`, either as an individual value or an object containing those fields
-- The hand-written immutable updates are replaced by "mutating" logic in reducers thanks to Immer
-- There's no need for separate files for each type of code
-- We teach having _all_ logic for a given reducer in a single "slice" file
-- Instead of having separate folders by "type of code", we recommend organizing files by "features", with related code living in the same folder
-- Ideally, the naming of the reducers and actions should use the past tense and describe "a thing that happened", rather than an imperative "do this thing now", such as `todoAdded` instead of `ADD_TODO`
+- `createSlice` 将完全消除手写的 action 创建者和 action 类型
+- 所有像 `action.text` 和 `action.id` 这样的独特命名字段都被 `action.payload` 替换，作为一个单独的值或包含这些字段的对象
+- 手写的不可变更新被 reducers 中的 "变异" 逻辑替换，感谢 Immer
+- 不需要为每种类型的代码分别创建文件
+- 我们教授在一个 "slice" 文件中有一个给定 reducer 的 _所有_ 逻辑
+- 我们建议按 "特性" 组织文件，而不是按 "代码类型"，与相关代码生活在同一个文件夹中
+- 理想情况下，reducers 和 actions 的命名应使用过去时，并描述 "发生的事情"，而不是祈使 "现在做这件事"，例如 `todoAdded` 而不是 `ADD_TODO`
 
-Those separate files for constants, actions, and reducers, would all be replaced by a single "slice" file. The modernized slice file would look like this:
+这些常量、actions 和 reducers 的单独文件都将被一个 "slice" 文件替换。现代化的 slice 文件看起来像这样：
 
 ```js title="src/features/todos/todosSlice.js"
 import { createSlice } from '@reduxjs/toolkit'
@@ -282,10 +282,10 @@ const todosSlice = createSlice({
   initialState,
   reducers: {
     // highlight-start
-    // Give case reducers meaningful past-tense "event"-style names
+    // 给 case reducers 有意义的过去时 "事件" 风格的名字
     todoAdded(state, action) {
       const { id, text } = action.payload
-      // "Mutating" update syntax thanks to Immer, and no `return` needed
+      // 感谢 Immer 的 "变异" 更新语法，不需要 `return`
       state.todos.push({
         id,
         text,
@@ -294,15 +294,15 @@ const todosSlice = createSlice({
     },
     // highlight-end
     todoToggled(state, action) {
-      // Look for the specific nested object to update.
-      // In this case, `action.payload` is the default field in the action,
-      // and can hold the `id` value - no need for `action.id` separately
+      // 寻找特定的嵌套对象进行更新。
+      // 在这种情况下，`action.payload` 是 action 中的默认字段，
+      // 可以包含 `id` 值 - 不需要单独的 `action.id`
       const matchingTodo = state.todos.find(
         (todo) => todo.id === action.payload,
       )
 
       if (matchingTodo) {
-        // Can directly "mutate" the nested object
+        // 可以直接 "变异" 嵌套对象
         matchingTodo.completed = !matchingTodo.completed
       }
     },
@@ -310,30 +310,30 @@ const todosSlice = createSlice({
 })
 
 // highlight-start
-// `createSlice` automatically generated action creators with these names.
-// export them as named exports from this "slice" file
+// `createSlice` 自动生成了这些名字的 action 创建者。
+// 从这个 "slice" 文件中导出它们作为命名导出
 export const { todoAdded, todoToggled } = todosSlice.actions
 //highlight-end
 
-// Export the slice reducer as the default export
+// 将 slice reducer 作为默认导出
 export default todosSlice.reducer
 ```
 
-When you call `dispatch(todoAdded('Buy milk'))`, whatever single value you pass to the `todoAdded` action creator will automatically get used as the `action.payload` field. If you need to pass in multiple values, do so as an object, like `dispatch(todoAdded({id, text}))`. Alternately, you can use [the "prepare" notation inside of a `createSlice` reducer](https://redux.js.org/tutorials/essentials/part-4-using-data#preparing-action-payloads) to accept multiple separate arguments and create the `payload` field. The `prepare` notation is also useful for cases where the action creators were doing additional work, such as generating unique IDs for each item.
+当你调用 `dispatch(todoAdded('Buy milk'))`，你传递给 `todoAdded` action 创建者的任何单一值都会自动用作 `action.payload` 字段。如果你需要传递多个值，可以作为一个对象传递，如 `dispatch(todoAdded({id, text}))`。或者，你可以使用 [`createSlice` reducer 中的 "prepare" 符号](https://redux.js.org/tutorials/essentials/part-4-using-data#preparing-action-payloads) 来接受多个单独的参数并创建 `payload` 字段。`prepare` 符号也适用于 action 创建者需要做额外工作的情况，例如为每个项目生成唯一的 ID。
 
-While Redux Toolkit does not specifically care about your folder and file structures or action naming, [these are the best practices we recommend](https://redux.js.org/style-guide/) because we've found they lead to more maintainable and understandable code.
+虽然 Redux Toolkit 不特别关心你的文件夹和文件结构或 action 命名，但[我们推荐这些最佳实践](https://redux.js.org/style-guide/)，因为我们发现它们可以使代码更易于维护和理解。
 
-### Data Fetching with RTK Query
+### 使用 RTK Query 进行数据获取
 
-Typical legacy data fetching in a React+Redux app requires many moving pieces and types of code:
+在 React+Redux 应用中，典型的传统数据获取需要许多移动的部分和类型的代码：
 
-- Action creators and action types that represent "request starting", "request succeeded", and "request failed" actions
-- Thunks to dispatch the actions and make the async request
-- Reducers that track loading status and store the cached data
-- Selectors to read those values from the store
-- Dispatching the thunk in a component after mounting, either via `componentDidMount` in a class component or `useEffect` in a function component
+- 表示 "请求开始"、"请求成功" 和 "请求失败" 动作的 action 创建者和 action 类型
+- 分发动作并进行异步请求的 Thunks
+- 跟踪加载状态和存储缓存数据的 reducers
+- 从 store 中读取这些值的 selectors
+- 在组件挂载后分发 thunk，无论是在类组件的 `componentDidMount` 中还是在函数组件的 `useEffect` 中
 
-These typically would be split across many different files:
+这些通常会分布在许多不同的文件中：
 
 ```js title="src/constants/todos.js"
 export const FETCH_TODOS_STARTED = 'FETCH_TODOS_STARTED'
@@ -368,7 +368,7 @@ export const fetchTodos = () => {
     dispatch(fetchTodosStarted())
 
     try {
-      // Axios is common, but also `fetch`, or your own "API service" layer
+      // Axios 是常见的，但也可以是 `fetch`，或者你自己的 "API 服务" 层
       const res = await axios.get('/todos')
       dispatch(fetchTodosSucceeded(res.data))
     } catch (err) {
@@ -440,11 +440,11 @@ export function TodosList() {
     dispatch(fetchTodos())
   }, [dispatch])
 
-  // omit rendering logic here
+  // 省略渲染逻辑
 }
 ```
 
-Many users may be using the `redux-saga` library to manage data fetching, in which case they might have _additional_ "signal" action types used to trigger the sagas, and this saga file instead of thunks:
+许多用户可能正在使用 `redux-saga` 库来管理数据获取，在这种情况下，他们可能有 _额外的_ "信号" 动作类型用于触发 sagas，以及这个 saga 文件而不是 thunks：
 
 ```js title="src/sagas/todos.js"
 import { put, takeEvery, call } from 'redux-saga/effects'
@@ -455,7 +455,7 @@ import {
   fetchTodosFailed,
 } from '../actions/todos'
 
-// Saga to actually fetch data
+// 实际获取数据的 Saga
 export function* fetchTodos() {
   yield put(fetchTodosStarted())
 
@@ -467,25 +467,25 @@ export function* fetchTodos() {
   }
 }
 
-// "Watcher" saga that waits for a "signal" action, which is
-// dispatched only to kick off logic, not to update state
+// "观察者" saga，等待一个 "信号" 动作，该动作只是
+// 用于启动逻辑，而不是更新状态
 export function* fetchTodosSaga() {
   yield takeEvery(FETCH_TODOS_BEGIN, fetchTodos)
 }
 ```
 
-**_All_ of that code can be replaced with [Redux Toolkit's "RTK Query" data fetching and caching layer](https://redux-toolkit.js.org/rtk-query/overview)!**
+**_所有_ 的这些代码都可以用 [Redux Toolkit 的 "RTK Query" 数据获取和缓存层](https://redux-toolkit.js.org/rtk-query/overview) 来替换！**
 
-RTK Query replaces the need to write _any_ actions, thunks, reducers, selectors, or effects to manage data fetching. (In fact, it actually _uses_ all those same tools internally.) Additionally, RTK Query takes care of tracking loading state, deduplicating requests, and managing cache data lifecycles (including removing expired data that is no longer needed).
+RTK Query 取代了编写 _任何_ 动作、thunks、reducers、selectors 或 effects 来管理数据获取的需要。（实际上，它内部实际上 _使用_ 所有这些相同的工具。）此外，RTK Query 负责跟踪加载状态，消除重复的请求，并管理缓存数据生命周期（包括删除不再需要的过期数据）。
 
-To migrate, [set up a single RTK Query "API slice" definition and add the generated reducer + middleware to your store](https://redux.js.org/tutorials/essentials/part-7-rtk-query-basics):
+要迁移，[设置一个单一的 RTK Query "API slice" 定义并将生成的 reducer + middleware 添加到你的 store](https://redux.js.org/tutorials/essentials/part-7-rtk-query-basics)：
 
 ```js title="src/features/api/apiSlice.js"
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    // Fill in your own server starting URL here
+    // 在这里填写你自己的服务器起始 URL
     baseUrl: '/',
   }),
   endpoints: (build) => ({}),
@@ -495,21 +495,21 @@ export const api = createApi({
 ```js title="src/app/store.js"
 import { configureStore } from '@reduxjs/toolkit'
 
-// Import the API object
+// 导入 API 对象
 // highlight-next-line
 import { api } from '../features/api/apiSlice'
-// Import any other slice reducers as usual here
+// 正常导入任何其他 slice reducers
 import usersReducer from '../features/users/usersSlice'
 
 export const store = configureStore({
   reducer: {
-    // Add the generated RTK Query "API slice" caching reducer
+    // 添加生成的 RTK Query "API slice" 缓存 reducer
     // highlight-next-line
     [api.reducerPath]: api.reducer,
-    // Add any other reducers
+    // 添加任何其他 reducers
     users: usersReducer,
   },
-  // Add the RTK Query API middleware
+  // 添加 RTK Query API middleware
   // highlight-start
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(api.middleware),
@@ -517,28 +517,28 @@ export const store = configureStore({
 })
 ```
 
-Then, add "endpoints" that represents the specific data you want to fetch and cache, and export the auto-generated React hooks for each endpoint:
+然后，添加代表你想要获取和缓存的特定数据的 "endpoints"，并导出每个 endpoint 的自动生成的 React hooks：
 
 ```js title="src/features/api/apiSlice.js"
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    // Fill in your own server starting URL here
+    // 在这里填写你自己的服务器起始 URL
     baseUrl: '/',
   }),
   endpoints: (build) => ({
     // highlight-start
-    // A query endpoint with no arguments
+    // 一个没有参数的查询 endpoint
     getTodos: build.query({
       query: () => '/todos',
     }),
-    // A query endpoint with an argument
+    // 一个有参数的查询 endpoint
     userById: build.query({
       query: (userId) => `/users/${userId}`,
     }),
     // highlight-end
-    // A mutation endpoint
+    // 一个 mutation endpoint
     updateTodo: build.mutation({
       query: (updatedTodo) => ({
         url: `/todos/${updatedTodo.id}`,
@@ -553,7 +553,7 @@ export const api = createApi({
 export const { useGetTodosQuery, useUserByIdQuery, useUpdateTodoMutation } = api
 ```
 
-Finally, use the hooks in your components:
+最后，在你的组件中使用 hooks：
 
 ```js title="src/features/todos/TodoList.js"
 // highlight-next-line
@@ -563,13 +563,13 @@ export function TodoList() {
   // highlight-next-line
   const { data: todos, isFetching, isSuccess } = useGetTodosQuery()
 
-  // omit rendering logic here
+  // 省略渲染逻辑
 }
 ```
 
-### Data Fetching with `createAsyncThunk`
+### 使用 `createAsyncThunk` 进行数据获取
 
-**We _specifically_ recommend using RTK Query for data fetching.** However, some users have told us they aren't ready to make that step yet. In that case, you can at least cut down on some of the boilerplate of hand-written thunks and reducers using RTK's `createAsyncThunk`. It automatically generates the action creators and action types for you, calls the async function you provide to make the request, and dispatches those actions based on the promise lifecycle. The same example with `createAsyncThunk` might look like this:
+**我们 _特别_ 推荐使用 RTK Query 进行数据获取。**然而，一些用户告诉我们他们还没有准备好迈出这一步。在这种情况下，你至少可以使用 RTK 的 `createAsyncThunk` 减少一些手写 thunks 和 reducers 的样板代码。它会自动为你生成 action creators 和 action types，调用你提供的异步函数进行请求，并根据 promise 的生命周期分发这些 action。使用 `createAsyncThunk` 的同样例子可能看起来像这样：
 
 ```js title="src/features/todos/todosSlice"
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
@@ -582,10 +582,10 @@ const initialState = {
 }
 
 const fetchTodos = createAsyncThunk('todos/fetchTodos', async () => {
-  // Just make the async request here, and return the response.
-  // This will automatically dispatch a `pending` action first,
-  // and then `fulfilled` or `rejected` actions based on the promise.
-  // as needed based on the
+  // 在这里进行异步请求，并返回响应。
+  // 这将自动先分发一个 `pending` action，
+  // 然后根据 promise 分发 `fulfilled` 或 `rejected` action。
+  // 根据需要进行
   const res = await axios.get('/todos')
   return res.data
 })
@@ -594,19 +594,19 @@ export const todosSlice = createSlice({
   name: 'todos',
   initialState,
   reducers: {
-    // any additional "normal" case reducers here.
-    // these will generate new action creators
+    // 在这里添加任何额外的 "正常" case reducers。
+    // 这些将生成新的 action creators
   },
   extraReducers: (builder) => {
-    // Use `extraReducers` to handle actions that were generated
-    // _outside_ of the slice, such as thunks or in other slices
+    // 使用 `extraReducers` 来处理在 slice 外部生成的 action，
+    // 如 thunks 或在其他 slices 中
     builder
       .addCase(fetchTodos.pending, (state, action) => {
         state.status = 'loading'
       })
-      // Pass the generated action creators to `.addCase()`
+      // 将生成的 action creators 传递给 `.addCase()`
       .addCase(fetchTodos.fulfilled, (state, action) => {
-        // Same "mutating" update syntax thanks to Immer
+        // 同样的 "变异" 更新语法，感谢 Immer
         state.status = 'succeeded'
         state.todos = action.payload
       })
@@ -621,13 +621,13 @@ export const todosSlice = createSlice({
 export default todosSlice.reducer
 ```
 
-You'd also still need to write any selectors, and dispatch the `fetchTodos` thunk yourself in a `useEffect` hook.
+你还需要编写任何选择器，并在 `useEffect` 钩子中自己分发 `fetchTodos` thunk。
 
-### Reactive Logic with `createListenerMiddleware`
+### 使用 `createListenerMiddleware` 的反应式逻辑
 
-Many Redux apps have "reactive"-style logic that listens for specific actions or state changes, and runs additional logic in response. These behaviors are often implemented using the `redux-saga` or `redux-observable` libraries.
+许多 Redux 应用程序有 "反应式" 风格的逻辑，它监听特定的动作或状态变化，并作出额外的逻辑响应。这些行为通常使用 `redux-saga` 或 `redux-observable` 库实现。
 
-These libraries are used for a wide variety of tasks. As a basic example, a saga and an epic that listen for an action, wait one second, and then dispatch an additional action might look like this:
+这些库用于各种各样的任务。作为一个基本的例子，一个 saga 和一个 epic 监听一个动作，等待一秒钟，然后分发一个额外的动作可能看起来像这样：
 
 ```js title="src/sagas/ping.js"
 import { delay, put, takeEvery } from 'redux-saga/effects'
@@ -637,8 +637,8 @@ export function* ping() {
   yield put({ type: 'PONG' })
 }
 
-// "Watcher" saga that waits for a "signal" action, which is
-// dispatched only to kick off logic, not to update state
+// "观察者" saga，等待一个 "信号" 动作，该动作只是
+// 用于启动逻辑，而不是更新状态
 export function* pingSaga() {
   yield takeEvery('PING', ping)
 }
@@ -657,7 +657,7 @@ import { createStore, applyMiddleware } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import { combineEpics, createEpicMiddleware  } from 'redux-observable';
 
-// skip reducers
+// 跳过 reducers
 
 import { pingEpic } from '../sagas/ping'
 import { pingSaga } from '../epics/ping
@@ -681,15 +681,14 @@ sagaMiddleware.run(rootSaga)
 epicMiddleware.run(rootEpic)
 ```
 
-**The RTK "listener" middleware is designed to replace sagas and observables, with a simpler API, smaller bundle size, and better TS support.**
+**RTK 的 "listener" 中间件旨在用更简单的 API、更小的包大小和更好的 TS 支持来替代 sagas 和 observables。**
 
-The saga and epic examples could be replaced with the listener middleware, like this:
+saga 和 epic 的例子可以用 listener 中间件替换，像这样：
 
 ```js title="src/app/listenerMiddleware.js"
 import { createListenerMiddleware } from '@reduxjs/toolkit'
 
-// Best to define this in a separate file, to avoid importing
-// from the store file into the rest of the codebase
+// 最好在一个单独的文件中定义这个，以避免从 store 文件导入到代码库的其余部分
 export const listenerMiddleware = createListenerMiddleware()
 
 export const { startListening, stopListening } = listenerMiddleware
@@ -704,7 +703,7 @@ const pingSlice = createSlice({
   initialState,
   reducers: {
     pong(state, action) {
-      // state update here
+      // 在这里更新状态
     },
   },
 })
@@ -713,16 +712,16 @@ export const { pong } = pingSlice.actions
 export default pingSlice.reducer
 
 // highlight-start
-// The `startListening()` call could go in different files,
-// depending on your preferred app setup. Here, we just add
-// it directly in a slice file.
+// `startListening()` 的调用可以放在不同的文件中，
+// 这取决于你喜欢的应用程序设置。在这里，我们直接在
+// slice 文件中添加它。
 startListening({
-  // Match this exact action type based on the action creator
+  // 根据 action creator 精确匹配这个 action 类型
   actionCreator: pong,
-  // Run this effect callback whenever that action is dispatched
+  // 每当该动作被分发时，运行这个 effect 回调
   effect: async (action, listenerApi) => {
-    // Listener effect functions get a `listenerApi` object
-    // with many useful methods built in, including `delay`:
+    // Listener effect 函数获取一个 `listenerApi` 对象
+    // 内置了许多有用的方法，包括 `delay`：
     await listenerApi.delay(1000)
     listenerApi.dispatch(pong())
   },
@@ -735,26 +734,26 @@ import { configureStore } from '@reduxjs/toolkit'
 
 import { listenerMiddleware } from './listenerMiddleware'
 
-// omit reducers
+// 省略 reducers
 
 export const store = configureStore({
   reducer: rootReducer,
-  // Add the listener middleware _before_ the thunk or dev checks
+  // 在 thunk 或 dev 检查之前添加 listener 中间件
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listenerMiddleware.middleware),
 })
 ```
 
-### Migrating TypeScript for Redux Logic
+### 迁移 Redux 逻辑的 TypeScript
 
-Legacy Redux code that uses TypeScript typically follows _very_ verbose patterns for defining types. In particular, many users in the community have decided to manually define TS types for each individual action, and then created "action type unions" that try to limit what specific actions can actually be passed to `dispatch`.
+使用 TypeScript 的旧版 Redux 代码通常遵循定义类型的_非常_冗长的模式。特别是，社区中的许多用户决定为每个单独的操作手动定义 TS 类型，然后创建"操作类型联合"，试图限制实际可以传递给 `dispatch` 的特定操作。
 
-**We specifically and strongly recommend _against_ these patterns!**
+**我们特别且强烈建议_反对_这些模式！**
 
 ```ts no-transpile title="src/actions/todos.ts"
 import { ADD_TODO, TOGGLE_TODO } from '../constants/todos'
 
-// ❌ Common pattern: manually defining types for each action object
+// ❌ 常见模式：为每个操作对象手动定义类型
 interface AddTodoAction {
   type: typeof ADD_TODO
   text: string
@@ -766,7 +765,7 @@ interface ToggleTodoAction {
   id: string
 }
 
-// ❌ Common pattern: an "action type union" of all possible actions
+// ❌ 常见模式：所有可能操作的"操作类型联合"
 export type TodoActions = AddTodoAction | ToggleTodoAction
 
 export const addTodo = (id: string, text: string): AddTodoAction => ({
@@ -799,7 +798,7 @@ export default function todosReducer(
   action: TodoActions,
 ) {
   switch (action.type) {
-    // omit reducer logic
+    // 省略 reducer 逻辑
     default:
       return state
   }
@@ -814,29 +813,29 @@ import { CounterActions } from '../actions/counter'
 import { TodosState } from '../reducers/todos'
 import { CounterState } from '../reducers/counter'
 
-// omit reducer setup
+// 省略 reducer 设置
 
 export const store = createStore(rootReducer)
 
-// ❌ Common pattern: an "action type union" of all possible actions
+// ❌ 常见模式：所有可能操作的"操作类型联合"
 export type RootAction = TodoActions | CounterActions
-// ❌ Common pattern: manually defining the root state type with each field
+// ❌ 常见模式：手动定义每个字段的根状态类型
 export interface RootState {
   todos: TodosState
   counter: CounterState
 }
 
-// ❌ Common pattern: limiting what can be dispatched at the types level
+// ❌ 常见模式：在类型级别限制可以分派的内容
 export type AppDispatch = Dispatch<RootAction>
 ```
 
-**Redux Toolkit is designed to drastically simplify TS usage, and our recommendations include _inferring_ types as much as possible!**
+**Redux Toolkit 旨在大大简化 TS 的使用，我们的建议包括尽可能多地_推断_类型！**
 
-Per [our standard TypeScript setup and usage guidelines](../tutorials/typescript.md), start with setting up the store file to infer `AppDispatch` and `RootState` types directly from the store itself. That will correctly include any modifications to `dispatch` that were added by middleware, such as the ability to dispatch thunks, and update the `RootState` type any time you modify a slice's state definition or add more slices.
+根据[我们的标准 TypeScript 设置和使用指南](../tutorials/typescript.md)，首先设置 store 文件，直接从 store 本身推断 `AppDispatch` 和 `RootState` 类型。这将正确地包括由中间件添加到 `dispatch` 的任何修改，例如分派 thunks 的能力，并在您修改切片的状态定义或添加更多切片时更新 `RootState` 类型。
 
 ```ts no-transpile title="app/store.ts"
 import { configureStore } from '@reduxjs/toolkit'
-// omit any other imports
+// 省略任何其他导入
 
 const store = configureStore({
   reducer: {
@@ -846,17 +845,17 @@ const store = configureStore({
 })
 
 // highlight-start
-// Infer the `RootState` and `AppDispatch` types from the store itself
+// 从 store 本身推断 `RootState` 和 `AppDispatch` 类型
 
-// Inferred state type: {todos: TodosState, counter: CounterState}
+// 推断的状态类型：{todos: TodosState, counter: CounterState}
 export type RootState = ReturnType<typeof store.getState>
 
-// Inferred dispatch type: Dispatch & ThunkDispatch<RootState, undefined, UnknownAction>
+// 推断的 dispatch 类型：Dispatch & ThunkDispatch<RootState, undefined, UnknownAction>
 export type AppDispatch = typeof store.dispatch
 // highlight-end
 ```
 
-Each slice file should declare and export a type for its own slice state. Then, use the `PayloadAction` type to declare the type of any `action` argument inside of `createSlice.reducers`. The generated action creators will then _also_ have the correct type for the argument they accept, and the type of `action.payload` that they return.
+每个切片文件应声明并导出其自己切片状态的类型。然后，使用 `PayloadAction` 类型来声明 `createSlice.reducers` 内部任何 `action` 参数的类型。生成的操作创建者将_也_接受的参数的正确类型，以及他们返回的 `action.payload` 的类型。
 
 ```ts no-transpile title="src/features/todos/todosSlice.ts"
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
@@ -868,7 +867,7 @@ interface Todo {
 }
 
 // highlight-start
-// Declare and export a type for the slice's state
+// 声明并导出切片状态的类型
 export type TodosState = Todo[]
 
 const initialState: TodosState = []
@@ -876,37 +875,36 @@ const initialState: TodosState = []
 
 const todosSlice = createSlice({
   name: 'todos',
-  // The `state` argument type will be inferred for all case reducers
-  // from the type of `initialState`
+  // 所有 case reducers 的 `state` 参数类型将从 `initialState` 的类型推断
   initialState,
   reducers: {
     // highlight-start
-    // Use `PayloadAction<YourPayloadTypeHere>` for each `action` argument
+    // 对于每个 `action` 参数，使用 `PayloadAction<YourPayloadTypeHere>`
     todoAdded(state, action: PayloadAction<{ id: string; text: string }>) {
-      // omit logic
+      // 省略逻辑
     },
     todoToggled(state, action: PayloadAction<string>) {
-      // omit logic
+      // 省略逻辑
     },
     // highlight-end
   },
 })
 ```
 
-## Modernizing React Components with React-Redux
+## 使用 React-Redux 现代化 React 组件
 
-The general approach to migrating React-Redux usage in components is:
+迁移组件中 React-Redux 使用的一般方法是：
 
-- Migrate an existing React class component to be a function component
-- Replace the `connect` wrapper with uses of the `useSelector` and `useDispatch` hooks _inside_ the component
+- 将现有的 React 类组件迁移到函数组件
+- 用 `useSelector` 和 `useDispatch` 钩子的使用替换 `connect` 包装器_在_组件内部
 
-You can do this on an individual per-component basis. Components with `connect` and with hooks can coexist at the same time.
+您可以在每个组件的基础上进行此操作。带有 `connect` 和带有钩子的组件可以同时共存。
 
-This page won't cover the process of migrating class components to function components, but will focus on the changes specific to React-Redux.
+此页面不会涵盖将类组件迁移到函数组件的过程，但会关注特定于 React-Redux 的更改。
 
-### Migrating `connect` to Hooks
+### 将 `connect` 迁移到 Hooks
 
-A typical legacy component using React-Redux's `connect` API might look like this:
+一个典型的使用 React-Redux 的 `connect` API 的旧组件可能看起来像这样：
 
 ```js title="src/features/todos/TodoListItem.js"
 import { connect } from 'react-redux'
@@ -918,8 +916,8 @@ import {
   selectActiveTodoId,
 } from './todosSlice'
 
-// A `mapState` function, possibly using values from `ownProps`,
-// and returning an object with multiple separate fields inside
+// 一个 `mapState` 函数，可能使用来自 `ownProps` 的值，
+// 并返回一个包含多个独立字段的对象
 const mapStateToProps = (state, ownProps) => {
   return {
     todo: selectTodoById(state, ownProps.todoId),
@@ -927,9 +925,9 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-// Several possible variations on how you might see `mapDispatch` written:
+// 你可能会看到 `mapDispatch` 的几种可能写法：
 
-// 1) a separate function, manual wrapping of `dispatch`
+// 1) 一个单独的函数，手动包装 `dispatch`
 const mapDispatchToProps = (dispatch) => {
   return {
     todoDeleted: (id) => dispatch(todoDeleted(id)),
@@ -937,7 +935,7 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-// 2) A separate function, wrapping with `bindActionCreators`
+// 2) 一个单独的函数，使用 `bindActionCreators` 包装
 const mapDispatchToProps2 = (dispatch) => {
   return bindActionCreators(
     {
@@ -948,25 +946,25 @@ const mapDispatchToProps2 = (dispatch) => {
   )
 }
 
-// 3) An object full of action creators
+// 3) 一个充满 action 创建者的对象
 const mapDispatchToProps3 = {
   todoDeleted,
   todoToggled,
 }
 
-// The component, which gets all these fields as props
+// 这个组件，它获取所有这些字段作为 props
 function TodoListItem({ todo, activeTodoId, todoDeleted, todoToggled }) {
-  // rendering logic here
+  // 渲染逻辑在这里
 }
 
-// Finished with the call to `connect`
+// 用 `connect` 调用结束
 export default connect(mapStateToProps, mapDispatchToProps)(TodoListItem)
 ```
 
-**With the React-Redux hooks API, the `connect` call and `mapState/mapDispatch` arguments are replaced by hooks!**
+**使用 React-Redux hooks API，`connect` 调用和 `mapState/mapDispatch` 参数被 hooks 替换！**
 
-- Each individual field returned in `mapState` becomes a separate `useSelector` call
-- Each function passed in via `mapDispatch` becomes a separate callback function defined inside the component
+- `mapState` 返回的每个单独字段都变成了一个单独的 `useSelector` 调用
+- 通过 `mapDispatch` 传入的每个函数都变成了在组件内部定义的单独回调函数
 
 ```js title="src/features/todos/TodoListItem.js"
 import { useState } from 'react'
@@ -980,16 +978,16 @@ import {
 
 export function TodoListItem({ todoId }) {
   // highlight-start
-  // Get the actual `dispatch` function with `useDispatch`
+  // 使用 `useDispatch` 获取实际的 `dispatch` 函数
   const dispatch = useDispatch()
 
-  // Select values from the state with `useSelector`
+  // 使用 `useSelector` 从状态中选择值
   const activeTodoId = useSelector(selectActiveTodoId)
-  // Use prop in scope to select a specific value
+  // 使用作用域中的 prop 来选择特定的值
   const todo = useSelector((state) => selectTodoById(state, todoId))
   // highlight-end
 
-  // Create callback functions that dispatch as needed, with arguments
+  // 创建需要时可以 dispatch 的回调函数，带有参数
   const handleToggleClick = () => {
     dispatch(todoToggled(todoId))
   }
@@ -998,19 +996,19 @@ export function TodoListItem({ todoId }) {
     dispatch(todoDeleted(todoId))
   }
 
-  // omit rendering logic
+  // 省略渲染逻辑
 }
 ```
 
-One thing that's different is that `connect` optimized rendering performance by preventing the wrapped component from rendering unless its incoming `stateProps+dispatchProps+ownProps` had changed. The hooks cannot do that, since they're _inside_ the component. If you need to prevent [React's normal recursive rendering behavior](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#standard-render-behavior), wrap the component in `React.memo(MyComponent)` yourself.
+有一点不同的是，`connect` 通过防止包装组件渲染来优化渲染性能，除非其传入的 `stateProps+dispatchProps+ownProps` 发生了变化。Hooks 不能做到这一点，因为它们在组件的 _内部_ 。如果你需要防止 [React 的正常递归渲染行为](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#standard-render-behavior)，请自己用 `React.memo(MyComponent)` 包装组件。
 
-### Migrating TypeScript for Components
+### 为组件迁移 TypeScript
 
-One of the major downsides with `connect` is that it is _very_ hard to type correctly, and the type declarations end up being extremely verbose. This is due to it being a Higher-Order Component, and also the amount of flexibility in its API (four arguments, all optional, each with multiple possible overloads and variations).
+`connect` 的主要缺点之一是它非常难以正确地进行类型化，而且类型声明最终会变得非常冗长。这是因为它是一个高阶组件，同时也是因为它的 API 具有很大的灵活性（四个参数，全部可选，每个参数都有多种可能的重载和变体）。
 
-The community came up with multiple variations on how to handle this, with varying levels of complexity. On the low end, some usages required typing `state` in `mapState()`, and then calculating the types of all the props for the component:
+社区提出了多种处理这个问题的变体，复杂程度各不相同。在低端，一些用法需要在 `mapState()` 中对 `state` 进行类型化，然后计算组件的所有 props 的类型：
 
-```ts no-transpile title="Simple connect TS example"
+```ts no-transpile title="简单的 connect TS 示例"
 import { connect } from 'react-redux'
 import { RootState } from '../../app/store'
 import {
@@ -1050,13 +1048,13 @@ function TodoListItem({
 export default connect(mapStateToProps, mapDispatchToProps)(TodoListItem)
 ```
 
-The use of `typeof mapDispatch` as an object in particular was dangerous, because it would fail if thunks were included.
+特别是使用 `typeof mapDispatch` 作为对象是危险的，因为如果包含了 thunks，它会失败。
 
-Other community-created patterns required significantly more overhead, including declaring `mapDispatch` as a function and calling `bindActionCreators` in order to pass through a `dispatch: Dispatch<RootActions>` type, or manually calculating the types of _all_ the props received by the wrapped component and passing those as generics to `connect`.
+其他由社区创建的模式需要更多的开销，包括声明 `mapDispatch` 为函数并调用 `bindActionCreators` 以传递 `dispatch: Dispatch<RootActions>` 类型，或者手动计算被包装组件接收的 _所有_ props 的类型，并将这些作为泛型传递给 `connect`。
 
-One slightly-better alternative was the `ConnectedProps<T>` type that was added to `@types/react-redux` in v7.x, which enabled inferring the type of _all_ the props that would be passed to the component from `connect`. This did require splitting up the call to `connect` into two parts for the inference to work right:
+一个稍好的替代方案是在 `@types/react-redux` 的 v7.x 中添加的 `ConnectedProps<T>` 类型，它可以推断出 `connect` 会传递给组件的 _所有_ props 的类型。这确实需要将 `connect` 的调用分成两部分，以使推断正确工作：
 
-```ts no-transpile title="ConnectedProps<T> TS example"
+```ts no-transpile title="ConnectedProps<T> TS 示例"
 import { connect, ConnectedProps } from 'react-redux'
 import { RootState } from '../../app/store'
 import {
@@ -1082,16 +1080,16 @@ const mapDispatchToProps = {
   todoToggled,
 }
 
-// Call the first part of `connect` to get the function that accepts the component.
-// This knows the types of the props returned by `mapState/mapDispatch`
+// 调用 `connect` 的第一部分以获取接受组件的函数。
+// 这知道 `mapState/mapDispatch` 返回的 props 的类型
 const connector = connect(mapStateToProps, mapDispatchToProps)
-// The `ConnectedProps<T> util type can extract "the type of all props from Redux"
+// `ConnectedProps<T>` 工具类型可以提取 "来自 Redux 的所有 props 的类型"
 type PropsFromRedux = ConnectedProps<typeof connector>
 
-// The final component props are "the props from Redux" + "props from the parent"
+// 最终的组件 props 是 "来自 Redux 的 props" + "来自父组件的 props"
 type TodoListItemProps = PropsFromRedux & TodoListItemOwnProps
 
-// That type can then be used in the component
+// 然后可以在组件中使用该类型
 function TodoListItem({
   todo,
   activeTodoId,
@@ -1099,28 +1097,28 @@ function TodoListItem({
   todoToggled,
 }: TodoListItemProps) {}
 
-// And the final wrapped component is generated and exported
+// 最后生成并导出包装后的组件
 export default connector(TodoListItem)
 ```
 
-**The React-Redux hooks API is _much_ simpler to use with TypeScript!** Instead of dealing with layers of component wrapping, type inference, and generics, the hooks are simple functions that take arguments and return a result. All that you need to pass around are the types for `RootState` and `AppDispatch`.
+**React-Redux 的 hooks API 与 TypeScript 一起使用要 _简单得多_！** 不需要处理组件包装、类型推断和泛型的层次，hooks 是简单的函数，接受参数并返回结果。你需要传递的只是 `RootState` 和 `AppDispatch` 的类型。
 
-Per [our standard TypeScript setup and usage guidelines](../tutorials/typescript.md), we specifically teach setting up "pre-typed" aliases for the hooks, so that those have the correct types baked in, and only use those pre-typed hooks in the app.
+根据[我们的标准 TypeScript 设置和使用指南](../tutorials/typescript.md)，我们特别教授设置 "预类型化" 的 hooks 别名，这样这些 hooks 就有了正确的类型，并且只在应用程序中使用这些预类型化的 hooks。
 
-First, set up the hooks:
+首先，设置 hooks：
 
 ```ts no-transpile title="src/app/hooks.ts"
 import { useDispatch, useSelector } from 'react-redux'
 import type { RootState, AppDispatch } from './store'
 
 // highlight-start
-// Use throughout your app instead of plain `useDispatch` and `useSelector`
+// 在你的应用程序中使用，而不是普通的 `useDispatch` 和 `useSelector`
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
 export const useAppSelector = useSelector.withTypes<RootState>()
 // highlight-end
 ```
 
-Then, use them in your components:
+然后，在你的组件中使用它们：
 
 ```ts no-transpile title="src/features/todos/TodoListItem.tsx"
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
@@ -1137,30 +1135,30 @@ interface TodoListItemProps {
 
 function TodoListItem({ todoId }: TodoListItemProps) {
   // highlight-start
-  // Use the pre-typed hooks in the component
+  // 在组件中使用预类型化的 hooks
   const dispatch = useAppDispatch()
   const activeTodoId = useAppSelector(selectActiveTodoId)
   const todo = useAppSelector((state) => selectTodoById(state, todoId))
   // highlight-end
 
-  // omit event handlers and rendering logic
+  // 省略事件处理器和渲染逻辑
 }
 ```
 
-## Further Information
+## 更多信息
 
-See these docs pages and blog posts for more details:
+查看这些文档页面和博客文章以获取更多详细信息：
 
-- **Tutorials**
-  - [Redux Essentials: Redux Toolkit App Structure](https://redux.js.org/tutorials/essentials/part-2-app-structure)
-  - [Redux Fundamentals: Modern Redux with Redux Toolkit](https://redux.js.org/tutorials/fundamentals/part-8-modern-redux)
-  - [Redux TypeScript Quick Start](../tutorials/typescript.md)
-- **Additional Documentation**
-  - [Why Redux Toolkit is How to use Redux Today](../introduction/why-rtk-is-redux-today.md)
-  - [Redux Style Guide: Best Practices and Recommendations](https://redux.js.org/style-guide/)
-  - [Redux core: Usage with TypeScript](https://redux.js.org/usage/usage-with-typescript)
-  - [Redux Toolkit: Usage with TypeScript](./usage-with-typescript.md)
-- **Articles**
-  - [Presentation: Modern Redux with Redux Toolkit](https://blog.isquaredsoftware.com/2022/06/presentations-modern-redux-rtk/)
-  - [Mark Erikson: Redux Toolkit 1.0 Announcement and development history](https://blog.isquaredsoftware.com/2019/10/redux-toolkit-1.0/)
-  - [Lenz Weber: Do Not Create Action Type Unions](https://phryneas.de/redux-typescript-no-discriminating-union)
+- **教程**
+  - [Redux 基础知识：Redux Toolkit 应用结构](https://redux.js.org/tutorials/essentials/part-2-app-structure)
+  - [Redux 基础知识：使用 Redux Toolkit 的现代 Redux](https://redux.js.org/tutorials/fundamentals/part-8-modern-redux)
+  - [Redux TypeScript 快速入门](../tutorials/typescript.md)
+- **附加文档**
+  - [为什么 Redux Toolkit 是今天如何使用 Redux 的方式](../introduction/why-rtk-is-redux-today.md)
+  - [Redux 风格指南：最佳实践和推荐](https://redux.js.org/style-guide/)
+  - [Redux 核心：与 TypeScript 的使用](https://redux.js.org/usage/usage-with-typescript)
+  - [Redux Toolkit：与 TypeScript 的使用](./usage-with-typescript.md)
+- **文章**
+  - [演示：使用 Redux Toolkit 的现代 Redux](https://blog.isquaredsoftware.com/2022/06/presentations-modern-redux-rtk/)
+  - [Mark Erikson：Redux Toolkit 1.0 发布公告和开发历史](https://blog.isquaredsoftware.com/2019/10/redux-toolkit-1.0/)
+  - [Lenz Weber：不要创建 Action 类型联合](https://phryneas.de/redux-typescript-no-discriminating-union)

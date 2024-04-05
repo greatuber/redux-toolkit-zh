@@ -217,8 +217,8 @@ export interface CreateSliceOptions<
   /**
    * A callback that receives a *builder* object to define
    * case reducers via calls to `builder.addCase(actionCreatorOrType, reducer)`.
-   * 
-   * 
+   *
+   *
    * @example
 ```ts
 import { createAction, createSlice, Action } from '@reduxjs/toolkit'
@@ -240,17 +240,17 @@ createSlice({
   extraReducers: builder => {
     builder
       .addCase(incrementBy, (state, action) => {
-        // action is inferred correctly here if using TS
+        // 如果使用TS，这里可以正确地推断出 action
       })
-      // You can chain calls, or have separate `builder.addCase()` lines each time
+      // 你可以链式调用，或者每次都有单独的 `builder.addCase()` 行
       .addCase(decrement, (state, action) => {})
-      // You can match a range of action types
+      // 你可以匹配一系列的 action 类型
       .addMatcher(
         isRejectedAction,
-        // `action` will be inferred as a RejectedAction due to isRejectedAction being defined as a type guard
+        // 由于 isRejectedAction 被定义为类型保护，`action` 将被推断为 RejectedAction
         (state, action) => {}
       )
-      // and provide a default case if no other handlers matched
+      // 如果没有其他处理器匹配，可以提供一个默认情况
       .addDefaultCase((state, action) => {})
     }
 })

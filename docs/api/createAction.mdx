@@ -9,13 +9,13 @@ hide_title: true
 
 # `createAction`
 
-A helper function for defining a Redux [action](https://redux.js.org/basics/actions) type and creator.
+这是一个用于定义 Redux [动作](https://redux.js.org/basics/actions)类型和创建器的辅助函数。
 
 ```js
 function createAction(type, prepareAction?)
 ```
 
-The usual way to define an action in Redux is to separately declare an _action type_ constant and an _action creator_ function for constructing actions of that type.
+在 Redux 中定义动作的常规方式是分别声明一个 _动作类型_ 常量和一个用于构造该类型动作的 _动作创建器_ 函数。
 
 ```ts
 const INCREMENT = 'counter/increment'
@@ -31,7 +31,7 @@ const action = increment(3)
 // { type: 'counter/increment', payload: 3 }
 ```
 
-The `createAction` helper combines these two declarations into one. It takes an action type and returns an action creator for that type. The action creator can be called either without arguments or with a `payload` to be attached to the action.
+`createAction` 辅助函数将这两个声明合并为一个。它接受一个动作类型并返回该类型的动作创建器。动作创建器可以不带参数调用，也可以带一个要附加到动作的 `payload`。
 
 ```ts
 import { createAction } from '@reduxjs/toolkit'
@@ -42,17 +42,17 @@ let action = increment()
 // { type: 'counter/increment' }
 
 action = increment(3)
-// returns { type: 'counter/increment', payload: 3 }
+// 返回 { type: 'counter/increment', payload: 3 }
 
 console.log(`The action type is: ${increment.type}`)
 // 'The action type is: counter/increment'
 ```
 
-## Using Prepare Callbacks to Customize Action Contents
+## 使用 Prepare 回调自定义动作内容
 
-By default, the generated action creators accept a single argument, which becomes `action.payload`. This requires the caller to construct the entire payload correctly and pass it in.
+默认情况下，生成的动作创建器接受一个参数，该参数成为 `action.payload`。这要求调用者正确构造整个有效载荷并传入。
 
-In many cases, you may want to write additional logic to customize the creation of the `payload` value, such as accepting multiple parameters for the action creator, generating a random ID, or getting the current timestamp. To do this, `createAction` accepts an optional second argument: a "prepare callback" that will be used to construct the payload value.
+在许多情况下，你可能希望编写额外的逻辑来自定义 `payload` 值的创建，例如接受动作创建器的多个参数，生成随机 ID，或获取当前时间戳。为此，`createAction` 接受一个可选的第二个参数：一个将用于构造有效载荷值的 "prepare callback"。
 
 ```ts
 import { createAction, nanoid } from '@reduxjs/toolkit'
@@ -80,13 +80,13 @@ console.log(addTodo('Write more docs'))
  **/
 ```
 
-If provided, all arguments from the action creator will be passed to the prepare callback, and it should return an object with the `payload` field (otherwise the payload of created actions will be `undefined`). Additionally, the object can have a `meta` and/or an `error` field that will also be added to created actions. `meta` may contain extra information about the action, `error` may contain details about the action failure. These three fields (`payload`, `meta` and `error`) adhere to the specification of [Flux Standard Actions](https://github.com/redux-utilities/flux-standard-action#actions).
+如果提供了，动作创建器的所有参数都将传递给 prepare 回调，它应返回一个带有 `payload` 字段的对象（否则创建的动作的有效载荷将为 `undefined`）。此外，该对象可以有一个 `meta` 和/或一个 `error` 字段，也将添加到创建的动作中。`meta` 可能包含关于动作的额外信息，`error` 可能包含关于动作失败的详细信息。这三个字段（`payload`，`meta` 和 `error`）遵循 [Flux Standard Actions](https://github.com/redux-utilities/flux-standard-action#actions) 的规范。
 
-**Note:** The type field will be added automatically.
+**注意：** 类型字段将自动添加。
 
-## Usage with createReducer()
+## 与 createReducer() 的使用
 
-Action creators can be passed directly to `addCase` in a [createReducer()](createReducer.mdx) build callback.
+动作创建器可以直接传递给 `addCase` 在 [createReducer()](createReducer.mdx) 构建回调中。
 
 ```ts
 import { createAction, createReducer } from '@reduxjs/toolkit'
@@ -100,21 +100,21 @@ const counterReducer = createReducer(0, (builder) => {
 })
 ```
 
-:::warning Non-String Action Types
-As of Redux 5.0, action types are _required_ to be strings. An error will be thrown by the store if a non-string action type reaches the original store dispatch.
+:::warning 非字符串动作类型
+从 Redux 5.0 开始，动作类型 _必须_ 是字符串。如果非字符串动作类型到达原始存储器调度，将抛出错误。
 :::
 
 ## actionCreator.match
 
-Every generated actionCreator has a `.match(action)` method that can be used to determine if the passed action is of the same type as an action that would be created by the action creator.
+每个生成的 actionCreator 都有一个 `.match(action)` 方法，可以用来确定传递的动作是否与由动作创建器创建的动作的类型相同。
 
-This has different uses:
+这有不同的用途：
 
-### As a TypeScript Type Guard
+### 作为 TypeScript 类型保护
 
-This `match` method is a [TypeScript type guard](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates) and can be used to discriminate the `payload` type of an action.
+这个 `match` 方法是一个 [TypeScript 类型保护](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates)，可以用来区分动作的 `payload` 类型。
 
-This behavior can be particularly useful when used in custom middlewares, where manual casts might be neccessary otherwise.
+当在自定义中间件中使用时，这种行为可能特别有用，否则可能需要手动转换。
 
 ```ts
 import { createAction } from '@reduxjs/toolkit'
@@ -123,16 +123,16 @@ import type { Action } from '@reduxjs/toolkit'
 const increment = createAction<number>('INCREMENT')
 
 function someFunction(action: Action) {
-  // accessing action.payload would result in an error here
+  // 在这里访问 action.payload 将导致错误
   if (increment.match(action)) {
-    // action.payload can be used as `number` here
+    // 在这里，action.payload 可以作为 `number` 使用
   }
 }
 ```
 
-### With redux-observable
+### 与 redux-observable 一起使用
 
-The `match` method can also be used as a filter method, which makes it powerful when used with redux-observable:
+`match` 方法也可以用作过滤方法，这使得它在与 redux-observable 一起使用时非常强大：
 
 ```ts
 import { createAction } from '@reduxjs/toolkit'
@@ -146,7 +146,7 @@ export const epic = (actions$: Observable<Action>) =>
   actions$.pipe(
     filter(increment.match),
     map((action) => {
-      // action.payload can be safely used as number here (and will also be correctly inferred by TypeScript)
+      // 在这里，action.payload 可以安全地用作数字（并且也会被 TypeScript 正确推断）
       // ...
     }),
   )

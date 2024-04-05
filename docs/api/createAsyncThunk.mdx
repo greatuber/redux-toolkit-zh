@@ -9,27 +9,27 @@ hide_title: true
 
 # `createAsyncThunk`
 
-## Overview
+## 概述
 
-A function that accepts a Redux action type string and a callback function that should return a promise. It generates promise lifecycle action types based on the action type prefix that you pass in, and returns a thunk action creator that will run the promise callback and dispatch the lifecycle actions based on the returned promise.
+一个接受 Redux 动作类型字符串和应返回 promise 的回调函数的函数。它根据你传入的动作类型前缀生成 promise 生命周期动作类型，并返回一个 thunk 动作创建器，该创建器将运行 promise 回调并根据返回的 promise 分派生命周期动作。
 
-This abstracts the standard recommended approach for handling async request lifecycles.
+这抽象了处理异步请求生命周期的标准推荐方法。
 
-It does not generate any reducer functions, since it does not know what data you're fetching, how you want to track loading state, or how the data you return needs to be processed. You should write your own reducer logic that handles these actions, with whatever loading state and processing logic is appropriate for your own app.
+它不生成任何 reducer 函数，因为它不知道你正在获取什么数据，你希望如何跟踪加载状态，或者你返回的数据需要如何处理。你应该编写自己的 reducer 逻辑来处理这些动作，使用适合你自己应用的任何加载状态和处理逻辑。
 
 :::tip
 
-Redux Toolkit's [**RTK Query data fetching API**](../rtk-query/overview.md) is a purpose built data fetching and caching solution for Redux apps, and can **eliminate the need to write _any_ thunks or reducers to manage data fetching**. We encourage you to try it out and see if it can help simplify the data fetching code in your own apps!
+Redux Toolkit 的 [**RTK Query 数据获取 API**](../rtk-query/overview.md) 是为 Redux 应用专门构建的数据获取和缓存解决方案，可以**消除编写任何 thunk 或 reducer 来管理数据获取的需要**。我们鼓励你尝试一下，看看它是否可以帮助简化你自己应用中的数据获取代码！
 
 :::
 
-Sample usage:
+示例用法：
 
 ```ts no-transpile {5-11,22-25,30}
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { userAPI } from './userAPI'
 
-// First, create the thunk
+// 首先，创建 thunk
 const fetchUserById = createAsyncThunk(
   'users/fetchByIdStatus',
   async (userId: number, thunkAPI) => {
@@ -48,35 +48,35 @@ const initialState = {
   loading: 'idle',
 } satisfies UserState as UsersState
 
-// Then, handle actions in your reducers:
+// 然后，在你的 reducers 中处理动作：
 const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-    // standard reducer logic, with auto-generated action types per reducer
+    // 标准的 reducer 逻辑，每个 reducer 都有自动生成的动作类型
   },
   extraReducers: (builder) => {
-    // Add reducers for additional action types here, and handle loading state as needed
+    // 在这里添加额外的动作类型的 reducers，并根据需要处理加载状态
     builder.addCase(fetchUserById.fulfilled, (state, action) => {
-      // Add user to the state array
+      // 将用户添加到 state 数组
       state.entities.push(action.payload)
     })
   },
 })
 
-// Later, dispatch the thunk as needed in the app
+// 稍后，在应用中根据需要分派 thunk
 dispatch(fetchUserById(123))
 ```
 
-## Parameters
+## 参数
 
-`createAsyncThunk` accepts three parameters: a string action `type` value, a `payloadCreator` callback, and an `options` object.
+`createAsyncThunk` 接受三个参数：一个字符串动作 `type` 值，一个 `payloadCreator` 回调，和一个 `options` 对象。
 
 ### `type`
 
-A string that will be used to generate additional Redux action type constants, representing the lifecycle of an async request:
+一个将用于生成表示异步请求生命周期的额外 Redux 动作类型常量的字符串：
 
-For example, a `type` argument of `'users/requestStatus'` will generate these action types:
+例如，`type` 参数为 `'users/requestStatus'` 将生成这些动作类型：
 
 - `pending`: `'users/requestStatus/pending'`
 - `fulfilled`: `'users/requestStatus/fulfilled'`
@@ -84,60 +84,60 @@ For example, a `type` argument of `'users/requestStatus'` will generate these ac
 
 ### `payloadCreator`
 
-A callback function that should return a promise containing the result of some asynchronous logic. It may also return a value synchronously. If there is an error, it should either return a rejected promise containing an `Error` instance or a plain value such as a descriptive error message or otherwise a resolved promise with a `RejectWithValue` argument as returned by the `thunkAPI.rejectWithValue` function.
+一个应返回包含一些异步逻辑结果的 promise 的回调函数。它也可以同步返回一个值。如果有错误，它应返回一个包含 `Error` 实例的 rejected promise 或一个如描述性错误消息的普通值，或者返回一个包含 `RejectWithValue` 参数的 resolved promise，该参数由 `thunkAPI.rejectWithValue` 函数返回。
 
-The `payloadCreator` function can contain whatever logic you need to calculate an appropriate result. This could include a standard AJAX data fetch request, multiple AJAX calls with the results combined into a final value, interactions with React Native `AsyncStorage`, and so on.
+`payloadCreator` 函数可以包含你需要计算适当结果的任何逻辑。这可能包括一个标准的 AJAX 数据获取请求，多个 AJAX 调用的结果合并成一个最终值，与 React Native `AsyncStorage` 的交互等等。
 
-The `payloadCreator` function will be called with two arguments:
+`payloadCreator` 函数将被调用两个参数：
 
-- `arg`: a single value, containing the first parameter that was passed to the thunk action creator when it was dispatched. This is useful for passing in values like item IDs that may be needed as part of the request. If you need to pass in multiple values, pass them together in an object when you dispatch the thunk, like `dispatch(fetchUsers({status: 'active', sortBy: 'name'}))`.
-- `thunkAPI`: an object containing all of the parameters that are normally passed to a Redux thunk function, as well as additional options:
-  - `dispatch`: the Redux store `dispatch` method
-  - `getState`: the Redux store `getState` method
-  - `extra`: the "extra argument" given to the thunk middleware on setup, if available
-  - `requestId`: a unique string ID value that was automatically generated to identify this request sequence
-  - `signal`: an [`AbortController.signal` object](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal) that may be used to see if another part of the app logic has marked this request as needing cancelation.
-  - `rejectWithValue(value, [meta])`: rejectWithValue is a utility function that you can `return` (or `throw`) in your action creator to return a rejected response with a defined payload and meta. It will pass whatever value you give it and return it in the payload of the rejected action. If you also pass in a `meta`, it will be merged with the existing `rejectedAction.meta`.
-  - `fulfillWithValue(value, meta)`: fulfillWithValue is a utility function that you can `return` in your action creator to `fulfill` with a value while having the ability of adding to `fulfilledAction.meta`.
+- `arg`：一个单一的值，包含当它被分派时传递给 thunk 动作创建器的第一个参数。这对于传入可能作为请求的一部分需要的值如项目 ID 很有用。如果你需要传入多个值，当你分派 thunk 时将它们一起传入一个对象，如 `dispatch(fetchUsers({status: 'active', sortBy: 'name'}))`。
+- `thunkAPI`：一个包含通常传递给 Redux thunk 函数的所有参数以及额外选项的对象：
+  - `dispatch`：Redux store 的 `dispatch` 方法
+  - `getState`：Redux store 的 `getState` 方法
+  - `extra`：在设置 thunk 中间件时给出的 "extra argument"，如果有的话
+  - `requestId`：一个自动生成的唯一字符串 ID 值，用于标识此请求序列
+  - `signal`：一个 [`AbortController.signal` 对象](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal)，可以用来查看应用逻辑的其他部分是否已将此请求标记为需要取消。
+  - `rejectWithValue(value, [meta])`：rejectWithValue 是一个你可以在你的动作创建器中 `return`（或 `throw`）的实用函数，以返回一个带有定义的 payload 和 meta 的 rejected 响应。它将传递你给它的任何值，并在 rejected 动作的 payload 中返回它。如果你还传入了一个 `meta`，它将与现有的 `rejectedAction.meta` 合并。
+  - `fulfillWithValue(value, meta)`：fulfillWithValue 是一个你可以在你的动作创建器中 `return` 的实用函数，以 `fulfill` 一个值，同时有添加到 `fulfilledAction.meta` 的能力。
 
-The logic in the `payloadCreator` function may use any of these values as needed to calculate the result.
+`payloadCreator` 函数中的逻辑可以根据需要使用这些值来计算结果。
 
-### Options
+### 选项
 
-An object with the following optional fields:
+一个带有以下可选字段的对象：
 
-- `condition(arg, { getState, extra } ): boolean | Promise<boolean>`: a callback that can be used to skip execution of the payload creator and all action dispatches, if desired. See [Canceling Before Execution](#canceling-before-execution) for a complete description.
-- `dispatchConditionRejection`: if `condition()` returns `false`, the default behavior is that no actions will be dispatched at all. If you still want a "rejected" action to be dispatched when the thunk was canceled, set this flag to `true`.
-- `idGenerator(arg): string`: a function to use when generating the `requestId` for the request sequence. Defaults to use [nanoid](./otherExports.mdx/#nanoid), but you can implement your own ID generation logic.
-- `serializeError(error: unknown) => any` to replace the internal `miniSerializeError` method with your own serialization logic.
-- `getPendingMeta({ arg, requestId }, { getState, extra }): any`: a function to create an object that will be merged into the `pendingAction.meta` field.
+- `condition(arg, { getState, extra } ): boolean | Promise<boolean>`：一个可以用来跳过执行 payload 创建器和所有动作分派的回调，如果需要的话。请参见 [在执行前取消](#canceling-before-execution) 以获取完整描述。
+- `dispatchConditionRejection`：如果 `condition()` 返回 `false`，默认行为是根本不会分派任何动作。如果你仍然希望在 thunk 被取消时分派一个 "rejected" 动作，将此标志设置为 `true`。
+- `idGenerator(arg): string`：用于生成请求序列的 `requestId` 的函数。默认使用 [nanoid](./otherExports.mdx/#nanoid)，但你可以实现自己的 ID 生成逻辑。
+- `serializeError(error: unknown) => any` 用你自己的序列化逻辑替换内部的 `miniSerializeError` 方法。
+- `getPendingMeta({ arg, requestId }, { getState, extra }): any`：一个创建将被合并到 `pendingAction.meta` 字段的对象的函数。
 
-## Return Value
+## 返回值
 
-`createAsyncThunk` returns a standard Redux thunk action creator. The thunk action creator function will have plain action creators for the `pending`, `fulfilled`, and `rejected` cases attached as nested fields.
+`createAsyncThunk` 返回一个标准的 Redux thunk action 创建器。这个 thunk action 创建器函数将会有 `pending`、`fulfilled` 和 `rejected` 的普通 action 创建器作为嵌套字段。
 
-Using the `fetchUserById` example above, `createAsyncThunk` will generate four functions:
+使用上面的 `fetchUserById` 示例，`createAsyncThunk` 将生成四个函数：
 
-- `fetchUserById`, the thunk action creator that kicks off the async payload callback you wrote
-  - `fetchUserById.pending`, an action creator that dispatches an `'users/fetchByIdStatus/pending'` action
-  - `fetchUserById.fulfilled`, an action creator that dispatches an `'users/fetchByIdStatus/fulfilled'` action
-  - `fetchUserById.rejected`, an action creator that dispatches an `'users/fetchByIdStatus/rejected'` action
+- `fetchUserById`，启动你编写的异步 payload 回调的 thunk action 创建器
+  - `fetchUserById.pending`，一个派发 `'users/fetchByIdStatus/pending'` action 的 action 创建器
+  - `fetchUserById.fulfilled`，一个派发 `'users/fetchByIdStatus/fulfilled'` action 的 action 创建器
+  - `fetchUserById.rejected`，一个派发 `'users/fetchByIdStatus/rejected'` action 的 action 创建器
 
-When dispatched, the thunk will:
+当派发时，thunk 将：
 
-- dispatch the `pending` action
-- call the `payloadCreator` callback and wait for the returned promise to settle
-- when the promise settles:
-  - if the promise resolved successfully, dispatch the `fulfilled` action with the promise value as `action.payload`
-  - if the promise resolved with a `rejectWithValue(value)` return value, dispatch the `rejected` action with the value passed into `action.payload` and 'Rejected' as `action.error.message`
-  - if the promise failed and was not handled with `rejectWithValue`, dispatch the `rejected` action with a serialized version of the error value as `action.error`
-- Return a fulfilled promise containing the final dispatched action (either the `fulfilled` or `rejected` action object)
+- 派发 `pending` action
+- 调用 `payloadCreator` 回调并等待返回的 promise 解决
+- 当 promise 解决时：
+  - 如果 promise 成功解决，使用 promise 的值作为 `action.payload` 派发 `fulfilled` action
+  - 如果 promise 以 `rejectWithValue(value)` 的返回值解决，使用传入 `action.payload` 的值和 'Rejected' 作为 `action.error.message` 派发 `rejected` action
+  - 如果 promise 失败并且没有用 `rejectWithValue` 处理，使用错误值的序列化版本作为 `action.error` 派发 `rejected` action
+- 返回一个包含最终派发的 action（`fulfilled` 或 `rejected` action 对象）的已解决 promise
 
-## Promise Lifecycle Actions
+## Promise 生命周期 Actions
 
-`createAsyncThunk` will generate three Redux action creators using [`createAction`](./createAction.mdx): `pending`, `fulfilled`, and `rejected`. Each lifecycle action creator will be attached to the returned thunk action creator so that your reducer logic can reference the action types and respond to the actions when dispatched. Each action object will contain the current unique `requestId` and `arg` values under `action.meta`.
+`createAsyncThunk` 将使用 [`createAction`](./createAction.mdx) 生成三个 Redux action 创建器：`pending`、`fulfilled` 和 `rejected`。每个生命周期 action 创建器将被附加到返回的 thunk action 创建器上，以便你的 reducer 逻辑可以引用 action 类型并在派发时响应 actions。每个 action 对象将包含当前唯一的 `requestId` 和 `arg` 值在 `action.meta` 下。
 
-The action creators will have these signatures:
+action 创建器将有这些签名：
 
 ```ts no-transpile
 interface SerializedError {
@@ -210,7 +210,7 @@ type RejectedWithValue = <ThunkArg, RejectedValue>(
 ) => RejectedWithValueAction<ThunkArg, RejectedValue>
 ```
 
-To handle these actions in your reducers, reference the action creators in `createReducer` or `createSlice` using the "builder callback" notation.
+要在你的 reducers 中处理这些 actions，使用 "builder callback" 符号在 `createReducer` 或 `createSlice` 中引用 action 创建器。
 
 ```ts no-transpile {2,10}
 const reducer1 = createReducer(initialState, (builder) => {
@@ -227,9 +227,9 @@ const reducer2 = createSlice({
 })
 ```
 
-Additionally, a `settled` matcher is attached, for matching against both fulfilled and rejected actions. Conceptually this is similar to a `finally` block.
+此外，还附加了一个 `settled` 匹配器，用于匹配已完成和被拒绝的 actions。从概念上讲，这类似于 `finally` 块。
 
-Make sure you use `addMatcher` instead of `addCase`, since `settled` is a matcher rather than an action creator.
+确保你使用 `addMatcher` 而不是 `addCase`，因为 `settled` 是一个匹配器而不是 action 创建器。
 
 ```ts no-transpile {2,10}
 const reducer1 = createReducer(initialState, (builder) => {
@@ -246,23 +246,23 @@ const reducer2 = createSlice({
 })
 ```
 
-## Handling Thunk Results
+## 处理 Thunk 结果
 
-### Unwrapping Result Actions
+### 解包结果 Actions
 
-Thunks may return a value when dispatched. A common use case is to return a promise from the thunk, dispatch the thunk from a component, and then wait for the promise to resolve before doing additional work:
+Thunks 可能在派发时返回一个值。一个常见的用例是从 thunk 返回一个 promise，从组件中派发 thunk，然后等待 promise 解决后再进行额外的工作：
 
 ```ts no-transpile
 const onClick = () => {
   dispatch(fetchUserById(userId)).then(() => {
-    // do additional work
+    // 执行额外的工作
   })
 }
 ```
 
-The thunks generated by `createAsyncThunk` **will always return a resolved promise** with either the `fulfilled` action object or `rejected` action object inside, as appropriate.
+由 `createAsyncThunk` 生成的 thunks **将始终返回一个已解决的 promise**，其中包含适当的 `fulfilled` action 对象或 `rejected` action 对象。
 
-The calling logic may wish to treat these actions as if they were the original promise contents. The promise returned by the dispatched thunk has an `unwrap` property which can be called to extract the `payload` of a `fulfilled` action or to throw either the `error` or, if available, `payload` created by `rejectWithValue` from a `rejected` action:
+调用逻辑可能希望将这些 actions 视为原始 promise 的内容。由派发的 thunk 返回的 promise 有一个 `unwrap` 属性，可以调用它来提取 `fulfilled` action 的 `payload`，或者从 `rejected` action 中抛出 `error` 或，如果可用，由 `rejectWithValue` 创建的 `payload`：
 
 ```ts no-transpile
 // in the component
@@ -271,15 +271,15 @@ const onClick = () => {
   dispatch(fetchUserById(userId))
     .unwrap()
     .then((originalPromiseResult) => {
-      // handle result here
+      // 在这里处理结果
     })
     .catch((rejectedValueOrSerializedError) => {
-      // handle error here
+      // 在这里处理错误
     })
 }
 ```
 
-Or with async/await syntax:
+或者使用 async/await 语法：
 
 ```ts no-transpile
 // in the component
@@ -287,57 +287,57 @@ Or with async/await syntax:
 const onClick = async () => {
   try {
     const originalPromiseResult = await dispatch(fetchUserById(userId)).unwrap()
-    // handle result here
+    // 在这里处理结果
   } catch (rejectedValueOrSerializedError) {
-    // handle error here
+    // 在这里处理错误
   }
 }
 ```
 
-Using the attached `.unwrap()` property is preferred in most cases, however Redux Toolkit also exports an `unwrapResult` function that can be used for a similar purpose:
+在大多数情况下，优先使用附加的 `.unwrap()` 属性，然而 Redux Toolkit 也导出了一个 `unwrapResult` 函数，可以用于类似的目的：
 
 ```ts no-transpile
 import { unwrapResult } from '@reduxjs/toolkit'
 
-// in the component
+// 在组件中
 const onClick = () => {
   dispatch(fetchUserById(userId))
     .then(unwrapResult)
     .then((originalPromiseResult) => {
-      // handle result here
+      // 在这里处理结果
     })
     .catch((rejectedValueOrSerializedError) => {
-      // handle result here
+      // 在这里处理错误
     })
 }
 ```
 
-Or with async/await syntax:
+或者使用 async/await 语法：
 
 ```ts no-transpile
 import { unwrapResult } from '@reduxjs/toolkit'
 
-// in the component
+// 在组件中
 const onClick = async () => {
   try {
     const resultAction = await dispatch(fetchUserById(userId))
     const originalPromiseResult = unwrapResult(resultAction)
-    // handle result here
+    // 在这里处理结果
   } catch (rejectedValueOrSerializedError) {
-    // handle error here
+    // 在这里处理错误
   }
 }
 ```
 
-### Checking Errors After Dispatching
+### 派发后检查错误
 
-Note that this means **a failed request or error in a thunk will _never_ return a _rejected_ promise**. We assume that any failure is more of a handled error than an unhandled exception at this point. This is due to the fact that we want to prevent uncaught promise rejections for those who do not use the result of `dispatch`.
+注意，这意味着**失败的请求或 thunk 中的错误将 _永远不会_ 返回一个 _被拒绝的_ promise**。我们假设此时的任何失败更像是一个已处理的错误，而不是一个未处理的异常。这是因为我们想要防止那些不使用 `dispatch` 结果的人遇到未捕获的 promise 拒绝。
 
-If your component needs to know if the request failed, use `.unwrap` or `unwrapResult` and handle the re-thrown error accordingly.
+如果你的组件需要知道请求是否失败，使用 `.unwrap` 或 `unwrapResult` 并相应地处理重新抛出的错误。
 
-## Handling Thunk Errors
+## 处理 Thunk 错误
 
-When your `payloadCreator` returns a rejected promise (such as a thrown error in an `async` function), the thunk will dispatch a `rejected` action containing an automatically-serialized version of the error as `action.error`. However, to ensure serializability, everything that does not match the `SerializedError` interface will have been removed from it:
+当你的 `payloadCreator` 返回一个被拒绝的 promise（例如在 `async` 函数中抛出的错误），thunk 会派发一个 `rejected` 动作，其中包含作为 `action.error` 的错误的自动序列化版本。然而，为了确保可序列化，所有不符合 `SerializedError` 接口的内容都将从中删除：
 
 ```ts no-transpile
 export interface SerializedError {
@@ -348,9 +348,9 @@ export interface SerializedError {
 }
 ```
 
-If you need to customize the contents of the `rejected` action, you should catch any errors yourself, and then **return** a new value using the `thunkAPI.rejectWithValue` utility. Doing `return rejectWithValue(errorPayload)` will cause the `rejected` action to use that value as `action.payload`.
+如果你需要自定义 `rejected` 动作的内容，你应该自己捕获任何错误，然后使用 `thunkAPI.rejectWithValue` 实用程序**返回**一个新值。执行 `return rejectWithValue(errorPayload)` 将导致 `rejected` 动作使用该值作为 `action.payload`。
 
-The `rejectWithValue` approach should also be used if your API response "succeeds", but contains some kind of additional error details that the reducer should know about. This is particularly common when expecting field-level validation errors from an API.
+如果你的 API 响应 "成功"，但包含 reducer 应该知道的一些额外的错误详细信息，也应该使用 `rejectWithValue` 方法。当期望从 API 获取字段级别的验证错误时，这种情况特别常见。
 
 ```ts no-transpile
 const updateUser = createAsyncThunk(
@@ -361,19 +361,19 @@ const updateUser = createAsyncThunk(
       const response = await userAPI.updateById(id, fields)
       return response.data.user
     } catch (err) {
-      // Use `err.response.data` as `action.payload` for a `rejected` action,
-      // by explicitly returning it using the `rejectWithValue()` utility
+      // 使用 `err.response.data` 作为 `rejected` 动作的 `action.payload`，
+      // 通过显式地使用 `rejectWithValue()` 实用程序返回它
       return rejectWithValue(err.response.data)
     }
   },
 )
 ```
 
-## Cancellation
+## 取消
 
-### Canceling Before Execution
+### 执行前取消
 
-If you need to cancel a thunk before the payload creator is called, you may provide a `condition` callback as an option after the payload creator. The callback will receive the thunk argument and an object with `{getState, extra}` as parameters, and use those to decide whether to continue or not. If the execution should be canceled, the `condition` callback should return a literal `false` value or a promise that should resolve to `false`. If a promise is returned, the thunk waits for it to get fulfilled before dispatching the `pending` action, otherwise it proceeds with dispatching synchronously.
+如果你需要在调用 payload 创建器之前取消 thunk，你可以在 payload 创建器后的选项中提供一个 `condition` 回调。回调将接收 thunk 参数和一个带有 `{getState, extra}` 参数的对象，并使用这些来决定是否继续。如果应该取消执行，`condition` 回调应返回一个字面 `false` 值或一个应解析为 `false` 的 promise。如果返回了 promise，thunk 会等待它被满足后再派发 `pending` 动作，否则它会同步地进行派发。
 
 ```ts no-transpile
 const fetchUserById = createAsyncThunk(
@@ -387,7 +387,7 @@ const fetchUserById = createAsyncThunk(
       const { users } = getState()
       const fetchStatus = users.requests[userId]
       if (fetchStatus === 'fulfilled' || fetchStatus === 'loading') {
-        // Already fetched or in progress, don't need to re-fetch
+        // 已经获取或正在进行中，不需要重新获取
         return false
       }
     },
@@ -395,13 +395,13 @@ const fetchUserById = createAsyncThunk(
 )
 ```
 
-If `condition()` returns `false`, the default behavior is that no actions will be dispatched at all. If you still want a "rejected" action to be dispatched when the thunk was canceled, pass in `{condition, dispatchConditionRejection: true}`.
+如果 `condition()` 返回 `false`，默认行为是根本不会派发任何动作。如果你仍然希望在 thunk 被取消时派发一个 "rejected" 动作，传入 `{condition, dispatchConditionRejection: true}`。
 
-### Canceling While Running
+### 运行时取消
 
-If you want to cancel your running thunk before it has finished, you can use the `abort` method of the promise returned by `dispatch(fetchUserById(userId))`.
+如果你想在你的运行 thunk 完成之前取消它，你可以使用 `dispatch(fetchUserById(userId))` 返回的 promise 的 `abort` 方法。
 
-A real-life example of that would look like this:
+一个真实生活中的例子可能是这样的：
 
 ```ts no-transpile
 // file: store.ts noEmit
@@ -430,21 +430,21 @@ import React from 'react'
 function MyComponent(props: { userId: string }) {
   const dispatch = useAppDispatch()
   React.useEffect(() => {
-    // Dispatching the thunk returns a promise
+    // 派发 thunk 返回一个 promise
     const promise = dispatch(fetchUserById(props.userId))
     return () => {
-      // `createAsyncThunk` attaches an `abort()` method to the promise
+      // `createAsyncThunk` 将一个 `abort()` 方法附加到 promise 上
       promise.abort()
     }
   }, [props.userId])
 }
 ```
 
-After a thunk has been cancelled this way, it will dispatch (and return) a `"thunkName/rejected"` action with an `AbortError` on the `error` property. The thunk will not dispatch any further actions.
+在这种方式下取消 thunk 后，它将派发（并返回）一个带有 `AbortError` 在 `error` 属性上的 `"thunkName/rejected"` 动作。thunk 不会派发任何进一步的动作。
 
-Additionally, your `payloadCreator` can use the `AbortSignal` it is passed via `thunkAPI.signal` to actually cancel a costly asynchronous action.
+此外，你的 `payloadCreator` 可以使用它通过 `thunkAPI.signal` 传递的 `AbortSignal` 来实际取消一个昂贵的异步动作。
 
-The `fetch` api of modern browsers already comes with support for an `AbortSignal`:
+现代浏览器的 `fetch` api 已经支持 `AbortSignal`：
 
 ```ts no-transpile
 import { createAsyncThunk } from '@reduxjs/toolkit'
@@ -460,11 +460,11 @@ const fetchUserById = createAsyncThunk(
 )
 ```
 
-### Checking Cancellation Status
+### 检查取消状态
 
-### Reading the Signal Value
+### 读取信号值
 
-You can use the `signal.aborted` property to regularly check if the thunk has been aborted and in that case stop costly long-running work:
+你可以使用 `signal.aborted` 属性来定期检查 thunk 是否已被取消，如果是的话，停止耗时的长时间运行的工作：
 
 ```ts no-transpile
 import { createAsyncThunk } from '@reduxjs/toolkit'
@@ -479,7 +479,7 @@ const readStream = createAsyncThunk(
 
     while (!done) {
       if (signal.aborted) {
-        throw new Error('stop the work, this has been aborted!')
+        throw new Error('停止工作，这已经被取消了！')
       }
       const read = await reader.read()
       result += read.value
@@ -490,10 +490,10 @@ const readStream = createAsyncThunk(
 )
 ```
 
-#### Listening for Abort Events
+#### 监听中止事件
 
-You can also call `signal.addEventListener('abort', callback)` to have logic inside the thunk be notified when `promise.abort()` was called.
-This can for example be used in conjunction with an axios `CancelToken`:
+你也可以调用 `signal.addEventListener('abort', callback)` 来在 thunk 内部被通知 `promise.abort()` 被调用时的逻辑。
+这可以例如与 axios 的 `CancelToken` 一起使用：
 
 ```ts no-transpile
 import { createAsyncThunk } from '@reduxjs/toolkit'
@@ -514,25 +514,25 @@ const fetchUserById = createAsyncThunk(
 )
 ```
 
-### Checking if a Promise Rejection was from an Error or Cancellation
+### 检查 Promise 拒绝是由错误还是取消引起的
 
-To investigate behavior around thunk cancellation, you can inspect various properties on the `meta` object of the dispatched action.
-If a thunk was cancelled, the result of the promise will be a `rejected` action (regardless of whether that action was actually dispatched to the store).
+要调查 thunk 取消的行为，你可以检查派发的动作的 `meta` 对象上的各种属性。
+如果一个 thunk 被取消，promise 的结果将是一个 `rejected` 动作（无论该动作是否实际被派发到 store）。
 
-- If it was cancelled before execution, `meta.condition` will be true.
-- If it was aborted while running, `meta.aborted` will be true.
-- If neither of those is true, the thunk was not cancelled, it was simply rejected, either by a Promise rejection or `rejectWithValue`.
-- If the thunk was not rejected, both `meta.aborted` and `meta.condition` will be `undefined`.
+- 如果在执行前被取消，`meta.condition` 将为 true。
+- 如果在运行时被中止，`meta.aborted` 将为 true。
+- 如果这两者都不是，那么 thunk 没有被取消，它只是被拒绝，要么是由 Promise 拒绝，要么是由 `rejectWithValue`。
+- 如果 thunk 没有被拒绝，`meta.aborted` 和 `meta.condition` 都将是 `undefined`。
 
-So if you wanted to test that a thunk was cancelled before executing, you can do the following:
+所以，如果你想测试一个 thunk 在执行前被取消，你可以这样做：
 
 ```ts no-transpile
 import { createAsyncThunk } from '@reduxjs/toolkit'
 
-test('this thunk should always be skipped', async () => {
+test('这个 thunk 应该总是被跳过', async () => {
   const thunk = createAsyncThunk(
     'users/fetchById',
-    async () => throw new Error('This promise should never be entered'),
+    async () => throw new Error('这个 promise 永远不应该被进入'),
     {
       condition: () => false,
     }
@@ -544,9 +544,9 @@ test('this thunk should always be skipped', async () => {
 })
 ```
 
-## Examples
+## 示例
 
-- Requesting a user by ID, with loading state, and only one request at a time:
+- 通过 ID 请求一个用户，有加载状态，并且一次只有一个请求：
 
 ```ts no-transpile
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
@@ -616,22 +616,22 @@ const UsersComponent = () => {
   const fetchOneUser = async (userId) => {
     try {
       const user = await dispatch(fetchUserById(userId)).unwrap()
-      showToast('success', `Fetched ${user.name}`)
+      showToast('success', `获取 ${user.name}`)
     } catch (err) {
-      showToast('error', `Fetch failed: ${err.message}`)
+      showToast('error', `获取失败: ${err.message}`)
     }
   }
 
-  // render UI here
+  // 在这里渲染 UI
 }
 ```
 
-- Using rejectWithValue to access a custom rejected payload in a component
+- 使用 rejectWithValue 在组件中访问自定义拒绝的有效载荷
 
-  _Note: this is a contrived example assuming our userAPI only ever throws validation-specific errors_
+  _注意：这是一个假设我们的 userAPI 只会抛出特定于验证的错误的人为示例_
 
 ```ts no-transpile
-// file: store.ts noEmit
+// 文件: store.ts noEmit
 import { configureStore } from '@reduxjs/toolkit'
 import type { Reducer } from '@reduxjs/toolkit'
 import { useDispatch } from 'react-redux'
@@ -641,18 +641,18 @@ const store = configureStore({ reducer: { users: usersReducer } })
 export const useAppDispatch = () => useDispatch<typeof store.dispatch>()
 export type RootState = ReturnType<typeof store.getState>
 
-// file: user/userAPI.ts noEmit
+// 文件: user/userAPI.ts noEmit
 
 export declare const userAPI: {
   updateById<Response>(id: string, fields: {}): { data: Response }
 }
 
-// file: user/slice.ts
+// 文件: user/slice.ts
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { userAPI } from './userAPI'
 import type { AxiosError } from 'axios'
 
-// Sample types that will be used
+// 将要使用的样本类型
 export interface User {
   id: string
   first_name: string
@@ -682,11 +682,11 @@ export const updateUser = createAsyncThunk<
     const response = await userAPI.updateById<UpdateUserResponse>(id, fields)
     return response.data.user
   } catch (err) {
-    let error: AxiosError<ValidationErrors> = err // cast the error for access
+    let error: AxiosError<ValidationErrors> = err // 转换错误以便访问
     if (!error.response) {
       throw err
     }
-    // We got validation errors, let's return those so we can reference in our component and set form errors
+    // 我们得到了验证错误，让我们返回这些错误，这样我们就可以在组件中引用并设置表单错误
     return rejectWithValue(error.response.data)
   }
 })
@@ -706,13 +706,13 @@ const usersSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    // The `builder` callback form is used here because it provides correctly typed reducers from the action creators
+    // 这里使用 `builder` 回调形式，因为它提供了从 action creators 中正确类型化的 reducers
     builder.addCase(updateUser.fulfilled, (state, { payload }) => {
       state.entities[payload.id] = payload
     })
     builder.addCase(updateUser.rejected, (state, action) => {
       if (action.payload) {
-        // Being that we passed in ValidationErrors to rejectType in `createAsyncThunk`, the payload will be available here.
+        // 由于我们在 `createAsyncThunk` 中传入了 ValidationErrors 到 rejectType，所以有效载荷将在这里可用。
         state.error = action.payload.errorMessage
       } else {
         state.error = action.error.message
@@ -723,13 +723,13 @@ const usersSlice = createSlice({
 
 export default usersSlice.reducer
 
-// file: externalModules.d.ts noEmit
+// 文件: externalModules.d.ts noEmit
 
 declare module 'some-toast-library' {
   export function showToast(type: string, message: string)
 }
 
-// file: user/UsersComponent.ts
+// 文件: user/UsersComponent.ts
 
 import React from 'react'
 import { useAppDispatch } from '../store'
@@ -746,26 +746,26 @@ const UsersComponent = (props: { id: string }) => {
   const { entities, error } = useSelector((state: RootState) => state.users)
   const dispatch = useAppDispatch()
 
-  // This is an example of an onSubmit handler using Formik meant to demonstrate accessing the payload of the rejected action
+  // 这是一个使用 Formik 的 onSubmit 处理器的示例，旨在演示如何访问被拒绝的 action 的有效载荷
   const handleUpdateUser = async (
     values: FormValues,
     formikHelpers: FormikHelpers<FormValues>,
   ) => {
     const resultAction = await dispatch(updateUser({ id: props.id, ...values }))
     if (updateUser.fulfilled.match(resultAction)) {
-      // user will have a type signature of User as we passed that as the Returned parameter in createAsyncThunk
+      // user 将具有 User 的类型签名，因为我们将其作为 Returned 参数传递给了 createAsyncThunk
       const user = resultAction.payload
-      showToast('success', `Updated ${user.first_name} ${user.last_name}`)
+      showToast('success', `更新了 ${user.first_name} ${user.last_name}`)
     } else {
       if (resultAction.payload) {
-        // Being that we passed in ValidationErrors to rejectType in `createAsyncThunk`, those types will be available here.
+        // 由于我们在 `createAsyncThunk` 中传入了 ValidationErrors 到 rejectType，所以这些类型将在这里可用。
         formikHelpers.setErrors(resultAction.payload.field_errors)
       } else {
-        showToast('error', `Update failed: ${resultAction.error}`)
+        showToast('error', `更新失败: ${resultAction.error}`)
       }
     }
   }
 
-  // render UI here
+  // 在这里渲染 UI
 }
 ```
