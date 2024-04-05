@@ -8,67 +8,67 @@ description: 'RTK Query > Usage > Usage Without React Hooks: Using RTKQ with oth
 
 &nbsp;
 
-# Usage Without React Hooks
+# 不使用 React Hooks 的使用方法
 
-Like the Redux core and Redux Toolkit, RTK Query's primary functionality is UI-agnostic and can be used with any UI layer. RTK Query also includes a version of [`createApi`](../api/createApi.mdx) designed specifically for use with React, which [automatically generates React hooks](../api/created-api/hooks.mdx).
+就像 Redux 核心和 Redux Toolkit 一样，RTK Query 的主要功能是 UI-agnostic，可以与任何 UI 层一起使用。RTK Query 还包括一个专为 React 设计的 [`createApi`](../api/createApi.mdx) 版本，它[自动生成 React hooks](../api/created-api/hooks.mdx)。
 
-While React hooks are the primary way that the majority of users are expected to be using RTK Query, the library itself uses plain JS logic and can be used both with React Class components, and independent of React itself.
+虽然 React hooks 是大多数用户预期使用 RTK Query 的主要方式，但该库本身使用纯 JS 逻辑，既可以与 React Class 组件一起使用，也可以独立于 React 本身使用。
 
-This page documents how to interact with RTK Query when used without React Hooks, in order to make proper use of RTK Query [`cache behavior`](./cache-behavior).
+本页面记录了在不使用 React Hooks 的情况下如何与 RTK Query 交互，以便正确使用 RTK Query 的 [`缓存行为`](./cache-behavior)。
 
-## Adding a subscription
+## 添加订阅
 
-Cache subscriptions are used to tell RTK Query that it needs to fetch data for an endpoint. A subscription for an endpoint can be added by dispatching the result of the [`initiate`](../api/created-api/endpoints.mdx#initiate) thunk action creator attached to a query endpoint.
+缓存订阅用于告诉 RTK Query 它需要为端点获取数据。可以通过分派附加到查询端点的 [`initiate`](../api/created-api/endpoints.mdx#initiate) thunk action 创建器的结果来添加端点的订阅。
 
-With React hooks, this behavior is instead handled within [`useQuery`](../api/created-api/hooks.mdx#usequery), [`useQuerySubscription`](../api/created-api/hooks.mdx#usequerysubscription), [`useLazyQuery`](../api/created-api/hooks.mdx#uselazyquery), and [`useLazyQuerySubscription`](../api/created-api/hooks.mdx#uselazyquerysubscription).
+在 React hooks 中，这种行为是在 [`useQuery`](../api/created-api/hooks.mdx#usequery)、[`useQuerySubscription`](../api/created-api/hooks.mdx#usequerysubscription)、[`useLazyQuery`](../api/created-api/hooks.mdx#uselazyquery) 和 [`useLazyQuerySubscription`](../api/created-api/hooks.mdx#uselazyquerysubscription) 中处理的。
 
-```ts title="Subscribing to cached data" no-transpile
+```ts title="订阅缓存数据" no-transpile
 const promise = dispatch(api.endpoints.getPosts.initiate())
 const { refetch } = promise
-// interact with the cache in the same way as you would with a useFetch...() hook
+// 与 useFetch...() hook 一样与缓存交互
 const { data, isLoading, isSuccess /*...*/ } = await promise
 ```
 
-## Removing a subscription
+## 移除订阅
 
-Removing a cache subscription is necessary for RTK Query to identify that cached data is no longer required. This allows RTK Query to clean up and remove old cache data.
+移除缓存订阅对于 RTK Query 确定不再需要缓存数据是必要的。这允许 RTK Query 清理和移除旧的缓存数据。
 
-The result of dispatching the [`initiate`](../api/created-api/endpoints.mdx#initiate) thunk action creator of a query endpoint is a Promise with an `unsubscribe` property. This property is a function that when called, will remove the corresponding cache subscription.
+分派查询端点的 [`initiate`](../api/created-api/endpoints.mdx#initiate) thunk action 创建器的结果是一个带有 `unsubscribe` 属性的 Promise。当调用此属性时，它将移除相应的缓存订阅。
 
-With React hooks, this behavior is instead handled within [`useQuery`](../api/created-api/hooks.mdx#usequery), [`useQuerySubscription`](../api/created-api/hooks.mdx#usequerysubscription), [`useLazyQuery`](../api/created-api/hooks.mdx#uselazyquery), and [`useLazyQuerySubscription`](../api/created-api/hooks.mdx#uselazyquerysubscription).
+在 React hooks 中，这种行为是在 [`useQuery`](../api/created-api/hooks.mdx#usequery)、[`useQuerySubscription`](../api/created-api/hooks.mdx#usequerysubscription)、[`useLazyQuery`](../api/created-api/hooks.mdx#uselazyquery) 和 [`useLazyQuerySubscription`](../api/created-api/hooks.mdx#uselazyquerysubscription) 中处理的。
 
-```ts title="Unsubscribing from cached data" no-transpile
-// Adding a cache subscription
+```ts title="取消订阅缓存数据" no-transpile
+// 添加缓存订阅
 const promise = dispatch(api.endpoints.getPosts.initiate())
 
-// Removing the corresponding cache subscription
+// 移除相应的缓存订阅
 promise.unsubscribe()
 ```
 
-## Accessing cached data & request status
+## 访问缓存数据和请求状态
 
-Accessing cache data and request status information can be performed using the `select` function property of a query endpoint to create a selector and call that with the Redux state. This provides a snapshot of the cache data and request status information at the time it is called.
+可以使用查询端点的 `select` 函数属性创建一个选择器，并用 Redux 状态调用它，以访问缓存数据和请求状态信息。这提供了在调用时的缓存数据和请求状态信息的快照。
 
 :::caution
 
-The `endpoint.select(arg)` function creates a _new_ selector instance - it isn't the actual selector function itself!
+`endpoint.select(arg)` 函数创建一个 _新的_ 选择器实例 - 它不是实际的选择器函数本身！
 
 :::
 
-With React hooks, this behaviour is instead handled within [`useQuery`](../api/created-api/hooks.mdx#usequery), [`useQueryState`](../api/created-api/hooks.mdx#usequerystate), and [`useLazyQuery`](../api/created-api/hooks.mdx#uselazyquery).
+在 React hooks 中，这种行为是在 [`useQuery`](../api/created-api/hooks.mdx#usequery)、[`useQueryState`](../api/created-api/hooks.mdx#usequerystate) 和 [`useLazyQuery`](../api/created-api/hooks.mdx#uselazyquery) 中处理的。
 
-```ts title="Accessing cached data & request status" no-transpile
+```ts title="访问缓存数据和请求状态" no-transpile
 const result = api.endpoints.getPosts.select()(state)
 const { data, isSuccess, isError, error } = result
 ```
 
-Note that unlike with the auto-generated hooks, there is no `isFetching` flag, and the `isLoading` flag will be true if the status is pending, regardless of if there is already data.
+请注意，与自动生成的 hooks 不同，没有 `isFetching` 标志，如果状态是 pending，无论是否已经有数据，`isLoading` 标志都会为 true。
 
-### Memoization
+### Memoization（记忆化）
 
-Because the `endpoint.select(arg)` function returns a new selector each time it's called, and because this instance itself is memoized, it can be desirable to memoize the creation of a selector (for example, to then use that memoized instance in another selector). This can be done with `createSelector`:
+由于 `endpoint.select(arg)` 函数每次调用时都返回一个新的选择器，并且这个实例本身是记忆化的，所以可能希望记忆化选择器的创建（例如，然后在另一个选择器中使用该记忆化实例）。这可以通过 `createSelector` 来完成：
 
-```ts title="Creating a memoized selector creator" no-transpile
+```ts title="创建一个记忆化的选择器创建器" no-transpile
 const createGetPostSelector = createSelector(
   (id: string) => id,
   (id) => api.endpoints.getPost.select(id),
@@ -81,23 +81,23 @@ const selectGetPostError = createSelector(
 )
 ```
 
-## Performing mutations
+## 执行变更
 
-[Mutations](./mutations.mdx) are used in order to update data on the server. Mutations can be performed by dispatching the result of the [`initiate`](../api/created-api/endpoints.mdx#initiate) thunk action creator attached to a mutation endpoint.
+[变更](./mutations.mdx)用于更新服务器上的数据。可以通过分派附加到变更端点的 [`initiate`](../api/created-api/endpoints.mdx#initiate) thunk action 创建器的结果来执行变更。
 
-With React hooks, this behavior is instead handled within [`useMutation`](../api/created-api/hooks.mdx#usemutation).
+在 React hooks 中，这种行为是在 [`useMutation`](../api/created-api/hooks.mdx#usemutation) 中处理的。
 
-```ts title="Triggering a mutation endpoint" no-transpile
+```ts title="触发一个变更端点" no-transpile
 dispatch(api.endpoints.addPost.initiate({ name: 'foo' }))
 ```
 
-## Examples
+## 示例
 
-Examples of usage without React hooks can be found under the following:
+以下是不使用 React hooks 的使用示例：
 
-- The `PostDetail` component in the [`React Class Components` example](./examples.mdx#react-class-components)
-- The [`Svelte` example](./examples.mdx#svelte)
-- The below `Cache Lifetime Subscription Class Component` example:
+- [`React Class Components` 示例](./examples.mdx#react-class-components)中的 `PostDetail` 组件
+- [`Svelte` 示例](./examples.mdx#svelte)
+- 下面的 `Cache Lifetime Subscription Class Component` 示例：
 
 <iframe
   src="https://codesandbox.io/embed/rtk-query-cache-lifetime-subscription-class-component-example-38mgd?fontsize=12&runonclick=1&hidenavigation=1&module=%2Fsrc%2Fcomponents%2FUsersList.tsx&theme=dark&runonclick=1"
@@ -113,7 +113,7 @@ Examples of usage without React hooks can be found under the following:
   sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"
 ></iframe>
 
-## Further Information
+## 更多信息
 
-- NgRx maintainer Brandon Roberts has written a post called [Cousins playing nicely: Experimenting with NgRx Store and RTK Query](https://dev.to/brandontroberts/cousins-playing-nicely-experimenting-with-ngrx-store-and-rtk-query-25f4), which demonstrates some approaches for integrating RTK Query into NgRx
-- [`saulmoro/ngrx-rtk-query`](https://github.com/SaulMoro/ngrx-rtk-query) implements an NgRx equivalent of the subscription lifecycle managed in RTKQ's own React hooks
+- NgRx 维护者 Brandon Roberts 写了一篇名为 [Cousins playing nicely: Experimenting with NgRx Store and RTK Query](https://dev.to/brandontroberts/cousins-playing-nicely-experimenting-with-ngrx-store-and-rtk-query-25f4) 的文章，演示了一些将 RTK Query 集成到 NgRx 的方法
+- [`saulmoro/ngrx-rtk-query`](https://github.com/SaulMoro/ngrx-rtk-query) 实现了 RTKQ 自己的 React hooks 中管理的订阅生命周期的 NgRx 等价物

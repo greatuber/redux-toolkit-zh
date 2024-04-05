@@ -8,37 +8,37 @@ description: 'RTK Query > Usage > Customizing Queries: overriding default query 
 
 &nbsp;
 
-# Customizing queries
+# 自定义查询
 
-RTK Query is agnostic as to how your requests resolve. You can use any library you like to handle requests, or no library at all. RTK Query provides reasonable defaults expected to cover the majority of use cases, while also allowing room for customization to alter query handling to fit specific needs.
+RTK Query 对于你的请求如何解析并不关心。你可以使用任何你喜欢的库来处理请求，或者完全不使用库。RTK Query 提供了预期能覆盖大多数用例的合理默认值，同时也允许自定义以改变查询处理以适应特定需求。
 
-## Customizing queries with `baseQuery`
+## 使用 `baseQuery` 自定义查询
 
-The default method to handle queries is via the [`baseQuery`](../api/createApi#basequery) option on [`createApi`](../api/createApi), in combination with the [`query`](../api/createApi.mdx#query) option on an endpoint definition.
+处理查询的默认方法是通过 [`createApi`](../api/createApi) 的 [`baseQuery`](../api/createApi#basequery) 选项，结合端点定义的 [`query`](../api/createApi.mdx#query) 选项。
 
-To process queries, endpoints are defined with a [`query`](../api/createApi.mdx#query) option, which passes its return value to a common [`baseQuery`](../api/createApi#basequery) function used for the API.
+为了处理查询，端点被定义为一个 [`query`](../api/createApi.mdx#query) 选项，它将其返回值传递给用于 API 的通用 [`baseQuery`](../api/createApi#basequery) 函数。
 
-By default, RTK Query ships with [`fetchBaseQuery`](../api/fetchBaseQuery), which is a lightweight [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) wrapper that automatically handles request headers and response parsing in a manner similar to common libraries like `axios`. If `fetchBaseQuery` alone does not meet your needs, you can customize its behaviour with a wrapper function, or create your own [`baseQuery`](../api/createApi.mdx#basequery) function from scratch for [`createApi`](../api/createApi) to use.
+默认情况下，RTK Query 附带了 [`fetchBaseQuery`](../api/fetchBaseQuery)，这是一个轻量级的 [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) 包装器，它自动处理请求头和响应解析，类似于常见的库如 `axios`。如果 `fetchBaseQuery` 本身不能满足你的需求，你可以使用一个包装函数来自定义其行为，或者为 [`createApi`](../api/createApi) 使用从头开始创建你自己的 [`baseQuery`](../api/createApi.mdx#basequery) 函数。
 
-See also [`baseQuery API Reference`](../api/createApi.mdx#basequery).
+参见 [`baseQuery API Reference`](../api/createApi.mdx#basequery)。
 
-### Implementing a custom `baseQuery`
+### 实现一个自定义的 `baseQuery`
 
-RTK Query expects a `baseQuery` function to be called with three arguments: `args`, `api`, and `extraOptions`. It is expected to return an object with either a `data` or `error` property, or a promise that resolves to return such an object.
+RTK Query 期望 `baseQuery` 函数被调用时带有三个参数：`args`，`api` 和 `extraOptions`。它应该返回一个带有 `data` 或 `error` 属性的对象，或者一个解析为返回此类对象的 promise。
 
 :::tip
 
-Base query and query functions must _always_ catch errors themselves, and return it in an object!
+基础查询和查询函数必须 _始终_ 自己捕获错误，并在对象中返回它！
 
 ```ts no-transpile
 function brokenCustomBaseQuery() {
-  // ❌ Don't let this throw by itself
+  // ❌ 不要让这个自己抛出
   const data = await fetchSomeData()
   return { data }
 }
 
 function correctCustomBaseQuery() {
-  // ✅ Catch errors and _return_ them so the RTKQ logic can track it
+  // ✅ 捕获错误并 _返回_ 它们，以便 RTKQ 逻辑可以跟踪它
   try {
     const data = await fetchSomeData()
     return { data }
@@ -50,9 +50,9 @@ function correctCustomBaseQuery() {
 
 :::
 
-#### baseQuery function arguments
+#### baseQuery 函数参数
 
-```ts title="baseQuery example arguments" no-transpile
+```ts title="baseQuery 示例参数" no-transpile
 const customBaseQuery = (
   // highlight-start
   args,
@@ -60,20 +60,20 @@ const customBaseQuery = (
   extraOptions,
   // highlight-end
 ) => {
-  // omitted
+  // 省略
 }
 ```
 
-#### baseQuery function return value
+#### baseQuery 函数返回值
 
-1.  ```ts title="Expected success result format" no-transpile
+1.  ```ts title="预期的成功结果格式" no-transpile
     return { data: YourData }
     ```
-2.  ```ts title="Expected error result format" no-transpile
+2.  ```ts title="预期的错误结果格式" no-transpile
     return { error: YourError }
     ```
 
-```ts title="baseQuery example return value" no-transpile
+```ts title="baseQuery 示例返回值" no-transpile
 const customBaseQuery = (
   args,
   { signal, dispatch, getState },
@@ -87,16 +87,16 @@ const customBaseQuery = (
 ```
 
 :::note
-This format is required so that RTK Query can infer the return types for your responses.
+这种格式是必需的，以便 RTK Query 可以推断你的响应的返回类型。
 :::
 
-At its core, a `baseQuery` function only needs to have the minimum return value to be valid; an object with a `data` or `error` property. It is up to the user to determine how they wish to use the provided arguments, and how requests are handled within the function itself.
+在其核心，一个 `baseQuery` 函数只需要有最小的返回值才能有效；一个带有 `data` 或 `error` 属性的对象。由用户决定如何使用提供的参数，以及在函数内部如何处理请求。
 
-#### fetchBaseQuery defaults
+#### fetchBaseQuery 默认值
 
-For [`fetchBaseQuery`](../api/fetchBaseQuery) specifically, the return type is as follows:
+对于 [`fetchBaseQuery`](../api/fetchBaseQuery) 特别地，返回类型如下：
 
-```ts title="Return types of fetchBaseQuery" no-transpile
+```ts title="fetchBaseQuery 的返回类型" no-transpile
 Promise<
   | {
       data: any
@@ -114,20 +114,20 @@ Promise<
 >
 ```
 
-1.  ```ts title="Expected success result format with fetchBaseQuery" no-transpile
+1.  ```ts title="使用 fetchBaseQuery 的预期成功结果格式" no-transpile
     return { data: YourData }
     ```
-2.  ```ts title="Expected error result format with fetchBaseQuery" no-transpile
+2.  ```ts title="使用 fetchBaseQuery 的预期错误结果格式" no-transpile
     return { error: { status: number, data: YourErrorData } }
     ```
 
-## Customizing query responses with `transformResponse`
+## 使用 `transformResponse` 自定义查询响应
 
-Individual endpoints on [`createApi`](../api/createApi.mdx) accept a [`transformResponse`](../api/createApi.mdx) property which allows manipulation of the data returned by a query or mutation before it hits the cache.
+[`createApi`](../api/createApi.mdx)上的单个端点接受一个[`transformResponse`](../api/createApi.mdx)属性，该属性允许在数据由查询或突变返回并命中缓存之前对其进行操作。
 
-`transformResponse` is called with the data that a successful `baseQuery` returns for the corresponding endpoint, and the return value of `transformResponse` is used as the cached data associated with that endpoint call.
+`transformResponse` 会在成功的 `baseQuery` 为相应端点返回数据时被调用，`transformResponse` 的返回值将被用作与该端点调用相关联的缓存数据。
 
-By default, the payload from the server is returned directly.
+默认情况下，服务器的有效载荷将直接返回。
 
 ```ts
 function defaultTransformResponse(
@@ -139,18 +139,16 @@ function defaultTransformResponse(
 }
 ```
 
-To change it, provide a function that looks like:
+要更改它，提供一个如下所示的函数：
 
-```ts title="Unpack a deeply nested collection" no-transpile
+```ts title="解包一个深度嵌套的集合" no-transpile
 transformResponse: (response, meta, arg) =>
   response.some.deeply.nested.collection
 ```
 
-`transformResponse` is called with the `meta` property returned from the `baseQuery` as its second
-argument, which can be used while determining the transformed response. The value for `meta` is
-dependent on the `baseQuery` used.
+`transformResponse` 会在 `baseQuery` 返回的 `meta` 属性作为其第二个参数被调用，这可以在确定转换响应时使用。`meta` 的值取决于使用的 `baseQuery`。
 
-```ts title="transformResponse meta example" no-transpile
+```ts title="transformResponse meta 示例" no-transpile
 transformResponse: (response: { sideA: Tracks; sideB: Tracks }, meta, arg) => {
   if (meta?.coinFlip === 'heads') {
     return response.sideA
@@ -159,11 +157,9 @@ transformResponse: (response: { sideA: Tracks; sideB: Tracks }, meta, arg) => {
 }
 ```
 
-`transformResponse` is called with the `arg` property provided to the endpoint as its third
-argument, which can be used while determining the transformed response. The value for `arg` is
-dependent on the `endpoint` used, as well as the argument used when calling the query/mutation.
+`transformResponse` 会在 `arg` 属性提供给端点作为其第三个参数被调用，这可以在确定转换响应时使用。`arg` 的值取决于使用的 `endpoint`，以及调用查询/突变时使用的参数。
 
-```ts title="transformResponse arg example" no-transpile
+```ts title="transformResponse arg 示例" no-transpile
 transformResponse: (response: Posts, meta, arg) => {
   return {
     originalArg: arg,
@@ -172,9 +168,9 @@ transformResponse: (response: Posts, meta, arg) => {
 }
 ```
 
-While there is less need to store the response in a [normalized lookup table](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape) with RTK Query managing caching data, `transformResponse` can be leveraged to do so if desired.
+虽然使用 RTK Query 管理缓存数据时，将响应存储在 [标准化查找表](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape) 中的需求较少，但如果需要，可以利用 `transformResponse` 来实现。
 
-```ts title="Normalize the response data" no-transpile
+```ts title="标准化响应数据" no-transpile
 transformResponse: (response) =>
   response.reduce((acc, curr) => {
     acc[curr.id] = curr
@@ -182,14 +178,14 @@ transformResponse: (response) =>
   }, {})
 
 /*
-  will convert:
+  将会转换：
   [
     {id: 1, name: 'Harry'},
     {id: 2, name: 'Ron'},
     {id: 3, name: 'Hermione'},
   ]
 
-  to:
+  为：
   {
     1: { id: 1, name: "Harry" },
     2: { id: 2, name: "Ron" },
@@ -198,17 +194,17 @@ transformResponse: (response) =>
 */
 ```
 
-[`createEntityAdapter`](../../api/createEntityAdapter.mdx) can also be used with `transformResponse` to normalize data, while also taking advantage of other features provided by `createEntityAdapter`, including providing an `ids` array, using [`sortComparer`](../../api/createEntityAdapter.mdx#sortcomparer) to maintain a consistently sorted list, as well as maintaining strong TypeScript support.
+[`createEntityAdapter`](../../api/createEntityAdapter.mdx) 也可以与 `transformResponse` 一起使用来标准化数据，同时也可以利用 `createEntityAdapter` 提供的其他功能，包括提供一个 `ids` 数组，使用 [`sortComparer`](../../api/createEntityAdapter.mdx#sortcomparer) 来维护一个始终排序的列表，以及维护强大的 TypeScript 支持。
 
-See also [Websocket Chat API with a transformed response shape](./streaming-updates.mdx#websocket-chat-api-with-a-transformed-response-shape) for an example of `transformResponse` normalizing response data in combination with `createEntityAdapter`, while also updating further data using [`streaming updates`](./streaming-updates.mdx).
+另请参见 [具有转换响应形状的 Websocket 聊天 API](./streaming-updates.mdx#websocket-chat-api-with-a-transformed-response-shape)，该示例展示了 `transformResponse` 如何与 `createEntityAdapter` 结合使用来标准化响应数据，同时还使用 [`streaming updates`](./streaming-updates.mdx) 更新更多数据。
 
-## Customizing query responses with `transformErrorResponse`
+## 使用 `transformErrorResponse` 自定义查询响应
 
-Individual endpoints on [`createApi`](../api/createApi.mdx) accept a [`transformErrorResponse`](../api/createApi.mdx) property which allows manipulation of the error returned by a query or mutation before it hits the cache.
+[`createApi`](../api/createApi.mdx)上的单个端点接受一个[`transformErrorResponse`](../api/createApi.mdx)属性，该属性允许在查询或突变返回错误并命中缓存之前对其进行操作。
 
-`transformErrorResponse` is called with the error that a failed `baseQuery` returns for the corresponding endpoint, and the return value of `transformErrorResponse` is used as the cached error associated with that endpoint call.
+`transformErrorResponse` 会在失败的 `baseQuery` 为相应端点返回错误时被调用，`transformErrorResponse` 的返回值将被用作与该端点调用相关联的缓存错误。
 
-By default, the payload from the server is returned directly.
+默认情况下，服务器的有效载荷将直接返回。
 
 ```ts
 function defaultTransformResponse(
@@ -220,18 +216,16 @@ function defaultTransformResponse(
 }
 ```
 
-To change it, provide a function that looks like:
+要更改它，提供一个如下所示的函数：
 
-```ts title="Unpack a deeply nested error object" no-transpile
+```ts title="解包一个深度嵌套的错误对象" no-transpile
 transformErrorResponse: (response, meta, arg) =>
   response.data.some.deeply.nested.errorObject
 ```
 
-`transformErrorResponse` is called with the `meta` property returned from the `baseQuery` as its second
-argument, which can be used while determining the transformed response. The value for `meta` is
-dependent on the `baseQuery` used.
+`transformErrorResponse` 会在 `baseQuery` 返回的 `meta` 属性作为其第二个参数被调用，这可以在确定转换响应时使用。`meta` 的值取决于使用的 `baseQuery`。
 
-```ts title="transformErrorResponse meta example" no-transpile
+```ts title="transformErrorResponse meta 示例" no-transpile
 transformErrorResponse: (
   response: { data: { sideA: Tracks; sideB: Tracks } },
   meta,
@@ -244,11 +238,9 @@ transformErrorResponse: (
 }
 ```
 
-`transformErrorResponse` is called with the `arg` property provided to the endpoint as its third
-argument, which can be used while determining the transformed response. The value for `arg` is
-dependent on the `endpoint` used, as well as the argument used when calling the query/mutation.
+`transformErrorResponse` 会在 `arg` 属性提供给端点作为其第三个参数被调用，这可以在确定转换响应时使用。`arg` 的值取决于使用的 `endpoint`，以及调用查询/突变时使用的参数。
 
-```ts title="transformErrorResponse arg example" no-transpile
+```ts title="transformErrorResponse arg 示例" no-transpile
 transformErrorResponse: (response: Posts, meta, arg) => {
   return {
     originalArg: arg,
@@ -257,52 +249,52 @@ transformErrorResponse: (response: Posts, meta, arg) => {
 }
 ```
 
-## Customizing queries with `queryFn`
+## 使用 `queryFn` 自定义查询
 
-RTK Query comes with `fetchBaseQuery` out of the box, which makes it straightforward to define endpoints that talk to HTTP URLs (such as a typical REST API). We also have integrations with GraphQL as well. However, at its core, RTK Query is really about tracking loading state and cached values for _any_ async request/response sequence, not just HTTP requests.
+RTK Query 默认提供了 `fetchBaseQuery`，使得定义与 HTTP URL（如典型的 REST API）通信的端点变得简单。我们也有与 GraphQL 的集成。然而，RTK Query 的核心实际上是跟踪 _任何_ 异步请求/响应序列的加载状态和缓存值，而不仅仅是 HTTP 请求。
 
-RTK Query supports defining endpoints that run arbitrary async logic and return a result. Individual endpoints on [`createApi`](../api/createApi.mdx) accept a [`queryFn`](../api/createApi.mdx#queryfn) property, which let you write your own async function with whatever logic you want inside.
+RTK Query 支持定义运行任意异步逻辑并返回结果的端点。[`createApi`](../api/createApi.mdx) 上的单个端点接受一个 [`queryFn`](../api/createApi.mdx#queryfn) 属性，让你可以编写自己的异步函数，并在其中添加任何你想要的逻辑。
 
-This can be useful for scenarios where you want to have particularly different behaviour for a single endpoint, or where the query itself is not relevant, including:
+这在你想要为单个端点有特别不同的行为，或者查询本身不相关的场景中可能很有用，包括：
 
-- One-off queries that use a different base URL
-- One-off queries that use different request handling, such as automatic re-tries
-- One-off queries that use different error handling behaviour
-- Queries that make requests using a third-party library SDK, such as Firebase or Supabase
-- Queries that perform async tasks that are not a typical request/response
-- Performing multiple requests with a single query ([example](#performing-multiple-requests-with-a-single-query))
-- Leveraging invalidation behaviour with no relevant query ([example](#using-a-no-op-queryfn))
-- Using [Streaming Updates](./streaming-updates) with no relevant initial request ([example](#streaming-data-with-no-initial-request))
+- 使用不同基础 URL 的一次性查询
+- 使用不同请求处理的一次性查询，如自动重试
+- 使用不同错误处理行为的一次性查询
+- 使用第三方库 SDK（如 Firebase 或 Supabase）进行请求的查询
+- 执行非典型请求/响应的异步任务的查询
+- 使用单个查询执行多个请求（[示例](#performing-multiple-requests-with-a-single-query)）
+- 利用无关联查询的失效行为（[示例](#using-a-no-op-queryfn)）
+- 使用无初始请求的[流式更新](./streaming-updates)（[示例](#streaming-data-with-no-initial-request)）
 
-See also [`queryFn API Reference`](../api/createApi.mdx#queryfn) for the type signature and available options.
+也可以参考 [`queryFn API Reference`](../api/createApi.mdx#queryfn) 了解类型签名和可用选项。
 
-### Implementing a `queryFn`
+### 实现一个 `queryFn`
 
-A `queryFn` can be thought of as an inline `baseQuery`. It will be called with the same arguments as `baseQuery`, as well as the provided `baseQuery` function itself (`arg`, `api`, `extraOptions`, and `baseQuery`). Similarly to `baseQuery`, it is expected to return an object with either a `data` or `error` property, or a promise that resolves to return such an object.
+`queryFn` 可以被视为一个内联的 `baseQuery`。它将被调用与 `baseQuery` 相同的参数，以及提供的 `baseQuery` 函数本身（`arg`，`api`，`extraOptions` 和 `baseQuery`）。类似于 `baseQuery`，它预期返回一个具有 `data` 或 `error` 属性的对象，或者一个解析为返回此类对象的 promise。
 
-#### Basic `queryFn` Example
+#### 基础 `queryFn` 示例
 
-```ts title="Basic queryFn example" no-transpile
+```ts title="基础 queryFn 示例" no-transpile
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import { userAPI, User } from './userAPI'
 
 const api = createApi({
   baseQuery: fetchBaseQuery({ url: '/' }),
   endpoints: (build) => ({
-    // normal HTTP endpoint using fetchBaseQuery
+    // 使用 fetchBaseQuery 的正常 HTTP 端点
     getPosts: build.query<PostsResponse, void>({
       query: () => ({ url: 'posts' }),
     }),
     // highlight-start
-    // endpoint with a custom `queryFn` and separate async logic
+    // 具有自定义 `queryFn` 和单独异步逻辑的端点
     getUser: build.query<User, string>({
       queryFn: async (userId: string) => {
         try {
           const user = await userApi.getUserById(userId)
-          // Return the result in an object with a `data` field
+          // 在一个带有 `data` 字段的对象中返回结果
           return { data: user }
         } catch (error) {
-          // Catch any errors and return them as an object with an `error` field
+          // 捕获任何错误并将它们作为带有 `error` 字段的对象返回
           return { error }
         }
       },
@@ -312,9 +304,9 @@ const api = createApi({
 })
 ```
 
-#### queryFn function arguments
+#### queryFn 函数参数
 
-```ts title="queryFn example arguments" no-transpile
+```ts title="queryFn 示例参数" no-transpile
 const queryFn = (
   // highlight-start
   args,
@@ -323,20 +315,20 @@ const queryFn = (
   baseQuery,
   // highlight-end
 ) => {
-  // omitted
+  // 省略
 }
 ```
 
-#### queryFn function return value
+#### queryFn 函数返回值
 
-1.  ```ts title="Expected success result format" no-transpile
+1.  ```ts title="预期的成功结果格式" no-transpile
     return { data: YourData }
     ```
-2.  ```ts title="Expected error result format" no-transpile
+2.  ```ts title="预期的错误结果格式" no-transpile
     return { error: YourError }
     ```
 
-```ts title="queryFn example return value" no-transpile
+```ts title="queryFn 示例返回值" no-transpile
 const queryFn = (
   args,
   { signal, dispatch, getState },
@@ -350,13 +342,13 @@ const queryFn = (
 }
 ```
 
-## Examples - `baseQuery`
+## 示例 - `baseQuery`
 
 ### Axios baseQuery
 
-This example implements a very basic axios-based `baseQuery` utility.
+此示例实现了一个非常基础的基于 axios 的 `baseQuery` 工具。
 
-```ts title="Basic axios baseQuery"
+```ts title="基础 axios baseQuery"
 import { createApi } from '@reduxjs/toolkit/query'
 import type { BaseQueryFn } from '@reduxjs/toolkit/query'
 import axios from 'axios'
@@ -418,13 +410,13 @@ const api = createApi({
 
 ### GraphQL baseQuery
 
-This example implements a very basic GraphQL-based `baseQuery`.
+这个例子实现了一个非常基础的基于GraphQL的`baseQuery`。
 
-```ts title="Basic GraphQL baseQuery"
+```ts title="基础的GraphQL baseQuery"
 import { createApi } from '@reduxjs/toolkit/query'
 import { request, gql, ClientError } from 'graphql-request'
 
-// highlight-start
+// 高亮开始
 const graphqlBaseQuery =
   ({ baseUrl }: { baseUrl: string }) =>
   async ({ body }: { body: string }) => {
@@ -438,14 +430,14 @@ const graphqlBaseQuery =
       return { error: { status: 500, data: error } }
     }
   }
-// highlight-end
+// 高亮结束
 
 export const api = createApi({
-  // highlight-start
+  // 高亮开始
   baseQuery: graphqlBaseQuery({
     baseUrl: 'https://graphqlzero.almansi.me/api',
   }),
-  // highlight-end
+  // 高亮结束
   endpoints: (builder) => ({
     getPosts: builder.query({
       query: () => ({
@@ -480,16 +472,16 @@ export const api = createApi({
 })
 ```
 
-### Automatic re-authorization by extending fetchBaseQuery
+### 通过扩展fetchBaseQuery自动重新授权
 
-This example wraps [`fetchBaseQuery`](../api/fetchBaseQuery) such that when encountering a [`401 Unauthorized`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401) error, an additional request is sent to attempt to refresh an authorization token, and re-try to initial query after re-authorizing.
+这个例子包装了[`fetchBaseQuery`](../api/fetchBaseQuery)，当遇到[`401 Unauthorized`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401)错误时，会发送额外的请求尝试刷新授权令牌，并在重新授权后重试初始查询。
 
-```ts title="Simulating axios-like interceptors with a custom base query"
-// file: authSlice.ts noEmit
+```ts title="使用自定义base query模拟axios-like拦截器"
+// 文件: authSlice.ts noEmit
 declare function tokenReceived(args?: any): void
 declare function loggedOut(): void
 export { tokenReceived, loggedOut }
-// file: baseQueryWithReauth.ts
+// 文件: baseQueryWithReauth.ts
 import { fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type {
   BaseQueryFn,
@@ -506,12 +498,12 @@ const baseQueryWithReauth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions)
   if (result.error && result.error.status === 401) {
-    // try to get a new token
+    // 尝试获取新的令牌
     const refreshResult = await baseQuery('/refreshToken', api, extraOptions)
     if (refreshResult.data) {
-      // store the new token
+      // 存储新的令牌
       api.dispatch(tokenReceived(refreshResult.data))
-      // retry the initial query
+      // 重试初始查询
       result = await baseQuery(args, api, extraOptions)
     } else {
       api.dispatch(loggedOut())
@@ -521,16 +513,16 @@ const baseQueryWithReauth: BaseQueryFn<
 }
 ```
 
-#### Preventing multiple unauthorized errors
+#### 防止多个未授权错误
 
-Using [`async-mutex`](https://github.com/DirtyHairy/async-mutex) to prevent multiple calls to '/refreshToken' when multiple calls fail with [`401 Unauthorized`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401) errors.
+使用[`async-mutex`](https://github.com/DirtyHairy/async-mutex)防止当多个调用因[`401 Unauthorized`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401)错误失败时，多次调用'/refreshToken'。
 
-```ts title="Preventing multiple calls to '/refreshToken'"
-// file: authSlice.ts noEmit
+```ts title="防止多次调用'/refreshToken'"
+// 文件: authSlice.ts noEmit
 declare function tokenReceived(args?: any): void
 declare function loggedOut(): void
 export { tokenReceived, loggedOut }
-// file: baseQueryWithReauth.ts
+// 文件: baseQueryWithReauth.ts
 
 import { fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type {
@@ -539,31 +531,31 @@ import type {
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query'
 import { tokenReceived, loggedOut } from './authSlice'
-// highlight-start
+// 高亮开始
 import { Mutex } from 'async-mutex'
-// highlight-end
+// 高亮结束
 
-// create a new mutex
-// highlight-start
+// 创建一个新的互斥锁
+// 高亮开始
 const mutex = new Mutex()
-// highlight-end
+// 高亮结束
 const baseQuery = fetchBaseQuery({ baseUrl: '/' })
 const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
   unknown,
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-  // wait until the mutex is available without locking it
-  // highlight-start
+  // 等待互斥锁可用，但不锁定它
+  // 高亮开始
   await mutex.waitForUnlock()
-  // highlight-end
+  // 高亮结束
   let result = await baseQuery(args, api, extraOptions)
   if (result.error && result.error.status === 401) {
-    // checking whether the mutex is locked
-    // highlight-start
+    // 检查互斥锁是否被锁定
+    // 高亮开始
     if (!mutex.isLocked()) {
       const release = await mutex.acquire()
-      // highlight-end
+      // 高亮结束
       try {
         const refreshResult = await baseQuery(
           '/refreshToken',
@@ -572,22 +564,22 @@ const baseQueryWithReauth: BaseQueryFn<
         )
         if (refreshResult.data) {
           api.dispatch(tokenReceived(refreshResult.data))
-          // retry the initial query
+          // 重试初始查询
           result = await baseQuery(args, api, extraOptions)
         } else {
           api.dispatch(loggedOut())
         }
       } finally {
-        // release must be called once the mutex should be released again.
-        // highlight-start
+        // 一旦互斥锁应该再次被释放，必须调用release。
+        // 高亮开始
         release()
-        // highlight-end
+        // 高亮结束
       }
     } else {
-      // wait until the mutex is available without locking it
-      // highlight-start
+      // 等待互斥锁可用，但不锁定它
+      // 高亮开始
       await mutex.waitForUnlock()
-      // highlight-end
+      // 高亮结束
       result = await baseQuery(args, api, extraOptions)
     }
   }
@@ -595,27 +587,27 @@ const baseQueryWithReauth: BaseQueryFn<
 }
 ```
 
-### Automatic retries
+### 自动重试
 
-RTK Query exports a utility called `retry` that you can wrap the `baseQuery` in your API definition with. It defaults to 5 attempts with a basic exponential backoff.
+RTK Query 导出了一个名为 `retry` 的实用程序，你可以用它来包装 API 定义中的 `baseQuery`。它默认进行5次尝试，使用基本的指数退避。
 
-The default behavior would retry at these intervals:
+默认行为将在以下间隔重试：
 
 [remarks](docblock://query/retry.ts?token=defaultBackoff)
 
 [examples](docblock://query/retry.ts?token=retry)
 
-In the event that you didn't want to retry on a specific endpoint, you can just set `maxRetries: 0`.
+如果你不想在特定的端点上重试，你可以设置 `maxRetries: 0`。
 
 :::info
-It is possible for a hook to return `data` and `error` at the same time. By default, RTK Query will keep whatever the last 'good' result was in `data` until it can be updated or garbage collected.
+一个钩子可能同时返回 `data` 和 `error`。默认情况下，RTK Query 会保留 `data` 中的最后一个'好'结果，直到它可以被更新或垃圾收集。
 :::
 
-#### Bailing out of error re-tries
+#### 退出错误重试
 
-The `retry` utility has a `fail` method property attached which can be used to bail out of retries immediately. This can be used for situations where it is known that additional re-tries would be guaranteed to all fail and would be redundant.
+`retry` 实用程序有一个 `fail` 方法属性，可以用来立即退出重试。这可以用于那些已知额外的重试肯定都会失败并且是多余的情况。
 
-```ts title="Bailing out of error re-tries"
+```ts title="退出错误重试"
 import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react'
 import type { FetchArgs } from '@reduxjs/toolkit/query'
 interface Post {
@@ -633,8 +625,8 @@ const staggeredBaseQueryWithBailOut = retry(
       extraOptions,
     )
 
-    // bail out of re-tries immediately if unauthorized,
-    // because we know successive re-retries would be redundant
+    // 如果未授权，立即退出重试，
+    // 因为我们知道连续的重试将是多余的
     if (result.error?.status === 401) {
       retry.fail(result.error)
     }
@@ -657,33 +649,33 @@ export const api = createApi({
     }),
     getPost: build.query<Post, string>({
       query: (id) => ({ url: `post/${id}` }),
-      extraOptions: { maxRetries: 8 }, // You can override the retry behavior on each endpoint
+      extraOptions: { maxRetries: 8 }, // 你可以在每个端点上覆盖重试行为
     }),
   }),
 })
 export const { useGetPostsQuery, useGetPostQuery } = api
 ```
 
-### Adding Meta information to queries
+### 向查询添加元信息
 
-A `baseQuery` can also include a `meta` property in its return value. This can be beneficial in cases where you may wish to include additional information associated with the request such as a request ID or timestamp.
+`baseQuery` 的返回值也可以包含一个 `meta` 属性。在你可能希望包含与请求相关的额外信息的情况下，这可能是有益的，例如请求 ID 或时间戳。
 
-In such a scenario, the return value would look like so:
+在这种情况下，返回值将如下所示：
 
-1.  ```ts title="Expected success result format with meta" no-transpile
+1.  ```ts title="预期的成功结果格式带有元信息" no-transpile
     return { data: YourData, meta: YourMeta }
     ```
-2.  ```ts title="Expected error result format with meta" no-transpile
+2.  ```ts title="预期的错误结果格式带有元信息" no-transpile
     return { error: YourError, meta: YourMeta }
     ```
 
-<!-- TODO: re-write below with a more realistic example -->
+<!-- TODO: 用一个更真实的例子重写下面的内容 -->
 
-```ts title="baseQuery example with meta information"
-// file: idGenerator.ts noEmit
+```ts title="带有元信息的 baseQuery 示例"
+// 文件: idGenerator.ts noEmit
 export declare const uuid: () => string
 
-// file: metaBaseQuery.ts
+// 文件: metaBaseQuery.ts
 import { fetchBaseQuery, createApi } from '@reduxjs/toolkit/query'
 import type {
   BaseQueryFn,
@@ -738,15 +730,15 @@ const api = createApi({
   baseQuery: metaBaseQuery,
   // highlight-end
   endpoints: (build) => ({
-    // a theoretical endpoint where we only want to return data
-    // if request was performed past a certain date
+    // 一个理论上的端点，我们只想返回数据
+    // 如果请求是在某个日期之后执行的
     getRecentPosts: build.query<PostsResponse, void>({
       query: () => 'posts',
       // highlight-start
       transformResponse: (returnValue: PostsResponse, meta) => {
-        // `meta` here contains our added `requestId` & `timestamp`, as well as
-        // `request` & `response` from fetchBaseQuery's meta object.
-        // These properties can be used to transform the response as desired.
+        // 这里的 `meta` 包含我们添加的 `requestId` 和 `timestamp`，以及
+        // fetchBaseQuery 的元对象的 `request` 和 `response`。
+        // 这些属性可以用来按需转换响应。
         if (!meta) return []
         return returnValue.filter(
           (post) => post.timestamp >= meta.timestamp - DAY_MS,
@@ -758,29 +750,29 @@ const api = createApi({
 })
 ```
 
-### Constructing a Dynamic Base URL using Redux state
+### 使用 Redux 状态构造动态基础 URL
 
-In some cases, you may wish to have a dynamically altered base url determined from a property in your Redux state. A `baseQuery` has access to a [`getState`](../api/createApi.mdx#basequery-function-arguments) method that provides the current store state at the time it is called. This can be used to construct the desired url using a partial url string, and the appropriate data from your store state.
+在某些情况下，你可能希望从 Redux 状态的属性中确定一个动态改变的基础 url。`baseQuery` 可以访问 [`getState`](../api/createApi.mdx#basequery-function-arguments) 方法，该方法在被调用时提供当前的存储状态。这可以用来使用部分 url 字符串和存储状态中的适当数据来构造所需的 url。
 
-```ts title="Dynamically generated Base URL example"
-// file: src/store.ts noEmit
+```ts title="动态生成基础 URL 示例"
+// 文件: src/store.ts noEmit
 export type RootState = {
   auth: {
     projectId: number | null
   }
 }
 
-// file: src/services/projectSlice.ts noEmit
+// 文件: src/services/projectSlice.ts noEmit
 import type { RootState } from '../store'
 export const selectProjectId = (state: RootState) => state.auth.projectId
 
-// file: src/services/types.ts noEmit
+// 文件: src/services/types.ts noEmit
 export interface Post {
   id: number
   name: string
 }
 
-// file: src/services/api.ts
+// 文件: src/services/api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type {
   BaseQueryFn,
@@ -801,7 +793,7 @@ const dynamicBaseQuery: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
   const projectId = selectProjectId(api.getState() as RootState)
-  // gracefully handle scenarios where data to generate the URL is missing
+  // 当生成 URL 的数据缺失时，优雅地处理情况
   if (!projectId) {
     return {
       error: {
@@ -813,11 +805,11 @@ const dynamicBaseQuery: BaseQueryFn<
   }
 
   const urlEnd = typeof args === 'string' ? args : args.url
-  // construct a dynamically generated portion of the url
+  // 构造一个动态生成的 url 部分
   const adjustedUrl = `project/${projectId}/${urlEnd}`
   const adjustedArgs =
     typeof args === 'string' ? adjustedUrl : { ...args, url: adjustedUrl }
-  // provide the amended url and other params to the raw base query
+  // 提供修正后的 url 和其他参数给原始基础查询
   return rawBaseQuery(adjustedArgs, api, extraOptions)
 }
 
@@ -833,23 +825,23 @@ export const api = createApi({
 export const { useGetPostsQuery } = api
 
 /*
-  Using `useGetPostsQuery()` where a `projectId` of 500 is in the redux state will result in
-  a request being sent to www.my-cool-site.com/project/500/posts
+  当 Redux 状态中有一个 `projectId` 为 500 时使用 `useGetPostsQuery()`，
+  将会发送一个请求到 www.my-cool-site.com/project/500/posts
 */
 ```
 
-## Examples - `transformResponse`
+## 示例 - `transformResponse`
 
-### Unpacking deeply nested GraphQL data
+### 解包深度嵌套的 GraphQL 数据
 
-```ts title="GraphQL transformation example"
-// file: graphqlBaseQuery.ts noEmit
+```ts title="GraphQL 转换示例"
+// 文件: graphqlBaseQuery.ts noEmit
 import { BaseQueryFn } from '@reduxjs/toolkit/query'
 declare const graphqlBaseQuery: (args: { baseUrl: string }) => BaseQueryFn
 declare const gql: (literals: TemplateStringsArray) => void
 export { graphqlBaseQuery, gql }
 
-// file: graphqlApi.ts
+// 文件: graphqlApi.ts
 import { createApi } from '@reduxjs/toolkit/query'
 import { graphqlBaseQuery, gql } from './graphqlBaseQuery'
 
@@ -876,20 +868,20 @@ export const api = createApi({
           }
         `,
       }),
-      // highlight-start
+      // 高亮开始
       transformResponse: (response: { posts: { data: Post[] } }) =>
         response.posts.data,
-      // highlight-end
+      // 高亮结束
     }),
   }),
 })
 ```
 
-### Normalizing data with `createEntityAdapter`
+### 使用 `createEntityAdapter` 标准化数据
 
-In the example below, `transformResponse` is used in conjunction with [`createEntityAdapter`](../../api/createEntityAdapter.mdx) to normalize the data before storing it in the cache.
+在下面的示例中，`transformResponse` 与 [`createEntityAdapter`](../../api/createEntityAdapter.mdx) 一起使用，以在将数据存储在缓存中之前对其进行标准化。
 
-For a response such as:
+对于如下的响应：
 
 <!-- prettier-ignore -->
 ```ts no-transpile
@@ -900,7 +892,7 @@ For a response such as:
 ]
 ```
 
-The normalized cache data will be stored as:
+标准化的缓存数据将被存储为：
 
 ```ts no-transpile
 {
@@ -923,22 +915,22 @@ export interface Post {
   name: string
 }
 
-// highlight-start
+// 高亮开始
 const postsAdapter = createEntityAdapter<Post>({
   sortComparer: (a, b) => a.name.localeCompare(b.name),
 })
-// highlight-end
+// 高亮结束
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: (build) => ({
     getPosts: build.query<EntityState<Post, number>, void>({
       query: () => `posts`,
-      // highlight-start
+      // 高亮开始
       transformResponse(response: Post[]) {
         return postsAdapter.addMany(postsAdapter.getInitialState(), response)
       },
-      // highlight-end
+      // 高亮结束
     }),
   }),
 })
@@ -946,13 +938,13 @@ export const api = createApi({
 export const { useGetPostsQuery } = api
 ```
 
-## Examples - `queryFn`
+## 示例 - `queryFn`
 
-### Using a Third-Party SDK
+### 使用第三方 SDK
 
-Many services like Firebase and Supabase provide their own SDK to make requests. You can use those SDK methods in a `queryFn`:
+许多服务，如 Firebase 和 Supabase，提供了自己的 SDK 来进行请求。你可以在 `queryFn` 中使用这些 SDK 方法：
 
-```ts title="Basic Third-Party SDK" no-transpile
+```ts title="基础的第三方 SDK" no-transpile
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react'
 import { supabase } from './supabaseApi'
 
@@ -962,7 +954,7 @@ export const supabaseApi = createApi({
   endpoints: (builder) => ({
     getBlogs: builder.query({
       queryFn: async () => {
-        // Supabase conveniently already has `data` and `error` fields
+        // Supabase 方便地已经有了 `data` 和 `error` 字段
         const { data, error } = await supabase.from('blogs').select()
         if (error) {
           return { error }
@@ -974,16 +966,16 @@ export const supabaseApi = createApi({
 })
 ```
 
-You could also try creating a custom base query that uses the SDK, and define endpoints that pass method names or args into that base query.
+你也可以尝试创建一个使用 SDK 的自定义基础查询，并定义将方法名或参数传入该基础查询的端点。
 
-### Using a no-op queryFn
+### 使用无操作的 queryFn
 
-In certain scenarios, you may wish to have a `query` or `mutation` where sending a request or returning data is not relevant for the situation. Such a scenario would be to leverage the `invalidatesTags` property to force re-fetch specific `tags` that have been provided to the cache.
+在某些情况下，你可能希望有一个 `query` 或 `mutation`，其中发送请求或返回数据对于情况并不相关。这样的情况可能是为了利用 `invalidatesTags` 属性来强制重新获取已提供给缓存的特定 `tags`。
 
-See also [`providing errors to the cache`](./automated-refetching.mdx#providing-data-to-the-cache) to see additional detail and an example for such a scenario to 'refetch errored queries'.
+另请参见 [`提供错误给缓存`](./automated-refetching.mdx#providing-data-to-the-cache) 以查看此类情况的更多细节和示例，以 '重新获取错误的查询'。
 
-```ts title="Using a no-op queryFn"
-// file: types.ts noEmit
+```ts title="使用无操作的 queryFn"
+// 文件: types.ts noEmit
 export interface Post {
   id: number
   name: string
@@ -993,7 +985,7 @@ export interface User {
   name: string
 }
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { Post, User } from './types'
 
@@ -1011,28 +1003,28 @@ const api = createApi({
       providesTags: ['User'],
     }),
 
-    // highlight-start
+    // 高亮开始
     refetchPostsAndUsers: build.mutation<null, void>({
-      // The query is not relevant here, so a `null` returning `queryFn` is used
+      // 这里的查询不相关，所以使用了一个返回 `null` 的 `queryFn`
       queryFn: () => ({ data: null }),
-      // This mutation takes advantage of tag invalidation behaviour to trigger
-      // any queries that provide the 'Post' or 'User' tags to re-fetch if the queries
-      // are currently subscribed to the cached data
+      // 这个 mutation 利用了标签失效行为来触发
+      // 任何提供 'Post' 或 'User' 标签的查询重新获取，如果查询
+      // 当前订阅了缓存的数据
       invalidatesTags: ['Post', 'User'],
     }),
-    // highlight-end
+    // 高亮结束
   }),
 })
 ```
 
-### Streaming data with no initial request
+### 无初始请求的数据流
 
-RTK Query provides the ability for an endpoint to send an initial request for data, followed up with recurring [streaming updates](./streaming-updates.mdx) that perform further updates to the cached data as the updates occur. However, the initial request is optional, and you may wish to use streaming updates without any initial request fired off.
+RTK Query 提供了一个端点发送初始数据请求的能力，然后用定期的[流式更新](./streaming-updates.mdx)进行进一步的缓存数据更新。然而，初始请求是可选的，你可能希望在没有任何初始请求被触发的情况下使用流式更新。
 
-In the example below, a `queryFn` is used to populate the cache data with an empty array, with no initial request sent. The array is later populated using streaming updates via the [`onCacheEntryAdded`](../api/createApi.mdx#oncacheentryadded) endpoint option, updating the cached data as it is received.
+在下面的示例中，一个 `queryFn` 被用来用一个空数组填充缓存数据，没有发送初始请求。数组稍后通过 [`onCacheEntryAdded`](../api/createApi.mdx#oncacheentryadded) 端点选项使用流式更新进行填充，接收到数据时更新缓存数据。
 
-```ts title="Streaming data with no initial request"
-// file: types.ts noEmit
+```ts title="无初始请求的数据流"
+// 文件: types.ts noEmit
 export interface Message {
   id: number
   channel: 'general' | 'redux'
@@ -1040,7 +1032,7 @@ export interface Message {
   text: string
 }
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { Message } from './types'
 
@@ -1048,15 +1040,15 @@ const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   tagTypes: ['Message'],
   endpoints: (build) => ({
-    // highlight-start
+    // 高亮开始
     streamMessages: build.query<Message[], void>({
-      // The query is not relevant here as the data will be provided via streaming updates.
-      // A queryFn returning an empty array is used, with contents being populated via
-      // streaming updates below as they are received.
+      // 这里的查询不相关，因为数据将通过流式更新提供。
+      // 使用返回空数组的 queryFn，内容将通过
+      // 下面的流式更新填充，当它们被接收时。
       queryFn: () => ({ data: [] }),
       async onCacheEntryAdded(arg, { updateCachedData, cacheEntryRemoved }) {
         const ws = new WebSocket('ws://localhost:8080')
-        // populate the array with messages as they are received from the websocket
+        // 当从 websocket 接收到消息时，填充数组
         ws.addEventListener('message', (event) => {
           updateCachedData((draft) => {
             draft.push(JSON.parse(event.data))
@@ -1066,23 +1058,23 @@ const api = createApi({
         ws.close()
       },
     }),
-    // highlight-end
+    // 高亮结束
   }),
 })
 ```
 
-### Performing multiple requests with a single query
+### 使用单个查询执行多个请求
 
-In the example below, a query is written to fetch all posts for a random user. This is done using a first request for a random user, followed by getting all posts for that user. Using `queryFn` allows the two requests to be included within a single query, avoiding having to chain that logic within component code.
+在下面的示例中，编写了一个查询来获取随机用户的所有帖子。这是通过首先请求一个随机用户，然后获取该用户的所有帖子来完成的。使用 `queryFn` 允许将两个请求包含在一个查询中，避免在组件代码中链接该逻辑。
 
-```ts title="Performing multiple requests with a single query"
-// file: types.ts noEmit
+```ts title="使用单个查询执行多个请求"
+// 文件: types.ts noEmit
 export interface Post {}
 export interface User {
   id: number
 }
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
 import type { Post, User } from './types'
@@ -1092,7 +1084,7 @@ const api = createApi({
   endpoints: (build) => ({
     getRandomUserPosts: build.query<Post, void>({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
-        // get a random user
+        // 获取一个随机用户
         const randomResult = await fetchWithBQ('users/random')
         if (randomResult.error)
           return { error: randomResult.error as FetchBaseQueryError }

@@ -8,18 +8,18 @@ description: 'RTK Query > Usage > Customizing createApi: adding customized varia
 
 &nbsp;
 
-# Customizing `createApi`
+# 自定义 `createApi`
 
-Currently, RTK Query includes two variants of `createApi`:
+目前，RTK Query包含两种变体的 `createApi`：
 
-- `createBaseApi`, which contains only the UI-agnostic Redux logic (the core module)
-- `createApi`, which contains both the core and React hooks modules
+- `createBaseApi`，只包含与UI无关的Redux逻辑（核心模块）
+- `createApi`，包含核心和React钩子模块
 
-You can create your own versions of `createApi` by either specifying non-default options for the modules or by adding your own modules.
+你可以通过为模块指定非默认选项或添加自己的模块来创建自己的 `createApi` 版本。
 
-## Customizing the React-Redux Hooks
+## 自定义 React-Redux 钩子
 
-If you want the hooks to use different versions of `useSelector`, `useDispatch` and `useStore`, such as if you are using a custom context, you can pass these in at module creation:
+如果你希望钩子使用不同版本的 `useSelector`，`useDispatch` 和 `useStore`，例如，如果你正在使用自定义上下文，你可以在模块创建时传入这些：
 
 ```ts
 import * as React from 'react'
@@ -48,9 +48,9 @@ const customCreateApi = buildCreateApi(
 )
 ```
 
-## Customizing `createSelector` for RTKQ
+## 自定义 RTKQ 的 `createSelector`
 
-Both `coreModule` and `reactHooksModule` accept a `createSelector` option which should be a selector creator instance from Reselect or with an equivalent signature.
+`coreModule` 和 `reactHooksModule` 都接受一个 `createSelector` 选项，它应该是来自 Reselect 的选择器创建器实例，或者具有等效签名。
 
 ```ts
 import * as React from 'react'
@@ -69,11 +69,11 @@ const customCreateApi = buildCreateApi(
 )
 ```
 
-## Creating your own module
+## 创建你自己的模块
 
-If you want to create your own module, you should review [the react-hooks module](https://github.com/reduxjs/redux-toolkit/blob/b74a52935a5840bebca5acdc8e2265e3b6497afa/src/query/react/module.ts) to see what an implementation would look like.
+如果你想创建自己的模块，你应该查看[react-hooks模块](https://github.com/reduxjs/redux-toolkit/blob/b74a52935a5840bebca5acdc8e2265e3b6497afa/src/query/react/module.ts)以了解实现可能是什么样子。
 
-Here is a very stripped down version:
+这是一个非常精简的版本：
 
 ```ts no-transpile
 import { CoreModule } from '@internal/core/module'
@@ -109,7 +109,7 @@ declare module '../apiTypes' {
 export const myModule = (): Module<CustomModule> => ({
   name: customModuleName,
   init(api, options, context) {
-    // initialize stuff here if you need to
+    // 如果需要，可以在这里初始化一些东西
 
     return {
       injectEndpoint(endpoint, definition) {

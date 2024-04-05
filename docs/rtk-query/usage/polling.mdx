@@ -8,16 +8,16 @@ description: 'RTK Query > Usage > Polling: re-fetching data on a timer'
 
 &nbsp;
 
-# Polling
+# 轮询
 
-## Polling Overview
+## 轮询概述
 
-Polling gives you the ability to have a 'real-time' effect by causing a query to run at a specified interval. To enable polling for a query, pass a `pollingInterval` to the `useQuery` hook or action creator with an interval in milliseconds:
+轮询使你能够通过使查询以指定的间隔运行来实现“实时”效果。要为查询启用轮询，将 `pollingInterval` 传递给 `useQuery` 钩子或动作创建器，并以毫秒为单位设置间隔：
 
 :::tip
-Polling additionally has the ability to skip sending requests while the window is out of focus. To enable this behavior, pass `skipPollingIfUnfocused: true` to the `useQuery` hook or action creator.
+轮询还具有在窗口失去焦点时跳过发送请求的能力。要启用此行为，将 `skipPollingIfUnfocused: true` 传递给 `useQuery` 钩子或动作创建器。
 
-_Note: `skipPollingIfUnfocused` requires [`setupListeners`](../api/setupListeners.mdx) to have been called._
+_注意：`skipPollingIfUnfocused` 需要 [`setupListeners`](../api/setupListeners.mdx) 已经被调用。_
 :::
 
 ```tsx no-transpile title="src/Pokemon.tsx" no-transpile
@@ -25,7 +25,7 @@ import * as React from 'react'
 import { useGetPokemonByNameQuery } from './services/pokemon'
 
 export const Pokemon = ({ name }: { name: string }) => {
-  // Automatically refetch every 3s unless the window is out of focus
+  // 自动每3秒重新获取一次，除非窗口失去焦点
   const { data, status, error, refetch } = useGetPokemonByNameQuery(name, {
     pollingInterval: 3000,
     skipPollingIfUnfocused: true,
@@ -35,7 +35,7 @@ export const Pokemon = ({ name }: { name: string }) => {
 }
 ```
 
-In an action creator without React Hooks:
+在没有 React Hooks 的动作创建器中：
 
 ```ts no-transpile
 const { data, status, error, refetch } = store.dispatch(
@@ -45,15 +45,15 @@ const { data, status, error, refetch } = store.dispatch(
 )
 ```
 
-## Polling Without React Hooks
+## 不使用 React Hooks 的轮询
 
-If you use polling without the convenience of React Hooks, you will need to manually call `updateSubscriptionOptions` on the promise ref to update the interval. This approach varies by framework but is possible everywhere. See the [Svelte Example](./examples#svelte) for one possibility, and the [Usage Without React Hooks](./usage-without-react-hooks.mdx) page for more details on working with subscriptions manually.
+如果你在没有 React Hooks 的便利性的情况下使用轮询，你将需要手动在 promise 引用上调用 `updateSubscriptionOptions` 来更新间隔。这种方法因框架而异，但在任何地方都是可能的。参见 [Svelte 示例](./examples#svelte) 以了解一种可能性，以及 [不使用 React Hooks 的使用方法](./usage-without-react-hooks.mdx) 页面以获取更多关于手动处理订阅的详细信息。
 
 ```ts no-transpile
 queryRef.updateSubscriptionOptions({ pollingInterval: 0 })
 ```
 
-## Polling Example
+## 轮询示例
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/polling?fontsize=12&runonclick=1&hidenavigation=1&theme=dark"

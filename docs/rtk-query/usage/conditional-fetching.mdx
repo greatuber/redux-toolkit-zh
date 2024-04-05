@@ -8,23 +8,23 @@ description: 'RTK Query > Usage > Conditional Fetching: skipping fetching if nee
 
 &nbsp;
 
-# Conditional Fetching
+# 条件获取
 
-## Overview
+## 概述
 
-Query hooks automatically begin fetching data as soon as the component is mounted. But, there are use cases where you may want to delay fetching data until some condition becomes true. RTK Query supports conditional fetching to enable that behavior.
+查询钩子会在组件挂载后立即开始获取数据。但是，你可能希望在某些条件变为真时延迟获取数据。RTK Query 支持条件获取以实现这种行为。
 
-If you want to prevent a query from automatically running, you can use the `skip` parameter in a hook.
+如果你想阻止查询自动运行，你可以在钩子中使用 `skip` 参数。
 
 [examples](docblock://query/react/buildHooks.ts?token=UseQuerySubscriptionOptions.skip)
 
 [remarks](docblock://query/react/buildHooks.ts?token=UseQuerySubscriptionOptions.skip)
 
 :::tip
-Typescript users may wish to use [`skipToken`](../api/created-api/hooks.mdx#skiptoken) as an alternative to the `skip` option in order to skip running a query, while still keeping types for the endpoint accurate.
+Typescript 用户可能希望使用 [`skipToken`](../api/created-api/hooks.mdx#skiptoken) 作为跳过运行查询的替代选项，同时仍保持端点类型的准确性。
 :::
 
-## Conditional Fetching Example
+## 条件获取示例
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/conditional-fetching?fontsize=12&runonclick=1&hidenavigation=1&module=%2Fsrc%2FPokemon.tsx&moduleview=1&theme=dark"

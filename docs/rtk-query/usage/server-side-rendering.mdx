@@ -8,52 +8,41 @@ description: 'RTK Query > Usage > Server Side Rendering'
 
 &nbsp;
 
-# Server Side Rendering
+# 服务器端渲染
 
-## Server Side Rendering with Next.js
+## 使用 Next.js 进行服务器端渲染
 
-RTK Query supports Server Side Rendering (SSR) with [Next.js](https://nextjs.org/) via
-[rehydration](./persistence-and-rehydration.mdx) in combination with
-[next-redux-wrapper](https://github.com/kirill-konshin/next-redux-wrapper).
+RTK Query 支持通过 [Next.js](https://nextjs.org/) 进行服务器端渲染 (SSR)，这是通过 [rehydration](./persistence-and-rehydration.mdx) 与 [next-redux-wrapper](https://github.com/kirill-konshin/next-redux-wrapper) 的组合实现的。
 
-The workflow is as follows:
+工作流程如下：
 
-- Set up `next-redux-wrapper`
-- In `getStaticProps` or `getServerSideProps`:
-  - Pre-fetch all queries via the `initiate` actions, e.g. `store.dispatch(api.endpoints.getPokemonByName.initiate(name))`
-  - Wait for each query to finish using `await Promise.all(dispatch(api.util.getRunningQueriesThunk()))`
-- In your `createApi` call, configure rehydration using the `extractRehydrationInfo` option:
+- 设置 `next-redux-wrapper`
+- 在 `getStaticProps` 或 `getServerSideProps` 中：
+  - 通过 `initiate` 动作预获取所有查询，例如 `store.dispatch(api.endpoints.getPokemonByName.initiate(name))`
+  - 使用 `await Promise.all(dispatch(api.util.getRunningQueriesThunk()))` 等待每个查询完成
+- 在你的 `createApi` 调用中，使用 `extractRehydrationInfo` 选项配置 rehydration：
 
   [examples](docblock://query/createApi.ts?token=CreateApiOptions.extractRehydrationInfo)
 
-An example repo using `next.js` is available [here](https://github.com/phryneas/ssr-experiments/tree/main/nextjs-blog).
+一个使用 `next.js` 的示例仓库可以在 [这里](https://github.com/phryneas/ssr-experiments/tree/main/nextjs-blog) 找到。
 
 :::tip
-While memory leaks are not anticipated, once a render is sent to the client and the store is being
-removed from memory, you may wish to also call `store.dispatch(api.util.resetApiState())` to
-ensure that no rogue timers are left running.
+虽然不预期会有内存泄漏，但一旦渲染被发送到客户端并且存储正在从内存中移除，你可能也希望调用 `store.dispatch(api.util.resetApiState())` 以确保没有遗留的定时器在运行。
 :::
 
 :::tip
-In order to avoid providing stale data with Static Site Generation (SSG), you may wish to set
-[`refetchOnMountOrArgChange`](../api/createApi.mdx#refetchonmountorargchange) to a reasonable value
-such as 900 (seconds) in order to allow data to be re-fetched when accessed if it has been that
-long since the page was generated.
+为了避免在静态站点生成 (SSG) 中提供过时的数据，你可能希望将 [`refetchOnMountOrArgChange`](../api/createApi.mdx#refetchonmountorargchange) 设置为一个合理的值，例如 900 (秒)，以便在访问数据时如果页面生成已经过去这么长时间，允许数据被重新获取。
 :::
 
-## Server Side Rendering elsewhere
+## 在其他地方进行服务器端渲染
 
-If you are not using `next.js`, and the example above cannot be adapted to your SSR framework,
-an `unstable__` marked approach is available to support SSR scenarios where you need to execute
-async code during render and not safely in an effect.
-This is a similar approach to using [`getDataFromTree`](https://www.apollographql.com/docs/react/performance/server-side-rendering/#executing-queries-with-getdatafromtree)
-with [Apollo](https://www.apollographql.com/docs/).
+如果你不使用 `next.js`，并且上面的示例不能适应你的 SSR 框架，一个标记为 `unstable__` 的方法可以支持你在渲染期间而不是在 effect 中安全地执行异步代码的 SSR 场景。这与使用 [`getDataFromTree`](https://www.apollographql.com/docs/react/performance/server-side-rendering/#executing-queries-with-getdatafromtree) 与 [Apollo](https://www.apollographql.com/docs/) 的方法类似。
 
-The workflow is as follows:
+工作流程如下：
 
-- Create a version of `createApi` that performs asynchronous work during render:
+- 创建一个在渲染期间执行异步工作的 `createApi` 版本：
 
   [examples](docblock://query/react/module.ts?token=ReactHooksModuleOptions.unstable__sideEffectsInRender)
 
-- Use your custom `createApi` when calling `const api = createApi({...})`
-- Wait for all queries to finish using `await Promise.all(dispatch(api.util.getRunningQueriesThunk()))` before performing the next render cycle
+- 在调用 `const api = createApi({...})` 时使用你的自定义 `createApi`
+- 在执行下一个渲染周期之前，使用 `await Promise.all(dispatch(api.util.getRunningQueriesThunk()))` 等待所有查询完成

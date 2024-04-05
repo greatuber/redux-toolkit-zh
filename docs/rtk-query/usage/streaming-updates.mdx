@@ -8,56 +8,56 @@ description: 'RTK Query > Usage > Streaming Updates: updating cache from pushed 
 
 &nbsp;
 
-# Streaming Updates
+# 流式更新
 
-## Overview
+## 概述
 
-RTK Query gives you the ability to receive **streaming updates** for persistent queries. This enables a query to establish an ongoing connection to the server (typically using WebSockets), and apply updates to the cached data as additional information is received from the server.
+RTK Query 为您提供了接收持久查询的**流式更新**的能力。这使得查询能够建立与服务器的持续连接（通常使用 WebSockets），并在从服务器接收到额外信息时更新缓存的数据。
 
-Streaming updates can be used to enable the API to receive real-time updates to the back-end data, such as new entries being created, or important properties being updated.
+流式更新可以用来使 API 实时接收后端数据的更新，例如创建新条目，或者更新重要属性。
 
-To enable streaming updates for a query, pass the asynchronous `onCacheEntryAdded` function to the query, including the logic for how to update the query when streamed data is received. See [`onCacheEntryAdded` API reference](../api/createApi#oncacheentryadded) for more details.
+要为查询启用流式更新，将异步函数 `onCacheEntryAdded` 传递给查询，包括当接收到流式数据时如何更新查询的逻辑。请参阅 [`onCacheEntryAdded` API 参考](../api/createApi#oncacheentryadded)以获取更多详情。
 
-## When to use streaming updates
+## 何时使用流式更新
 
-Primarily updates to query data should be done via [`polling`](./polling) intermittently on an interval, using [`cache invalidation`](./automated-refetching#advanced-invalidation-with-abstract-tag-ids) to invalidate data based on tags associated with queries & mutations, or with [`refetchOnMountOrArgChange`](../api/createApi#refetchonmountorargchange) to fetch fresh data when a component using the data mounts.
+主要的查询数据更新应通过[`轮询`](./polling)在一定间隔内间歇性地进行，使用[`缓存失效`](./automated-refetching#advanced-invalidation-with-abstract-tag-ids)根据与查询和突变相关联的标签使数据失效，或者使用[`refetchOnMountOrArgChange`](../api/createApi#refetchonmountorargchange)在使用数据的组件挂载时获取新数据。
 
-However, streaming updates is particularly useful for scenarios involving:
+然而，流式更新对于以下情况特别有用：
 
-- _Small, frequent changes to large objects_. Rather than repeatedly polling for a large object, the object can be fetched with an initial query, and streaming updates can update individual properties as updates are received.
-- _External event-driven updates_. Where data may be changed by the server or otherwise external users and where real-time updates are expected to be shown to an active user, polling alone would result in periods of stale data in between queries, causing state to easily get out of sync. Streaming updates can update all active clients as the updates occur rather than waiting for the next interval to elapse.
+- _大对象的小的、频繁的更改_。而不是反复轮询一个大对象，可以使用初始查询获取对象，然后流式更新可以在接收到更新时更新单个属性。
+- _外部事件驱动的更新_。在数据可能被服务器或其他外部用户更改，且预期实时更新将显示给活动用户的情况下，仅轮询会导致查询之间的数据过时，导致状态容易脱节。流式更新可以在更新发生时更新所有活动客户端，而不是等待下一个间隔过去。
 
-Example use cases that benefit from streaming updates are:
+从流式更新中受益的示例用例包括：
 
-- GraphQL subscriptions
-- Real-time chat applications
-- Real-time multiplayer games
-- Collaborative document editing with multiple concurrent users
+- GraphQL 订阅
+- 实时聊天应用
+- 实时多人游戏
+- 多个并发用户的协作文档编辑
 
-## Using the `onCacheEntryAdded` Lifecycle
+## 使用 `onCacheEntryAdded` 生命周期
 
-The `onCacheEntryAdded` lifecycle callback lets you write arbitrary async logic that will be executed after a new cache entry is added to the RTK Query cache (ie, after a component has created a new subscription to a given endpoint+params combination).
+`onCacheEntryAdded` 生命周期回调让您可以编写将在新的缓存条目添加到 RTK Query 缓存后（即，组件创建了给定端点+参数组合的新订阅后）执行的任意异步逻辑。
 
-`onCacheEntryAdded` will be called with two arguments: the `arg` that was passed to the subscription, and an options object containing "lifecycle promises" and utility functions. You can use these to write sequenced logic that waits for data to be added, initiates server connections, applies partial updates, and cleans up the connection when the query subscription is removed.
+`onCacheEntryAdded` 将被调用两个参数：传递给订阅的 `arg`，以及包含 "生命周期承诺" 和实用函数的选项对象。您可以使用这些来编写等待数据被添加、启动服务器连接、应用部分更新，并在查询订阅被移除时清理连接的顺序逻辑。
 
-Typically, you will `await cacheDataLoaded` to determine when the first data has been fetched, then use the `updateCacheData` utility to apply streaming updates as messages are received. `updateCacheData` is an Immer-powered callback that receives a `draft` of the current cache value. You may "mutate" the draft value to update it as needed based on the received values. RTK Query will then dispatch an action that applies a diffed patch based on those changes.
+通常，您将 `await cacheDataLoaded` 以确定何时获取了第一批数据，然后使用 `updateCacheData` 实用程序在接收到消息时应用流式更新。`updateCacheData` 是一个由 Immer 驱动的回调，它接收当前缓存值的 `draft`。您可以 "变更" 草稿值以根据接收到的值进行需要的更新。然后，RTK Query 将调度一个基于这些更改的差异化补丁的动作。
 
-Finally, you can `await cacheEntryRemoved` to know when to clean up any server connections.
+最后，您可以 `await cacheEntryRemoved` 以知道何时清理任何服务器连接。
 
-## Streaming Update Examples
+## 流式更新示例
 
-### Websocket Chat API
+### Websocket 聊天 API
 
 ```ts
-// file: schemaValidators.ts noEmit
+// 文件：schemaValidators.ts noEmit
 import type { Message } from './api'
 
 export function isMessage(message: unknown): message is Message {
-  // in real code this would check `message` to ensure it is a `Message`
+  // 在真实代码中，这将检查 `message` 以确保它是一个 `Message`
   return true
 }
 
-// file: api.ts
+// 文件：api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { isMessage } from './schemaValidators'
 
@@ -75,20 +75,20 @@ export const api = createApi({
   endpoints: (build) => ({
     getMessages: build.query<Message[], Channel>({
       query: (channel) => `messages/${channel}`,
-      // highlight-start
+      // 高亮开始
       async onCacheEntryAdded(
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
       ) {
-        // create a websocket connection when the cache subscription starts
+        // 当缓存订阅开始时创建一个 websocket 连接
         const ws = new WebSocket('ws://localhost:8080')
         try {
-          // wait for the initial query to resolve before proceeding
+          // 在继续之前等待初始查询解析
           await cacheDataLoaded
 
-          // when data is received from the socket connection to the server,
-          // if it is a message and for the appropriate channel,
-          // update our query result with the received message
+          // 当从服务器到套接字连接接收到数据时，
+          // 如果它是一个消息并且是适当的频道，
+          // 使用接收到的消息更新我们的查询结果
           const listener = (event: MessageEvent) => {
             const data = JSON.parse(event.data)
             if (!isMessage(data) || data.channel !== arg) return
@@ -100,15 +100,15 @@ export const api = createApi({
 
           ws.addEventListener('message', listener)
         } catch {
-          // no-op in case `cacheEntryRemoved` resolves before `cacheDataLoaded`,
-          // in which case `cacheDataLoaded` will throw
+          // 如果 `cacheEntryRemoved` 在 `cacheDataLoaded` 之前解析，
+          // 那么 `cacheDataLoaded` 将抛出，此时无操作
         }
-        // cacheEntryRemoved will resolve when the cache subscription is no longer active
+        // 当缓存订阅不再活动时，cacheEntryRemoved 将解析
         await cacheEntryRemoved
-        // perform cleanup steps once the `cacheEntryRemoved` promise resolves
+        // 一旦 `cacheEntryRemoved` 承诺解析，执行清理步骤
         ws.close()
       },
-      // highlight-end
+      // 高亮结束
     }),
   }),
 })
@@ -116,27 +116,27 @@ export const api = createApi({
 export const { useGetMessagesQuery } = api
 ```
 
-#### What to expect
+#### 预期结果
 
-When the `getMessages` query is triggered (e.g. via a component mounting with the `useGetMessagesQuery()` hook), a `cache entry` will be added based on the serialized arguments for the endpoint. The associated query will be fired off based on the `query` property to fetch the initial data for the cache. Meanwhile, the asynchronous `onCacheEntryAdded` callback will begin, and create a new WebSocket connection. Once the response for the initial query is received, the cache will be populated with the response data, and the `cacheDataLoaded` promise will resolve. After awaiting the `cacheDataLoaded` promise, the `message` event listener will be added to the WebSocket connection, which updates the cache data when an associated message is received.
+当触发 `getMessages` 查询（例如，通过使用 `useGetMessagesQuery()` 钩子挂载组件时），将根据端点的序列化参数添加一个 `缓存条目`。关联的查询将基于 `query` 属性触发，以获取缓存的初始数据。同时，异步的 `onCacheEntryAdded` 回调将开始，并创建一个新的 WebSocket 连接。一旦收到初始查询的响应，缓存将用响应数据填充，`cacheDataLoaded` promise 将解决。在等待 `cacheDataLoaded` promise 后，将向 WebSocket 连接添加 `message` 事件监听器，当收到关联消息时更新缓存数据。
 
-When there are no more active subscriptions to the data (e.g. when the subscribed components remain unmounted for a sufficient amount of time), the `cacheEntryRemoved` promise will resolve, allowing the remaining code to run and close the websocket connection. RTK Query will also remove the associated data from the cache.
+当没有更多的活动订阅数据时（例如，当订阅的组件保持卸载足够长的时间），`cacheEntryRemoved` promise 将解决，允许剩余的代码运行并关闭 websocket 连接。RTK Query 也将从缓存中删除关联的数据。
 
-If a query for the corresponding cache entry runs later, it will overwrite the whole cache entry, and the streaming update listeners will continue to work on the updated data.
+如果稍后运行对应缓存条目的查询，它将覆盖整个缓存条目，流更新监听器将继续在更新的数据上工作。
 
-### Websocket Chat API with a transformed response shape
+### 带有转换响应形状的 Websocket 聊天 API
 
 ```ts
-// file: schemaValidators.ts noEmit
+// 文件：schemaValidators.ts noEmit
 import type { Message } from './api'
 
 export function isMessage(message: unknown): message is Message {
-  // in real code this would check `message` to ensure it is a `Message`
+  // 在实际代码中，这将检查 `message` 以确保它是一个 `Message`
 
   return true
 }
 
-// file: api.ts
+// 文件：api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { createEntityAdapter } from '@reduxjs/toolkit'
 import type { EntityState } from '@reduxjs/toolkit'
@@ -151,24 +151,24 @@ export interface Message {
   text: string
 }
 
-// highlight-start
+// 高亮开始
 const messagesAdapter = createEntityAdapter<Message>()
-// highlight-end
+// 高亮结束
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: (build) => ({
-    // highlight-start
+    // 高亮开始
     getMessages: build.query<EntityState<Message, number>, Channel>({
-      // highlight-end
+      // 高亮结束
       query: (channel) => `messages/${channel}`,
-      // highlight-start
+      // 高亮开始
       transformResponse(response: Message[]) {
         return messagesAdapter.addMany(
           messagesAdapter.getInitialState(),
           response,
         )
       },
-      // highlight-end
+      // 高亮结束
       async onCacheEntryAdded(
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
@@ -182,9 +182,9 @@ export const api = createApi({
             if (!isMessage(data) || data.channel !== arg) return
 
             updateCachedData((draft) => {
-              // highlight-start
+              // 高亮开始
               messagesAdapter.upsertOne(draft, data)
-              // highlight-end
+              // 高亮结束
             })
           }
 
@@ -200,9 +200,9 @@ export const api = createApi({
 export const { useGetMessagesQuery } = api
 ```
 
-This example demonstrates how the [previous example](#websocket-chat-api) can be altered to allow for transforming the response shape when adding data to the cache.
+此示例演示了如何修改[上一个示例](#websocket-chat-api)，以允许在将数据添加到缓存时转换响应形状。
 
-For example, the data is transformed from this shape:
+例如，数据从这种形状转换为：
 
 ```ts no-transpile
 [
@@ -221,13 +221,13 @@ For example, the data is transformed from this shape:
 ]
 ```
 
-To this:
+变为这种形状：
 
 ```ts no-transpile
 {
-  // The unique IDs of each item. Must be strings or numbers
+  // 每个项目的唯一 ID。必须是字符串或数字
   ids: [0, 1],
-  // A lookup table mapping entity IDs to the corresponding entity objects
+  // 一个查找表，将实体 ID 映射到对应的实体对象
   entities: {
     0: {
       id: 0,
@@ -245,4 +245,4 @@ To this:
 };
 ```
 
-A key point to keep in mind is that updates to the cached data within the `onCacheEntryAdded` callback must respect the transformed data shape which will be present for the cached data. The example shows how [`createEntityAdapter`](../../api/createEntityAdapter) can be used for the initial `transformResponse`, and again when streamed updates are received to upsert received items into the cached data, while maintaining the normalized state structure.
+需要记住的关键点是，`onCacheEntryAdded` 回调中对缓存数据的更新必须尊重将存在于缓存数据的转换数据形状。示例显示了如何使用 [`createEntityAdapter`](../../api/createEntityAdapter) 进行初始的 `transformResponse`，以及在接收到流更新时如何将接收到的项目插入到缓存数据中，同时保持规范化的状态结构。

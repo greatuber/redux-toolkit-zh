@@ -8,103 +8,103 @@ description: 'RTK Query > Usage > Cache Behavior: defaults, cache lifetimes, and
 
 &nbsp;
 
-# Cache Behavior
+# 缓存行为
 
-A key feature of RTK Query is its management of cached data. When data is fetched from the server, RTK Query will store the data in the Redux store as a 'cache'. When an additional request is performed for the same data, RTK Query will provide the existing cached data rather than sending an additional request to the server.
+RTK Query 的一个关键特性是其对缓存数据的管理。当从服务器获取数据时，RTK Query 会将数据存储在 Redux store 中作为 '缓存'。当对同一数据进行额外的请求时，RTK Query 会提供现有的缓存数据，而不是向服务器发送额外的请求。
 
-RTK Query provides a number of concepts and tools to manipulate the cache behaviour and adjust it to your needs.
+RTK Query 提供了一些概念和工具来操作缓存行为并根据您的需求进行调整。
 
-## Default Cache Behavior
+## 默认缓存行为
 
-With RTK Query, caching is based on:
+在 RTK Query 中，缓存基于：
 
-- API endpoint definitions
-- The serialized query parameters used when components subscribe to data from an endpoint
-- Active subscription reference counts
+- API 端点定义
+- 当组件从端点订阅数据时使用的序列化查询参数
+- 活动订阅引用计数
 
-When a subscription is started, the parameters used with the endpoint are serialized and stored internally as a `queryCacheKey` for the request. Any future request that produces the same `queryCacheKey` (i.e. called with the same parameters, factoring serialization) will be de-duped against the original, and will share the same data and updates. i.e. two separate components performing the same request will use the same cached data.
+当开始一个订阅时，与端点一起使用的参数被序列化并内部存储为请求的 `queryCacheKey`。任何未来产生相同 `queryCacheKey` 的请求（即，使用相同参数调用，考虑到序列化）将被对原始请求进行去重，并将共享相同的数据和更新。即，执行相同请求的两个独立组件将使用相同的缓存数据。
 
-When a request is attempted, if the data already exists in the cache, then that data is served and no new request is sent to the server. Otherwise, if the data does not exist in the cache, then a new request is sent, and the returned response is stored in the cache.
+当尝试一个请求时，如果数据已经存在于缓存中，那么将提供该数据，不会向服务器发送新的请求。否则，如果数据不存在于缓存中，那么将发送新的请求，并将返回的响应存储在缓存中。
 
-Subscriptions are reference-counted. Additional subscriptions that ask for the same endpoint+params increment the reference count. As long as there is an active 'subscription' to the data (e.g. if a component is mounted that calls a `useQuery` hook for the endpoint), then the data will remain in the cache. Once the subscription is removed (e.g. when last component subscribed to the data unmounts), after an amount of time (default 60 seconds), the data will be removed from the cache. The expiration time can be configured with the `keepUnusedDataFor` property for the [API definition as a whole](../api/createApi.mdx#keepunuseddatafor), as well as on a [per-endpoint](../api/createApi.mdx#keepunuseddatafor-1) basis.
+订阅是引用计数的。请求相同端点+参数的额外订阅会增加引用计数。只要数据有一个活动的 '订阅'（例如，如果有一个调用端点的 `useQuery` 钩子的组件被挂载），那么数据将保留在缓存中。一旦订阅被移除（例如，当最后一个订阅数据的组件卸载时），在一段时间后（默认 60 秒），数据将从缓存中移除。过期时间可以通过 [API 定义整体](../api/createApi.mdx#keepunuseddatafor) 的 `keepUnusedDataFor` 属性进行配置，也可以在 [每个端点](../api/createApi.mdx#keepunuseddatafor-1) 的基础上进行配置。
 
-### Cache lifetime & subscription example
+### 缓存生命周期和订阅示例
 
-Imagine an endpoint that expects an `id` as the query param, and 4 components mounted which are requesting data from this same endpoint:
+想象一个端点，它期望一个 `id` 作为查询参数，有 4 个组件挂载，它们都从这个相同的端点请求数据：
 
 ```ts no-transpile
 import { useGetUserQuery } from './api.ts'
 
 function ComponentOne() {
-  // component subscribes to the data
+  // 组件订阅数据
   const { data } = useGetUserQuery(1)
 
   return <div>...</div>
 }
 
 function ComponentTwo() {
-  // component subscribes to the data
+  // 组件订阅数据
   const { data } = useGetUserQuery(2)
 
   return <div>...</div>
 }
 
 function ComponentThree() {
-  // component subscribes to the data
+  // 组件订阅数据
   const { data } = useGetUserQuery(3)
 
   return <div>...</div>
 }
 
 function ComponentFour() {
-  // component subscribes to the *same* data as ComponentThree,
-  // as it has the same query parameters
+  // 组件订阅与 ComponentThree *相同* 的数据，
+  // 因为它有相同的查询参数
   const { data } = useGetUserQuery(3)
 
   return <div>...</div>
 }
 ```
 
-While four components are subscribed to the endpoint, there are only three distinct combinations of endpoint + query parameters. Query parameters `1` and `2` will each have a single subscriber, while query parameter `3` has two subscribers. RTK Query will make three distinct fetches; one for each unique set of query parameters per endpoint.
+虽然有四个组件订阅了端点，但只有三个不同的端点 + 查询参数组合。查询参数 `1` 和 `2` 各有一个订阅者，而查询参数 `3` 有两个订阅者。RTK Query 将进行三次不同的获取；每个端点的每一组唯一的查询参数都会进行一次。
 
-Data is kept in the cache as long as at least one active subscriber is interested in that endpoint + parameter combination. When the subscriber reference count reaches zero, a timer is set, and if there are no new subscriptions to that data by the time the timer expires, the cached data will be removed. The default expiration is 60 seconds, which can be configured both for the [API definition as a whole](../api/createApi.mdx#keepunuseddatafor), as well as on a [per-endpoint](../api/createApi.mdx#keepunuseddatafor-1) basis.
+只要至少有一个活动订阅者对该端点 + 参数组合感兴趣，数据就会保留在缓存中。当订阅者引用计数达到零时，会设置一个计时器，如果在计时器到期之前没有新的订阅到该数据，缓存数据将被移除。默认的过期时间是 60 秒，可以为 [API 定义整体](../api/createApi.mdx#keepunuseddatafor) 配置，也可以在 [每个端点](../api/createApi.mdx#keepunuseddatafor-1) 的基础上进行配置。
 
-If 'ComponentThree' is unmounted in the example above, regardless of how much time passes, the data will remain in the cache due to 'ComponentFour' still being subscribed to the same data, and the subscribe reference count will be `1`. However, once 'ComponentFour' unmounts, the subscriber reference count will be `0`. The data will remain in the cache for the remainder of the expiration time. If no new subscription has been created before the timer expires, the cached data will finally be removed.
+如果在上面的例子中 'ComponentThree' 被卸载，无论过去多长时间，由于 'ComponentFour' 仍然订阅了相同的数据，数据将保留在缓存中，订阅引用计数将为 `1`。然而，一旦 'ComponentFour' 卸载，订阅者引用计数将为 `0`。数据将在缓存中保留剩余的过期时间。如果在计时器到期之前没有创建新的订阅，缓存数据最终将被移除。
 
-## Manipulating Cache Behavior
+## 操作缓存行为
 
-On top of the default behaviour, RTK Query provides a number of methods to re-fetch data earlier in scenarios where it should be considered invalid, or is otherwise deemed suitable to be 'refreshed'.
+除了默认行为外，RTK Query 提供了一些方法在数据应被视为无效，或者被认为适合 '刷新' 的情况下提前重新获取数据。
 
-### Reducing subscription time with `keepUnusedDataFor`
+### 使用 `keepUnusedDataFor` 减少订阅时间
 
-As mentioned above under [Default Cache Behavior](#default-cache-behavior) and [Cache lifetime & subscription example](#cache-lifetime--subscription-example), by default, data will remain in the cache for 60 seconds after the subscriber reference count hits zero.
+如上文 [默认缓存行为](#默认缓存行为) 和 [缓存生命周期和订阅示例](#缓存生命周期和订阅示例) 所述，默认情况下，当订阅者引用计数达到零后，数据将在缓存中保留 60 秒。
 
-This value can be configured using the `keepUnusedDataFor` option for both the API definition, as well as per-endpoint. Note that the per-endpoint version, if provided, will overrule a setting on the API definition.
+这个值可以使用 `keepUnusedDataFor` 选项为 API 定义以及每个端点进行配置。注意，如果提供了每个端点的版本，它将覆盖 API 定义上的设置。
 
-Providing a value to `keepUnusedDataFor` as a number in seconds specifies how long the data should be kept in the cache after the subscriber reference count reaches zero.
+为 `keepUnusedDataFor` 提供一个以秒为单位的数字值，指定在订阅者引用计数达到零后，数据应在缓存中保留多长时间。
 
-```ts title="keepUnusedDataFor configuration"
-// file: types.ts noEmit
+```ts title="keepUnusedDataFor 配置"
+// 文件: types.ts noEmit
 export interface Post {
   id: number
   name: string
 }
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Post } from './types'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   // highlight-start
-  // global configuration for the api
+  // api 的全局配置
   keepUnusedDataFor: 30,
   // highlight-end
   endpoints: (builder) => ({
     getPosts: builder.query<Post[], number>({
       query: () => `posts`,
       // highlight-start
-      // configuration for an individual endpoint, overriding the api setting
+      // 单个端点的配置，覆盖 api 设置
       keepUnusedDataFor: 5,
       // highlight-end
     }),
@@ -112,15 +112,15 @@ export const api = createApi({
 })
 ```
 
-### Re-fetching on demand with `refetch`/`initiate`
+### 使用 `refetch`/`initiate` 按需重新获取
 
-In order to achieve complete granular control over re-fetching data, you can use the `refetch` function returned as a result property from a [`useQuery`](../api/created-api/hooks.mdx#usequery) or [`useQuerySubscription`](../api/created-api/hooks.mdx#usequerysubscription) hook.
+为了实现对重新获取数据的完全粒度控制，你可以使用从 [`useQuery`](../api/created-api/hooks.mdx#usequery) 或 [`useQuerySubscription`](../api/created-api/hooks.mdx#usequerysubscription) 钩子返回的结果属性中的 `refetch` 函数。
 
-Calling the `refetch` function will force refetch the associated query.
+调用 `refetch` 函数将强制重新获取关联的查询。
 
-Alternatively, you can dispatch the `initiate` thunk action for an endpoint, passing the option `forceRefetch: true` to the thunk action creator for the same effect.
+或者，你可以为端点分派 `initiate` thunk 动作，将选项 `forceRefetch: true` 传递给 thunk 动作创建器以达到相同的效果。
 
-```tsx no-transpile title="Force refetch example"
+```tsx no-transpile title="强制重新获取示例"
 import { useDispatch } from 'react-redux'
 import { useGetPostsQuery } from './api'
 
@@ -129,12 +129,12 @@ const Component = () => {
   const { data, refetch } = useGetPostsQuery({ count: 5 })
 
   function handleRefetchOne() {
-    // force re-fetches the data
+    // 强制重新获取数据
     refetch()
   }
 
   function handleRefetchTwo() {
-    // has the same effect as `refetch` for the associated query
+    // 与 `refetch` 对关联查询有相同的效果
     dispatch(
       api.endpoints.getPosts.initiate(
         { count: 5 },
@@ -145,48 +145,48 @@ const Component = () => {
 
   return (
     <div>
-      <button onClick={handleRefetchOne}>Force re-fetch 1</button>
-      <button onClick={handleRefetchTwo}>Force re-fetch 2</button>
+      <button onClick={handleRefetchOne}>强制重新获取 1</button>
+      <button onClick={handleRefetchTwo}>强制重新获取 2</button>
     </div>
   )
 }
 ```
 
-### Encouraging re-fetching with `refetchOnMountOrArgChange`
+### 通过 `refetchOnMountOrArgChange` 鼓励重新获取
 
-Queries can be encouraged to re-fetch more frequently than usual via the [`refetchOnMountOrArgChange`](../api/createApi.mdx#refetchonmountorargchange) property. This can be passed to the endpoint as a whole, to individual hook calls, or when dispatching the [`initiate`](../api/created-api/endpoints.mdx#initiate) action (the name of the action creator's option is `forceRefetch`).
+通过 [`refetchOnMountOrArgChange`](../api/createApi.mdx#refetchonmountorargchange) 属性，查询可以被鼓励比通常更频繁地重新获取。这可以传递给整个端点，传递给单个钩子调用，或者在分派 [`initiate`](../api/created-api/endpoints.mdx#initiate) 动作时（动作创建器的选项名为 `forceRefetch`）。
 
-`refetchOnMountOrArgChange` is used to encourage re-fetching in additional situations where the default behavior would instead serve cached data.
+`refetchOnMountOrArgChange` 用于在默认行为将提供缓存数据的额外情况下鼓励重新获取。
 
-`refetchOnMountOrArgChange` accepts either a boolean value, or a number as time in seconds.
+`refetchOnMountOrArgChange` 接受布尔值，或者作为时间（秒）的数字。
 
-Passing `false` (the default value) for this property will use the default behavior [described above](#default-cache-behavior).
+传递 `false`（默认值）对于此属性将使用[上述描述](#default-cache-behavior)的默认行为。
 
-Passing `true` for this property will cause the endpoint to always refetch when a new subscriber to the query is added. If passed to an individual hook call and not the api definition itself, then this applies only to that hook call. I.e., when the component calling the hook mounts, or the argument changes, it will always refetch, regardless of whether cached data for the endpoint + arg combination already exists.
+传递 `true` 对于此属性将导致端点在添加新的查询订阅者时总是重新获取。如果传递给单个钩子调用而不是 api 定义本身，那么这只适用于那个钩子调用。即，当调用钩子的组件挂载，或者参数改变时，它将总是重新获取，无论端点 + arg 组合的缓存数据是否已经存在。
 
-Passing a `number` as a value in seconds will use the following behavior:
+传递一个 `number` 作为秒数的值将使用以下行为：
 
-- At the time a query subscription is created:
-  - if there is an existing query in the cache, it will compare the current time vs the last fulfilled timestamp for that query,
-  - It will refetch if the provided amount of time in seconds has elapsed.
-- If there is no query, it will fetch the data.
-- If there is an existing query, but the amount of time specified since the last query has not elapsed, it will serve the existing cached data.
+- 在创建查询订阅时：
+  - 如果缓存中存在现有查询，它将比较当前时间与该查询的最后满足时间戳，
+  - 如果提供的时间（秒）已经过去，它将重新获取。
+- 如果没有查询，它将获取数据。
+- 如果存在现有查询，但自上次查询以来指定的时间还没有过去，它将提供现有的缓存数据。
 
-```ts title="Configuring re-fetching on subscription if data exceeds a given time"
-// file: types.ts noEmit
+```ts title="配置如果数据超过给定时间则在订阅时重新获取"
+// 文件: types.ts noEmit
 export interface Post {
   id: number
   name: string
 }
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Post } from './types'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   // highlight-start
-  // global configuration for the api
+  // api 的全局配置
   refetchOnMountOrArgChange: 30,
   // highlight-end
   endpoints: (builder) => ({
@@ -197,15 +197,15 @@ export const api = createApi({
 })
 ```
 
-```tsx no-transpile title="Forcing refetch on component mount"
+```tsx no-transpile title="强制在组件挂载时重新获取"
 import { useGetPostsQuery } from './api'
 
 const Component = () => {
   const { data } = useGetPostsQuery(
     { count: 5 },
     // highlight-start
-    // this overrules the api definition setting,
-    // forcing the query to always fetch when this component is mounted
+    // 这将覆盖 api 定义设置，
+    // 强制此组件挂载时总是获取查询
     { refetchOnMountOrArgChange: true },
     // highlight-end
   )
@@ -214,33 +214,33 @@ const Component = () => {
 }
 ```
 
-### Re-fetching on window focus with `refetchOnFocus`
+### 使用 `refetchOnFocus` 在窗口聚焦时重新获取
 
-The [`refetchOnFocus`](../api/createApi.mdx#refetchonfocus) option allows you to control whether RTK Query will try to refetch all subscribed queries after the application window regains focus.
+[`refetchOnFocus`](../api/createApi.mdx#refetchonfocus) 选项允许你控制应用窗口重新获得焦点后，RTK Query 是否尝试重新获取所有已订阅的查询。
 
-If you specify this option alongside `skip: true`, this will not be evaluated until skip is false.
+如果你在 `skip: true` 旁边指定了此选项，那么在 skip 为 false 之前，不会对此进行评估。
 
-Note that this requires [`setupListeners`](../api/setupListeners.mdx) to have been called.
+请注意，这需要已经调用了 [`setupListeners`](../api/setupListeners.mdx)。
 
-This option is available on both the api definition with [`createApi`](../api/createApi.mdx), as well as on the [`useQuery`](../api/created-api/hooks.mdx#usequery), [`useQuerySubscription`](../api/created-api/hooks.mdx#usequerysubscription), [`useLazyQuery`](../api/created-api/hooks.mdx#uselazyquery), and [`useLazyQuerySubscription`](../api/created-api/hooks.mdx#uselazyquerysubscription) hooks.
+此选项在 [`createApi`](../api/createApi.mdx) 的 api 定义以及 [`useQuery`](../api/created-api/hooks.mdx#usequery)、[`useQuerySubscription`](../api/created-api/hooks.mdx#usequerysubscription)、[`useLazyQuery`](../api/created-api/hooks.mdx#uselazyquery) 和 [`useLazyQuerySubscription`](../api/created-api/hooks.mdx#uselazyquerysubscription) 钩子上都可用。
 
 ```ts title="src/services/api.ts"
-// file: src/services/types.ts noEmit
+// 文件: src/services/types.ts noEmit
 export interface Post {
   id: number
   name: string
 }
 
-// file: src/services/api.ts
+// 文件: src/services/api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Post } from './types'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-  // highlight-start
-  // global configuration for the api
+  // 高亮开始
+  // api 的全局配置
   refetchOnFocus: true,
-  // highlight-end
+  // 高亮结束
   endpoints: (builder) => ({
     getPosts: builder.query<Post[], number>({
       query: () => `posts`,
@@ -250,22 +250,22 @@ export const api = createApi({
 ```
 
 ```ts title="src/store.ts"
-// file: src/services/types.ts noEmit
+// 文件: src/services/types.ts noEmit
 export interface Post {
   id: number
   name: string
 }
 
-// file: src/services/api.ts noEmit
+// 文件: src/services/api.ts noEmit
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Post } from './types'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-  // highlight-start
-  // global configuration for the api
+  // 高亮开始
+  // api 的全局配置
   refetchOnFocus: true,
-  // highlight-end
+  // 高亮结束
   endpoints: (builder) => ({
     getPosts: builder.query<Post[], number>({
       query: () => `posts`,
@@ -273,7 +273,7 @@ export const api = createApi({
   }),
 })
 
-// file: src/store.ts
+// 文件: src/store.ts
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
 import { api } from './services/api'
@@ -285,41 +285,41 @@ export const store = configureStore({
   middleware: (gDM) => gDM().concat(api.middleware),
 })
 
-// highlight-start
-// enable listener behavior for the store
+// 高亮开始
+// 为 store 启用监听器行为
 setupListeners(store.dispatch)
-// highlight-end
+// 高亮结束
 
 export type RootState = ReturnType<typeof store.getState>
 ```
 
-### Re-fetching on network reconnection with `refetchOnReconnect`
+### 使用 `refetchOnReconnect` 在网络重新连接时重新获取
 
-The [`refetchOnReconnect`](../api/createApi.mdx#refetchonreconnect) option on [`createApi`](../api/createApi.mdx) allows you to control whether RTK Query will try to refetch all subscribed queries after regaining a network connection.
+[`createApi`](../api/createApi.mdx) 上的 [`refetchOnReconnect`](../api/createApi.mdx#refetchonreconnect) 选项允许你控制在重新获得网络连接后，RTK Query 是否尝试重新获取所有已订阅的查询。
 
-If you specify this option alongside `skip: true`, this **will not be evaluated** until `skip` is false.
+如果你在 `skip: true` 旁边指定了此选项，那么在 `skip` 为 false 之前，**不会对此进行评估**。
 
-Note that this requires [`setupListeners`](../api/setupListeners.mdx) to have been called.
+请注意，这需要已经调用了 [`setupListeners`](../api/setupListeners.mdx)。
 
-This option is available on both the api definition with [`createApi`](../api/createApi.mdx), as well as on the [`useQuery`](../api/created-api/hooks.mdx#usequery), [`useQuerySubscription`](../api/created-api/hooks.mdx#usequerysubscription), [`useLazyQuery`](../api/created-api/hooks.mdx#uselazyquery), and [`useLazyQuerySubscription`](../api/created-api/hooks.mdx#uselazyquerysubscription) hooks.
+此选项在 [`createApi`](../api/createApi.mdx) 的 api 定义以及 [`useQuery`](../api/created-api/hooks.mdx#usequery)、[`useQuerySubscription`](../api/created-api/hooks.mdx#usequerysubscription)、[`useLazyQuery`](../api/created-api/hooks.mdx#uselazyquery) 和 [`useLazyQuerySubscription`](../api/created-api/hooks.mdx#uselazyquerysubscription) 钩子上都可用。
 
 ```ts title="src/services/api.ts"
-// file: src/services/types.ts noEmit
+// 文件: src/services/types.ts noEmit
 export interface Post {
   id: number
   name: string
 }
 
-// file: src/services/api.ts
+// 文件: src/services/api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Post } from './types'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-  // highlight-start
-  // global configuration for the api
+  // 高亮开始
+  // api 的全局配置
   refetchOnReconnect: true,
-  // highlight-end
+  // 高亮结束
   endpoints: (builder) => ({
     getPosts: builder.query<Post[], number>({
       query: () => `posts`,
@@ -329,22 +329,22 @@ export const api = createApi({
 ```
 
 ```ts title="src/store.ts"
-// file: src/services/types.ts noEmit
+// 文件: src/services/types.ts noEmit
 export interface Post {
   id: number
   name: string
 }
 
-// file: src/services/api.ts noEmit
+// 文件: src/services/api.ts noEmit
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Post } from './types'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-  // highlight-start
-  // global configuration for the api
+  // 高亮开始
+  // api 的全局配置
   refetchOnReconnect: true,
-  // highlight-end
+  // 高亮结束
   endpoints: (builder) => ({
     getPosts: builder.query<Post[], number>({
       query: () => `posts`,
@@ -352,7 +352,7 @@ export const api = createApi({
   }),
 })
 
-// file: src/store.ts
+// 文件: src/store.ts
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
 import { api } from './services/api'
@@ -364,59 +364,59 @@ export const store = configureStore({
   middleware: (gDM) => gDM().concat(api.middleware),
 })
 
-// highlight-start
-// enable listener behavior for the store
+// 高亮开始
+// 为 store 启用监听器行为
 setupListeners(store.dispatch)
-// highlight-end
+// 高亮结束
 
 export type RootState = ReturnType<typeof store.getState>
 ```
 
-### Re-fetching after mutations by invalidating cache tags
+### 通过使缓存标签无效来在突变后重新获取
 
-RTK Query uses an optional [cache tag](./automated-refetching.mdx#cache-tags) system to automate re-fetching for query endpoints that have data affected by mutation endpoints.
+RTK Query 使用一个可选的[缓存标签](./automated-refetching.mdx#cache-tags)系统，以自动化那些数据受到突变端点影响的查询端点的重新获取。
 
-See [Automated Re-fetching](./automated-refetching.mdx) for full details on this concept.
+有关此概念的完整细节，请参见[自动重新获取](./automated-refetching.mdx)。
 
-## Tradeoffs
+## 权衡
 
-### No Normalized or De-duplicated Cache
+### 没有规范化或去重的缓存
 
-RTK Query deliberately **does _not_ implement a cache that would deduplicate identical items across multiple requests**. There are several reasons for this:
+RTK Query 故意**不实现一个可以在多个请求之间去重相同项目的缓存**。这有几个原因：
 
-- A fully normalized shared-across-queries cache is a _hard_ problem to solve
-- We don't have the time, resources, or interest in trying to solve that right now
-- In many cases, simply re-fetching data when it's invalidated works well and is easier to understand
-- At a minimum, RTKQ can help solve the general use case of "fetch some data", which is a big pain point for a lot of people
+- 一个完全规范化的跨查询共享缓存是一个难以解决的问题
+- 我们现在没有时间、资源或兴趣尝试解决这个问题
+- 在许多情况下，当数据无效时简单地重新获取数据效果很好，而且更容易理解
+- 至少，RTKQ 可以帮助解决"获取一些数据"的一般用例，这对很多人来说是一个大痛点
 
-As an example, say that we have an API slice with `getTodos` and `getTodo` endpoints, and our components make the following queries:
+举个例子，假设我们有一个带有 `getTodos` 和 `getTodo` 端点的 API 切片，我们的组件进行以下查询：
 
 - `getTodos()`
 - `getTodos({filter: 'odd'})`
 - `getTodo({id: 1})`
 
-Each of these query results would include a Todo object that looks like `{id: 1}`.
+每个查询结果都会包含一个看起来像 `{id: 1}` 的 Todo 对象。
 
-In a fully normalized de-duplicating cache, only a single copy of this Todo object would be stored. However, RTK Query saves each query result independently in the cache. So, this would result in three separate copies of this Todo being cached in the Redux store. However, if all the endpoints are consistently providing the same tags (such as `{type: 'Todo', id: 1}`), then invalidating that tag will force all the matching endpoints to refetch their data for consistency.
+在一个完全规范化的去重缓存中，只会存储这个 Todo 对象的一个副本。然而，RTK Query 在缓存中独立保存每个查询结果。所以，这会导致在 Redux 存储中缓存三个独立的 Todo 副本。然而，如果所有的端点都一致地提供相同的标签（如 `{type: 'Todo', id: 1}`），那么使该标签无效将强制所有匹配的端点重新获取他们的数据以保持一致性。
 
-The Redux docs have always recommended [keeping data in a normalized lookup table](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape) to enable easily finding items by ID and updating them in the store, and [RTK's `createEntityAdapter`](../../api/createEntityAdapter.mdx) was designed to help manage normalized state. Those concepts are still valuable and don't go away. However, if you're using RTK Query to manage caching data, there's less need to manipulate the data that way yourself.
+Redux 文档一直推荐[在规范化的查找表中保持数据](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape)，以便轻松地通过 ID 找到项目并在存储中更新它们，而 [RTK 的 `createEntityAdapter`](../../api/createEntityAdapter.mdx) 被设计用来帮助管理规范化的状态。这些概念仍然有价值，不会消失。然而，如果你正在使用 RTK Query 来管理缓存数据，那么你自己操作数据的需求就会减少。
 
-There are a couple additional points that can help here:
+这里还有一些可以帮助的额外点：
 
-- The generated query hooks have [a `selectFromResult` option](../api/created-api/hooks.mdx#selectfromresult) that allow components to read individual pieces of data from a query result. As an example, a `<TodoList>` component might call `useTodosQuery()`, and each individual `<TodoListItem>` could use the same query hook but select from the result to get the right todo object.
-- You can use the [`transformResponse` endpoint option](../api/createApi.mdx#transformresponse) to modify the fetched data so that it's [stored in a different shape](./customizing-queries.mdx#customizing-query-responses-with-transformresponse), such as using `createEntityAdapter` to normalize the data _for this one response_ before it's inserted into the cache.
+- 生成的查询钩子有一个 [`selectFromResult` 选项](../api/created-api/hooks.mdx#selectfromresult)，允许组件从查询结果中读取单个数据片段。例如，一个 `<TodoList>` 组件可能会调用 `useTodosQuery()`，每个单独的 `<TodoListItem>` 可以使用相同的查询钩子，但从结果中选择以获取正确的 todo 对象。
+- 你可以使用 [`transformResponse` 端点选项](../api/createApi.mdx#transformresponse) 来修改获取的数据，使其[以不同的形状存储](./customizing-queries.mdx#customizing-query-responses-with-transformresponse)，例如使用 `createEntityAdapter` 在数据插入缓存之前规范化这一响应的数据。
 
-### Further information
+### 更多信息
 
-- [Reddit: discussion of why RTKQ doesn't have a normalized cache, and tradeoffs](https://www.reddit.com/r/reactjs/comments/my9vrq/redux_toolkit_v16_alpha1_rtk_query_apis/gvxi5t7/)
+- [Reddit: 讨论为什么 RTKQ 没有规范化的缓存，以及权衡](https://www.reddit.com/r/reactjs/comments/my9vrq/redux_toolkit_v16_alpha1_rtk_query_apis/gvxi5t7/)
 
-## Examples
+## 示例
 
-### Cache Subscription Lifetime Demo
+### 缓存订阅生命周期演示
 
-This example is a live demo of how the subscriber reference count and the value of `keepUnusedDataFor` interact with each other. The `Subscriptions` and `Queries` (including the cached data) are shown in the demo for you to visualize (note that this can also be viewed in the [Redux Devtools Extension](https://github.com/reduxjs/redux-devtools)).
+这个示例是一个实时演示，展示了订阅者引用计数和 `keepUnusedDataFor` 的值如何相互作用。在演示中，`Subscriptions` 和 `Queries`（包括缓存的数据）都会显示出来，供你可视化（注意，这也可以在 [Redux Devtools Extension](https://github.com/reduxjs/redux-devtools) 中查看）。
 
-Two components are mounted, each with the same endpoints query (`useGetUsersQuery(2)`). You will be able to observe that when toggling off the components, the subscriber reference count will be reduced. After toggling off both components such that the subscriber reference count reaches zero, you will observe the cached data under the `Queries` section will persist for 5 seconds (the value of `keepUnusedDataFor` provided for the endpoint in this demo). If the subscriber reference count remains at 0 for the full duration, the cached data will then be removed from the store.
+挂载了两个组件，每个组件都有相同的端点查询（`useGetUsersQuery(2)`）。你将能够观察到，当切换组件时，订阅者引用计数会减少。当切换关闭所有组件，使得订阅者引用计数达到零时，你会观察到 `Queries` 部分下的缓存数据将持续 5 秒（这是在此演示中为端点提供的 `keepUnusedDataFor` 的值）。如果订阅者引用计数在整个期间保持为 0，那么缓存的数据将从存储中移除。
 
 <iframe
   src="https://codesandbox.io/embed/rtk-query-cache-subscription-lifetime-example-77tn4?fontsize=12&runonclick=1&hidenavigation=1&theme=dark&module=%2Fsrc%2Fservice%2Findex.ts"

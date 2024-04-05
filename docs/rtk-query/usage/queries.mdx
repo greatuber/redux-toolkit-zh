@@ -8,43 +8,43 @@ description: 'RTK Query > Usage > Queries: fetching data from a server'
 
 &nbsp;
 
-# Queries
+# 查询
 
-## Overview
+## 概述
 
-This is the most common use case for RTK Query. A query operation can be performed with any data fetching library of your choice, but the general recommendation is that you only use queries for requests that retrieve data. For anything that alters data on the server or will possibly invalidate the cache, you should use a [Mutation](./mutations).
+这是 RTK Query 的最常见用例。可以使用您选择的任何数据获取库执行查询操作，但一般建议只对检索数据的请求使用查询。对于在服务器上更改数据或可能使缓存失效的任何操作，您应使用 [Mutation](./mutations)。
 
-By default, RTK Query ships with [`fetchBaseQuery`](../api/fetchBaseQuery), which is a lightweight [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) wrapper that automatically handles request headers and response parsing in a manner similar to common libraries like `axios`. See [Customizing Queries](./customizing-queries) if `fetchBaseQuery` does not handle your requirements.
+默认情况下，RTK Query 附带 [`fetchBaseQuery`](../api/fetchBaseQuery)，这是一个轻量级的 [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) 包装器，它会自动处理请求头和响应解析，类似于常见的库如 `axios`。如果 `fetchBaseQuery` 无法满足您的需求，请参阅 [自定义查询](./customizing-queries)。
 
 :::info
 
-Depending on your environment, you may need to polyfill `fetch` with `node-fetch` or `cross-fetch` if you choose to use `fetchBaseQuery` or `fetch` on its own.
+根据您的环境，如果您选择使用 `fetchBaseQuery` 或单独使用 `fetch`，您可能需要使用 `node-fetch` 或 `cross-fetch` 对 `fetch` 进行 polyfill。
 
 :::
 
-See [`useQuery`](../api/created-api/hooks.mdx#usequery) for the hook signature and additional details.
+请参阅 [`useQuery`](../api/created-api/hooks.mdx#usequery) 以获取钩子签名和其他详细信息。
 
-## Defining Query Endpoints
+## 定义查询端点
 
-Query endpoints are defined by returning an object inside the `endpoints` section of `createApi`, and defining the fields using the `builder.query()` method.
+通过在 `createApi` 的 `endpoints` 部分内返回一个对象，并使用 `builder.query()` 方法定义字段来定义查询端点。
 
-Query endpoints should define either a `query` callback that constructs the URL (including any URL query params), or [a `queryFn` callback](./customizing-queries.mdx#customizing-queries-with-queryfn) that may do arbitrary async logic and return a result.
+查询端点应定义一个 `query` 回调，用于构造 URL（包括任何 URL 查询参数），或者定义一个可能执行任意异步逻辑并返回结果的 [`queryFn` 回调](./customizing-queries.mdx#customizing-queries-with-queryfn)。
 
-If the `query` callback needs additional data to generate the URL, it should be written to take a single argument. If you need to pass in multiple parameters, pass them formatted as a single "options object".
+如果 `query` 回调需要额外的数据来生成 URL，它应被编写为接受单个参数。如果您需要传入多个参数，请将它们格式化为单个 "options 对象"。
 
-Query endpoints may also modify the response contents before the result is cached, define "tags" to identify cache invalidation, and provide cache entry lifecycle callbacks to run additional logic as cache entries are added and removed.
+查询端点还可以在结果被缓存之前修改响应内容，定义 "tags" 来标识缓存失效，并提供缓存条目生命周期回调以在缓存条目被添加和删除时运行额外的逻辑。
 
-When used with TypeScript, you should supply generics for the return type and the expected query argument: `build.query<ReturnType, ArgType>`. If there is no argument, use `void` for the arg type instead.
+当与 TypeScript 一起使用时，您应为返回类型和预期的查询参数提供泛型：`build.query<ReturnType, ArgType>`。如果没有参数，使用 `void` 作为 arg 类型。
 
-```ts title="Example of all query endpoint options"
-// file: types.ts noEmit
+```ts title="所有查询端点选项的示例"
+// 文件: types.ts noEmit
 export interface Post {
   id: number
   name: string
 }
 
-// file: api.ts
-// Or from '@reduxjs/toolkit/query/react'
+// 文件: api.ts
+// 或从 '@reduxjs/toolkit/query/react' 导入
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { Post } from './types'
 
@@ -55,20 +55,20 @@ const api = createApi({
   tagTypes: ['Post'],
   endpoints: (build) => ({
     // highlight-start
-    // The query accepts a number and returns a Post
+    // 查询接受一个数字并返回一个 Post
     getPost: build.query<Post, number>({
-      // note: an optional `queryFn` may be used in place of `query`
+      // 注意：可选的 `queryFn` 可以代替 `query` 使用
       query: (id) => ({ url: `post/${id}` }),
-      // Pick out data and prevent nested properties in a hook or selector
+      // 选择数据并防止在钩子或选择器中嵌套属性
       transformResponse: (response: { data: Post }, meta, arg) => response.data,
-      // Pick out errors and prevent nested properties in a hook or selector
+      // 选择错误并防止在钩子或选择器中嵌套属性
       transformErrorResponse: (
         response: { status: string | number },
         meta,
         arg,
       ) => response.status,
       providesTags: (result, error, id) => [{ type: 'Post', id }],
-      // The 2nd parameter is the destructured `QueryLifecycleApi`
+      // 第二个参数是解构的 `QueryLifecycleApi`
       async onQueryStarted(
         arg,
         {
@@ -81,7 +81,7 @@ const api = createApi({
           updateCachedData,
         },
       ) {},
-      // The 2nd parameter is the destructured `QueryCacheLifecycleApi`
+      // 第二个参数是解构的 `QueryCacheLifecycleApi`
       async onCacheEntryAdded(
         arg,
         {
@@ -101,69 +101,69 @@ const api = createApi({
 })
 ```
 
-## Performing Queries with React Hooks
+## 使用 React 钩子执行查询
 
-If you're using React Hooks, RTK Query does a few additional things for you. The primary benefit is that you get a render-optimized hook that allows you to have 'background fetching' as well as [derived booleans](#frequently-used-query-hook-return-values) for convenience.
+如果您正在使用 React 钩子，RTK Query 为您做了一些额外的事情。主要的好处是您可以得到一个优化渲染的钩子，允许您进行 '后台获取'，以及为了方便提供 [派生布尔值](#frequently-used-query-hook-return-values)。
 
-Hooks are automatically generated based on the name of the `endpoint` in the service definition. An endpoint field with `getPost: builder.query()` will generate a hook named `useGetPostQuery`.
+基于服务定义中的 `endpoint` 名称自动生成钩子。带有 `getPost: builder.query()` 的端点字段将生成一个名为 `useGetPostQuery` 的钩子。
 
-### Hook types
+### 钩子类型
 
-There are 5 query-related hooks:
+有 5 个与查询相关的钩子：
 
 1. [`useQuery`](../api/created-api/hooks.mdx#usequery)
-   - Composes `useQuerySubscription` and `useQueryState` and is the primary hook. Automatically triggers fetches of data from an endpoint, 'subscribes' the component to the cached data, and reads the request status and cached data from the Redux store.
+   - 组合 `useQuerySubscription` 和 `useQueryState`，是主要的钩子。自动触发从端点获取数据的请求，'订阅'组件到缓存数据，并从 Redux 存储中读取请求状态和缓存数据。
 2. [`useQuerySubscription`](../api/created-api/hooks.mdx#usequerysubscription)
-   - Returns a `refetch` function and accepts all hook options. Automatically triggers fetches of data from an endpoint, and 'subscribes' the component to the cached data.
+   - 返回一个 `refetch` 函数，并接受所有钩子选项。自动触发从端点获取数据的请求，并 '订阅' 组件到缓存数据。
 3. [`useQueryState`](../api/created-api/hooks.mdx#usequerystate)
-   - Returns the query state and accepts `skip` and `selectFromResult`. Reads the request status and cached data from the Redux store.
+   - 返回查询状态并接受 `skip` 和 `selectFromResult`。从 Redux 存储中读取请求状态和缓存数据。
 4. [`useLazyQuery`](../api/created-api/hooks.mdx#uselazyquery)
-   - Returns a tuple with a `trigger` function, the query result, and last promise info. Similar to `useQuery`, but with manual control over when the data fetching occurs. **Note: the `trigger` function takes a second argument of `preferCacheValue?: boolean` in the event you want to skip making a request if cached data already exists.**
+   - 返回一个包含 `trigger` 函数、查询结果和最后的 promise 信息的元组。类似于 `useQuery`，但可以手动控制数据获取的时机。**注意：`trigger` 函数接受一个 `preferCacheValue?: boolean` 的第二个参数，以便在已经存在缓存数据的情况下跳过请求。**
 5. [`useLazyQuerySubscription`](../api/created-api/hooks.mdx#uselazyquerysubscription)
-   - Returns a tuple with a `trigger` function, and last promise info. Similar to `useQuerySubscription`, but with manual control over when the data fetching occurs. **Note: the `trigger` function takes a second argument of `preferCacheValue?: boolean` in the event you want to skip making a request if cached data already exists.**
+   - 返回一个包含 `trigger` 函数和最后的 promise 信息的元组。类似于 `useQuerySubscription`，但可以手动控制数据获取的时机。**注意：`trigger` 函数接受一个 `preferCacheValue?: boolean` 的第二个参数，以便在已经存在缓存数据的情况下跳过请求。**
 
-In practice, the standard `useQuery`-based hooks such as `useGetPostQuery` will be the primary hooks used in your application, but the other hooks are available for specific use cases.
+在实践中，标准的 `useQuery`-based 钩子，如 `useGetPostQuery`，将是您应用程序中主要使用的钩子，但其他钩子可用于特定的用例。
 
-### Query Hook Options
+### 查询钩子选项
 
-The query hooks expect two parameters: `(queryArg?, queryOptions?)`.
+查询钩子期望两个参数：`(queryArg?, queryOptions?)`。
 
-The `queryArg` param will be passed through to the underlying `query` callback to generate the URL.
+`queryArg` 参数将被传递给底层的 `query` 回调以生成 URL。
 
-The `queryOptions` object accepts several additional parameters that can be used to control the behavior of the data fetching:
+`queryOptions` 对象接受几个额外的参数，可以用来控制数据获取的行为：
 
-- [skip](./conditional-fetching) - Allows a query to 'skip' running for that render. Defaults to `false`
-- [pollingInterval](./polling) - Allows a query to automatically refetch on a provided interval, specified in milliseconds. Defaults to `0` _(off)_
-- [selectFromResult](#selecting-data-from-a-query-result) - Allows altering the returned value of the hook to obtain a subset of the result, render-optimized for the returned subset.
-- [refetchOnMountOrArgChange](../api/createApi#refetchonmountorargchange) - Allows forcing the query to always refetch on mount (when `true` is provided). Allows forcing the query to refetch if enough time (in seconds) has passed since the last query for the same cache (when a `number` is provided). Defaults to `false`
-- [refetchOnFocus](../api/createApi#refetchonfocus) - Allows forcing the query to refetch when the browser window regains focus. Defaults to `false`
-- [refetchOnReconnect](../api/createApi#refetchonreconnect) - Allows forcing the query to refetch when regaining a network connection. Defaults to `false`
+- [skip](./conditional-fetching) - 允许查询在该渲染中 '跳过' 运行。默认为 `false`
+- [pollingInterval](./polling) - 允许查询在提供的间隔上自动重新获取，以毫秒为单位。默认为 `0` _(关闭)_
+- [selectFromResult](#selecting-data-from-a-query-result) - 允许更改钩子的返回值以获取结果的子集，为返回的子集优化渲染。
+- [refetchOnMountOrArgChange](../api/createApi#refetchonmountorargchange) - 允许强制查询在挂载时始终重新获取（当提供 `true` 时）。允许强制查询在上次查询相同缓存后已经过足够时间（以秒为单位）时重新获取（当提供 `number` 时）。默认为 `false`
+- [refetchOnFocus](../api/createApi#refetchonfocus) - 允许强制查询在浏览器窗口重新获得焦点时重新获取。默认为 `false`
+- [refetchOnReconnect](../api/createApi#refetchonreconnect) - 允许强制查询在重新获得网络连接时重新获取。默认为 `false`
 
 :::info
 
-All `refetch`-related options will override the defaults you may have set in [createApi](../api/createApi)
+所有 `refetch` 相关的选项将覆盖你可能在 [createApi](../api/createApi) 中设置的默认值
 
 :::
 
-### Frequently Used Query Hook Return Values
+### 常用的查询钩子返回值
 
-The query hook returns an object containing properties such as the latest `data` for the query request, as well as status booleans for the current request lifecycle state. Below are some of the most frequently used properties. Refer to [`useQuery`](../api/created-api/hooks.mdx#usequery) for an extensive list of all returned properties.
+查询钩子返回一个对象，该对象包含诸如查询请求的最新 `data` 以及当前请求生命周期状态的状态布尔值等属性。以下是一些最常用的属性。请参考 [`useQuery`](../api/created-api/hooks.mdx#usequery) 以获取所有返回属性的详细列表。
 
-- `data` - The latest returned result regardless of hook arg, if present.
-- `currentData` - The latest returned result for the current hook arg, if present.
-- `error` - The error result if present.
-- `isUninitialized` - When true, indicates that the query has not started yet.
-- `isLoading` - When true, indicates that the query is currently loading for the first time, and has no data yet. This will be `true` for the first request fired off, but _not_ for subsequent requests.
-- `isFetching` - When true, indicates that the query is currently fetching, but might have data from an earlier request. This will be `true` for both the first request fired off, as well as subsequent requests.
-- `isSuccess` - When true, indicates that the query has data from a successful request.
-- `isError` - When true, indicates that the query is in an `error` state.
-- `refetch` - A function to force refetch the query
+- `data` - 无论钩子参数如何，都是最新返回的结果（如果存在）。
+- `currentData` - 当前钩子参数的最新返回结果（如果存在）。
+- `error` - 如果存在错误结果。
+- `isUninitialized` - 当为真时，表示查询尚未开始。
+- `isLoading` - 当为真时，表示查询正在首次加载，还没有数据。对于首次触发的请求，这将为 `true`，但对于后续请求则不会。
+- `isFetching` - 当为真时，表示查询正在获取，但可能已经有了来自早期请求的数据。对于首次触发的请求以及后续请求，这都将为 `true`。
+- `isSuccess` - 当为真时，表示查询已经从成功的请求中获取到数据。
+- `isError` - 当为真时，表示查询处于 `error` 状态。
+- `refetch` - 一个强制重新获取查询的函数
 
-In most cases, you will probably read `data` and either `isLoading` or `isFetching` in order to render your UI.
+在大多数情况下，你可能会读取 `data` 和 `isLoading` 或 `isFetching` 来渲染你的 UI。
 
-### Query Hook Usage Example
+### 查询钩子使用示例
 
-Here is an example of a `PostDetail` component:
+这是一个 `PostDetail` 组件的示例：
 
 ```tsx no-transpile title="Example"
 export const PostDetail = ({ id }: { id: string }) => {
@@ -177,43 +177,43 @@ export const PostDetail = ({ id }: { id: string }) => {
     skip: false,
   })
 
-  if (isLoading) return <div>Loading...</div>
-  if (!post) return <div>Missing post!</div>
+  if (isLoading) return <div>加载中...</div>
+  if (!post) return <div>缺少帖子!</div>
 
   return (
     <div>
-      {post.name} {isFetching ? '...refetching' : ''}
+      {post.name} {isFetching ? '...正在重新获取' : ''}
     </div>
   )
 }
 ```
 
-The way that this component is setup would have some nice traits:
+这个组件的设置方式有一些好的特性：
 
-1. It only shows 'Loading...' on the **initial load**
-   - **Initial load** is defined as a query that is pending and does not have data in the cache
-2. When the request is re-triggered by the polling interval, it will add '...refetching' to the post name
-3. If a user closed this `PostDetail`, but then re-opened it within [the allowed time](../api/createApi#keepunuseddatafor), they would immediately be served a cached result and polling would resume with the previous behavior.
+1. 它只在**初始加载**时显示 '加载中...'
+   - **初始加载**被定义为一个正在等待并且在缓存中没有数据的查询
+2. 当请求由轮询间隔重新触发时，它会在帖子名称后添加 '...正在重新获取'
+3. 如果用户关闭了这个 `PostDetail`，但在[允许的时间](../api/createApi#keepunuseddatafor)内重新打开它，他们将立即得到一个缓存的结果，并且轮询将以之前的行为恢复。
 
-### Query Loading State
+### 查询加载状态
 
-The auto-generated React hooks created by the React-specific version of `createApi` provide [derived booleans](#frequently-used-query-hook-return-values) that reflect the current state of a given query. Derived booleans are preferred for the generated React hooks as opposed to a `status` flag, as the derived booleans are able to provide a greater amount of detail which would not be possible with a single `status` flag, as multiple statuses may be true at a given time (such as `isFetching` and `isSuccess`).
+由`createApi`的React特定版本自动生成的React钩子提供了反映给定查询当前状态的[派生布尔值](#frequently-used-query-hook-return-values)。相比于`status`标志，生成的React钩子更倾向于使用派生布尔值，因为派生布尔值能够提供更多的细节，这是单一`status`标志无法做到的，因为在给定时间可能有多个状态为真（例如`isFetching`和`isSuccess`）。
 
-For query endpoints, RTK Query maintains a semantic distinction between `isLoading` and `isFetching` in order to provide more flexibility with the derived information provided.
+对于查询端点，RTK Query在`isLoading`和`isFetching`之间保持语义区分，以提供更多的派生信息。
 
-- `isLoading` refers to a query being in flight for the _first time_ for the given hook. No data will be available at this time.
-- `isFetching` refers to a query being in flight for the given endpoint + query param combination, but not necessarily for the first time. Data may be available from an earlier request done by this hook, maybe with the previous query param.
+- `isLoading`指的是给定钩子的查询_首次_进行中。此时将没有数据可用。
+- `isFetching`指的是给定端点+查询参数组合的查询正在进行中，但不一定是首次。可能有来自此钩子之前请求的数据，可能是之前的查询参数。
 
-This distinction allows for greater control when handling UI behavior. For example, `isLoading` can be used to display a skeleton while loading for the first time, while `isFetching` can be used to grey out old data when changing from page 1 to page 2 or when data is invalidated and re-fetched.
+这种区分为处理UI行为提供了更大的控制。例如，`isLoading`可以用于首次加载时显示骨架，而`isFetching`可以用于在从第1页切换到第2页或数据失效并重新获取时灰显旧数据。
 
-```tsx no-transpile title="Managing UI behavior with Query Loading States"
+```tsx no-transpile title="使用查询加载状态管理UI行为"
 import { Skeleton } from './Skeleton'
 import { useGetPostsQuery } from './api'
 
 function App() {
   const { data = [], isLoading, isFetching, isError } = useGetPostsQuery()
 
-  if (isError) return <div>An error has occurred!</div>
+  if (isError) return <div>发生错误！</div>
 
   if (isLoading) return <Skeleton />
 
@@ -232,25 +232,18 @@ function App() {
 }
 ```
 
-While `data` is expected to be used in the majority of situations, `currentData` is also provided,
-which allows for a further level of granularity. For example, if you wanted to show data in the UI
-as translucent to represent a re-fetching state, you can use `data` in combination with `isFetching`
-to achieve this. However, if you also wish to _only_ show data corresponding to the current arg,
-you can instead use `currentData` to achieve this.
+虽然`data`预计将在大多数情况下使用，但也提供了`currentData`，它允许进一步的粒度级别。例如，如果你想在UI中显示数据为半透明以表示重新获取状态，你可以结合使用`data`和`isFetching`来实现这一点。然而，如果你还希望_只_显示对应当前参数的数据，你可以改用`currentData`来实现这一点。
 
-In the example below, if posts are being fetched for the first time, a loading skeleton will be
-shown. If posts for the current user have previously been fetched, and are re-fetching (e.g. as a
-result of a mutation), the UI will show the previous data, but will grey out the data. If the user
-changes, it will instead show the skeleton again as opposed to greying out data for the previous user.
+在下面的例子中，如果首次获取帖子，将显示加载骨架。如果当前用户的帖子之前已经被获取过，并且正在重新获取（例如，作为变异的结果），UI将显示之前的数据，但会将数据灰显。如果用户更改，它将再次显示骨架，而不是灰显之前用户的数据。
 
-```tsx no-transpile title="Managing UI behavior with currentData"
+```tsx no-transpile title="使用currentData管理UI行为"
 import { Skeleton } from './Skeleton'
 import { useGetPostsByUserQuery } from './api'
 
 function PostsList({ userName }: { userName: string }) {
   const { currentData, isFetching, isError } = useGetPostsByUserQuery(userName)
 
-  if (isError) return <div>An error has occurred!</div>
+  if (isError) return <div>发生错误！</div>
 
   if (isFetching && !currentData) return <Skeleton />
 
@@ -265,23 +258,23 @@ function PostsList({ userName }: { userName: string }) {
               disabled={isFetching}
             />
           ))
-        : 'No data available'}
+        : '没有可用的数据'}
     </div>
   )
 }
 ```
 
-### Query Cache Keys
+### 查询缓存键
 
-When you perform a query, RTK Query automatically serializes the request parameters and creates an internal `queryCacheKey` for the request. Any future request that produces the same `queryCacheKey` will be de-duped against the original, and will share updates if a `refetch` is triggered on the query from any subscribed component.
+当你执行查询时，RTK Query会自动序列化请求参数，并为请求创建一个内部的`queryCacheKey`。任何未来产生相同`queryCacheKey`的请求都将与原始请求进行去重，并且如果任何订阅的组件触发查询的`refetch`，将共享更新。
 
-### Selecting data from a query result
+### 从查询结果中选择数据
 
-Sometimes you may have a parent component that is subscribed to a query, and then in a child component you want to pick an item from that query. In most cases you don't want to perform an additional request for a `getItemById`-type query when you know that you already have the result.
+有时你可能有一个订阅查询的父组件，然后在子组件中你想从该查询中选择一个项目。在大多数情况下，当你知道你已经有结果时，你不想为`getItemById`类型的查询执行额外的请求。
 
-`selectFromResult` allows you to get a specific segment from a query result in a performant manner. When using this feature, the component will not rerender unless the underlying data of the selected item has changed. If the selected item is one element in a larger collection, it will disregard changes to elements in the same collection.
+`selectFromResult`允许你以高效的方式从查询结果中获取特定的段。使用此功能时，除非所选项目的底层数据发生变化，否则组件不会重新渲染。如果所选项目是更大集合中的一个元素，它将忽略对同一集合中的元素的更改。
 
-```tsx no-transpile title="Using selectFromResult to extract a single result"
+```tsx no-transpile title="使用selectFromResult提取单个结果"
 function PostsList() {
   const { data: posts } = api.useGetPostsQuery()
 
@@ -293,7 +286,7 @@ function PostsList() {
 }
 
 function PostById({ id }: { id: number }) {
-  // Will select the post with the given id, and will only rerender if the given post's data changes
+  // 将选择给定id的帖子，并且只有在给定帖子的数据发生变化时才会重新渲染
   const { post } = api.useGetPostsQuery(undefined, {
     selectFromResult: ({ data }) => ({
       post: data?.find((post) => post.id === id),
@@ -304,16 +297,16 @@ function PostById({ id }: { id: number }) {
 }
 ```
 
-Note that a shallow equality check is performed on the overall return value of `selectFromResult` to determine whether to force a rerender. i.e. it will trigger a rerender if any of the returned object values change reference. If a new array/object is created and used as a return value within the callback, it will hinder the performance benefits due to being identified as a new item each time the callback is run. When intentionally providing an empty array/object, in order to avoid re-creating it each time the callback runs, you can declare an empty array/object outside of the component in order to maintain a stable reference.
+注意，对`selectFromResult`的整体返回值执行浅等式检查，以确定是否强制重新渲染。即，如果返回的对象值中的任何一个改变了引用，它将触发重新渲染。如果在回调中创建并使用了新的数组/对象作为返回值，由于每次运行回调时都会被识别为新项，它将阻碍性能优势。当有意提供一个空数组/对象时，为了避免每次运行回调时都重新创建它，你可以在组件外部声明一个空数组/对象，以保持稳定的引用。
 
-```tsx no-transpile title="Using selectFromResult with a stable empty array"
-// An array declared here will maintain a stable reference rather than be re-created again
+```tsx no-transpile title="使用具有稳定空数组的selectFromResult"
+// 在这里声明的数组将保持稳定的引用，而不是再次被创建
 const emptyArray: Post[] = []
 
 function PostsList() {
-  // This call will result in an initial render returning an empty array for `posts`,
-  // and a second render when the data is received.
-  // It will trigger additional rerenders only if the `posts` data changes
+  // 此调用将导致初始渲染返回`posts`的空数组，
+  // 并在接收到数据时进行第二次渲染。
+  // 只有在`posts`数据发生变化时，它才会触发额外的重新渲染
   const { posts } = api.useGetPostsQuery(undefined, {
     selectFromResult: ({ data }) => ({
       posts: data ?? emptyArray,
@@ -330,17 +323,17 @@ function PostsList() {
 }
 ```
 
-To summarize the above behaviour - the returned values must be correctly memoized. See also [Deriving Data with Selectors](https://redux.js.org/usage/deriving-data-selectors) and [Redux Essentials - RTK Query Advanced Patterns](https://redux.js.org/tutorials/essentials/part-8-rtk-query-advanced#selecting-values-from-results) for additional information.
+总结上述行为 - 返回的值必须正确地被记忆化。另请参见[使用选择器派生数据](https://redux.js.org/usage/deriving-data-selectors)和[Redux基础 - RTK查询高级模式](https://redux.js.org/tutorials/essentials/part-8-rtk-query-advanced#selecting-values-from-results)以获取更多信息。
 
-### Avoiding unnecessary requests
+### 避免不必要的请求
 
-By default, if you add a component that makes the same query as an existing one, no request will be performed.
+默认情况下，如果你添加了一个执行与现有查询相同的组件，将不会执行任何请求。
 
-In some cases, you may want to skip this behavior and force a refetch - in that case, you can call `refetch` that is returned by the hook.
+在某些情况下，你可能希望跳过这种行为并强制重新获取 - 在这种情况下，你可以调用由钩子返回的 `refetch`。
 
 :::info
 
-If you're not using React Hooks, you can access `refetch` like this:
+如果你没有使用React Hooks，你可以像这样访问 `refetch`：
 
 ```ts no-transpile
 const { status, data, error, refetch } = dispatch(
@@ -350,18 +343,18 @@ const { status, data, error, refetch } = dispatch(
 
 :::
 
-## Example: Observing caching behavior
+## 示例：观察缓存行为
 
-This example demonstrates request deduplication and caching behavior:
+此示例演示了请求去重和缓存行为：
 
-1. The first `Pokemon` component mounts and immediately fetches 'bulbasaur'
-2. A second later, another `Pokemon` component is rendered with 'bulbasaur'
-   - Notice that this one doesn't ever show 'Loading...' and no new network request happens? It's using the cache here.
-3. A moment after that, a `Pokemon` component for 'pikachu' is added, and a new request happens.
-4. When you click 'Refetch' for a specific `Pokemon`, it'll update all instances of that `Pokemon` with one request.
+1. 第一个 `Pokemon` 组件挂载并立即获取 'bulbasaur'
+2. 一秒钟后，另一个 'bulbasaur' 的 `Pokemon` 组件被渲染
+   - 注意到这个组件从未显示过 'Loading...' 并且没有新的网络请求发生吗？这里是使用了缓存。
+3. 此后的一刻，添加了一个 'pikachu' 的 `Pokemon` 组件，并发生了新的请求。
+4. 当你点击特定 `Pokemon` 的 'Refetch'，它将通过一个请求更新该 `Pokemon` 的所有实例。
 
-:::note Try it out
-Click the 'Add bulbasaur' button. You'll observe the same behavior described above until you click the 'Refetch' button on one of the components.
+:::note 试一试
+点击 'Add bulbasaur' 按钮。你将观察到上述描述的相同行为，直到你在其中一个组件上点击 'Refetch' 按钮。
 :::
 
 <iframe

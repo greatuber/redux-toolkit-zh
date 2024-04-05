@@ -8,13 +8,13 @@ description: 'RTK Query > Usage > Pagination: suggestions for handling paginated
 
 &nbsp;
 
-# Pagination
+# 分页
 
-RTK Query does not include any built-in pagination behavior. However, RTK Query does make it straightforward to integrate with a standard index-based pagination API. This is the most common form of pagination that you'll need to implement.
+RTK Query 不包含任何内置的分页行为。然而，RTK Query 使得与标准的基于索引的分页 API 集成变得直接明了。这是你需要实现的最常见的分页形式。
 
-## Pagination Recipes
+## 分页配方
 
-### Setup an endpoint to accept a page `arg`
+### 设置一个端点来接受页 `arg`
 
 ```ts title="src/app/services/posts.ts"
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
@@ -42,7 +42,7 @@ export const api = createApi({
 export const { useListPostsQuery } = api
 ```
 
-### Trigger the next page by incrementing the `page` state variable
+### 通过增加 `page` 状态变量触发下一页
 
 ```tsx no-transpile title="src/features/posts/PostsManager.tsx"
 const PostList = () => {
@@ -50,11 +50,11 @@ const PostList = () => {
   const { data: posts, isLoading, isFetching } = useListPostsQuery(page)
 
   if (isLoading) {
-    return <div>Loading</div>
+    return <div>加载中</div>
   }
 
   if (!posts?.data) {
-    return <div>No posts :(</div>
+    return <div>没有帖子 :(</div>
   }
 
   return (
@@ -65,35 +65,23 @@ const PostList = () => {
         </div>
       ))}
       <button onClick={() => setPage(page - 1)} isLoading={isFetching}>
-        Previous
+        上一页
       </button>
       <button onClick={() => setPage(page + 1)} isLoading={isFetching}>
-        Next
+        下一页
       </button>
     </div>
   )
 }
 ```
 
-### Automated Re-fetching of Paginated Queries
+### 自动重新获取分页查询
 
-It is a common use-case to utilize tag invalidation to perform
-[automated re-fetching](./automated-refetching.mdx) with RTK Query.
+使用标签失效来执行 RTK Query 的[自动重新获取](./automated-refetching.mdx)是一个常见的用例。
 
-A potential pitfall when combining this with pagination is that your paginated query may only
-provide a _partial_ list at any given time, and hence not `provide` tags for entity IDs that
-fall on pages which aren't currently shown. If a specific entity is deleted that falls on an
-earlier page, the paginated query will not be providing a tag for that specific ID, and will
-not be invalidated to trigger re-fetching data. As a result, items on the current page that
-should shift one item up will not have done so, and the total count of items and/or pages
-may be incorrect.
+当这与分页结合时的一个潜在陷阱是，你的分页查询可能只在任何给定的时间提供一个_部分_列表，因此不为当前未显示的页面上的实体 ID `提供` 标签。如果一个特定的实体被删除，该实体位于一个较早的页面上，分页查询将不会为该特定 ID 提供标签，也不会被失效以触发重新获取数据。因此，应该向上移动一个项目的当前页面上的项目将不会这样做，项目的总数和/或页面可能是不正确的。
 
-A strategy to overcome this is to ensure that the `delete` mutation always `invalidates` the
-paginated query, even if the deleted item is not _currently_ provided on that page. We can
-leverage the concept of
-[advanced invalidation with abstract tag ids](./automated-refetching.mdx#advanced-invalidation-with-abstract-tag-ids)
-to do this by `providing` a `'Posts'` tag with the `'PARTIAL-LIST'` ID in our paginated query,
-and `invalidating` that corresponding tag for any mutation that should affect it.
+克服这个问题的策略是确保 `删除` 变异总是 `使...失效` 分页查询，即使被删除的项目当前并未在该页面上提供。我们可以利用[高级失效与抽象标签 id](./automated-refetching.mdx#advanced-invalidation-with-abstract-tag-ids)的概念，通过在我们的分页查询中 `提供` 一个 `'Posts'` 标签与 `'PARTIAL-LIST'` ID，并对任何应该影响它的变异 `使...失效` 该相应的标签。
 
 ```ts title="Example of invalidating cache for paginated queries"
 // file: api.ts
@@ -121,8 +109,8 @@ export const postApi = createApi({
       providesTags: (result, error, page) =>
         result
           ? [
-              // Provides a tag for each post in the current page,
-              // as well as the 'PARTIAL-LIST' tag.
+              // 为当前页面中的每个帖子提供一个标签，
+              // 以及 'PARTIAL-LIST' 标签。
               ...result.data.map(({ id }) => ({ type: 'Posts' as const, id })),
               { type: 'Posts', id: 'PARTIAL-LIST' },
             ]
@@ -136,8 +124,8 @@ export const postApi = createApi({
           method: 'DELETE',
         }
       },
-      // Invalidates the tag for this Post `id`, as well as the `PARTIAL-LIST` tag,
-      // causing the `listPosts` query to re-fetch if a component is subscribed to the query.
+      // 使这个 Post `id` 的标签失效，以及 `PARTIAL-LIST` 标签，
+      // 如果一个组件订阅了查询，那么会导致 `listPosts` 查询重新获取。
       // highlight-start
       invalidatesTags: (result, error, id) => [
         { type: 'Posts', id },
@@ -149,9 +137,9 @@ export const postApi = createApi({
 })
 ```
 
-## General Pagination Example
+## 通用分页示例
 
-In the following example, you'll see `Loading` on the initial query, but then as you move forward we'll use the next/previous buttons as a _fetching_ indicator while any non-cached query is performed. When you go back, the cached data will be served instantaneously.
+在以下示例中，你会在初始查询时看到 `加载中`，但当你向前移动时，我们将使用下一个/前一个按钮作为任何非缓存查询执行时的_获取_指示器。当你回退时，缓存的数据将立即被提供。
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/pagination?fontsize=12&runonclick=1&hidenavigation=1&theme=dark"

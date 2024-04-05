@@ -8,15 +8,15 @@ description: 'RTK Query > Usage > Error Handling: dealing with API errors'
 
 &nbsp;
 
-# Error Handling
+# 错误处理
 
-## Overview
+## 概述
 
-If your query or mutation happens to throw an error when using [fetchBaseQuery](../api/fetchBaseQuery), it will be returned in the `error` property of the respective hook. The component will re-render when that occurs, and you can show appropriate UI based on the error data if desired.
+如果你在使用 [fetchBaseQuery](../api/fetchBaseQuery) 的查询或变异过程中出现错误，它将在相应钩子的 `error` 属性中返回。当这种情况发生时，组件将重新渲染，你可以根据错误数据显示适当的用户界面（如果需要的话）。
 
-### Error Display Examples
+### 错误显示示例
 
-```tsx no-transpile title="Query Error"
+```tsx no-transpile title="查询错误"
 function PostsList() {
   const { data, error } = useGetPostsQuery()
 
@@ -28,7 +28,7 @@ function PostsList() {
 }
 ```
 
-```tsx no-transpile title="Mutation Error"
+```tsx no-transpile title="变异错误"
 function AddPost() {
   const [addPost, { error }] = useAddPostMutation()
 
@@ -41,9 +41,9 @@ function AddPost() {
 ```
 
 :::tip
-If you need to access the error or success payload immediately after a mutation, you can chain `.unwrap()`.
+如果你需要在变异后立即访问错误或成功的有效载荷，你可以链式调用 `.unwrap()`。
 
-```ts title="Using .unwrap" no-transpile
+```ts title="使用 .unwrap" no-transpile
 addPost({ id: 1, name: 'Example' })
   .unwrap()
   .then((payload) => console.log('fulfilled', payload))
@@ -52,7 +52,7 @@ addPost({ id: 1, name: 'Example' })
 
 :::
 
-```tsx no-transpile title="Manually selecting an error"
+```tsx no-transpile title="手动选择错误"
 function PostsList() {
   const { error } = useSelector(api.endpoints.getPosts.select())
 
@@ -64,37 +64,37 @@ function PostsList() {
 }
 ```
 
-## Errors with a custom `baseQuery`
+## 自定义 `baseQuery` 的错误
 
-Whether a response is returned as `data` or `error` is dictated by the `baseQuery` provided.
+响应是作为 `data` 还是 `error` 返回的，取决于提供的 `baseQuery`。
 
-Ultimately, you can choose whatever library you prefer to use with your `baseQuery`, but it's important that you return the correct response format. If you haven't tried [`fetchBaseQuery`](../api/fetchBaseQuery) yet, give it a chance! Otherwise, see [Customizing Queries](./customizing-queries) for information on how to alter the returned errors.
+最终，你可以选择你喜欢的任何库与你的 `baseQuery` 一起使用，但重要的是你返回正确的响应格式。如果你还没有尝试过 [`fetchBaseQuery`](../api/fetchBaseQuery)，那就给它一个机会！否则，查看 [自定义查询](./customizing-queries) 以获取如何更改返回错误的信息。
 
-## Handling errors at a macro level
+## 在宏观层面处理错误
 
-There are quite a few ways that you can manage your errors, and in some cases, you may want to show a generic toast notification for any async error. Being that RTK Query is built on top of Redux and Redux-Toolkit, you can easily add a middleware to your store for this purpose.
+你可以通过很多方式来管理你的错误，在某些情况下，你可能希望为任何异步错误显示一个通用的弹出通知。由于 RTK Query 是基于 Redux 和 Redux-Toolkit 构建的，你可以轻松地为此目的向你的存储添加中间件。
 
 :::tip
 
-Redux Toolkit has [action matching utilities](../../api/matching-utilities.mdx#matching-utilities) that we can leverage for additional custom behaviors.
+Redux Toolkit 有 [动作匹配工具](../../api/matching-utilities.mdx#matching-utilities)，我们可以利用它们进行额外的自定义行为。
 
 :::
 
-```ts no-transpile title="Error catching middleware example"
+```ts no-transpile title="错误捕获中间件示例"
 import { isRejectedWithValue } from '@reduxjs/toolkit'
 import type { MiddlewareAPI, Middleware } from '@reduxjs/toolkit'
 import { toast } from 'your-cool-library'
 
 /**
- * Log a warning and show a toast!
+ * 记录警告并显示一个弹出通知！
  */
 export const rtkQueryErrorLogger: Middleware =
   (api: MiddlewareAPI) => (next) => (action) => {
-    // RTK Query uses `createAsyncThunk` from redux-toolkit under the hood, so we're able to utilize these matchers!
+    // RTK Query 在底层使用了 redux-toolkit 的 `createAsyncThunk`，所以我们能够使用这些匹配器！
     if (isRejectedWithValue(action)) {
       console.warn('We got a rejected action!')
       toast.warn({
-        title: 'Async error!',
+        title: '异步错误！',
         message:
           'data' in action.error
             ? (action.error.data as { message: string }).message

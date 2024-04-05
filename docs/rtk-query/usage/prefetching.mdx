@@ -8,24 +8,24 @@ description: 'RTK Query > Usage > Prefetching: fetching before user interaction'
 
 &nbsp;
 
-# Prefetching
+# 预取
 
-The goal of prefetching is to make data fetch _before_ the user navigates to a page or attempts to load some known content.
+预取的目标是在用户导航到页面或尝试加载一些已知内容之前获取数据。
 
-There are a handful of situations that you may want to do this, but some very common use cases are:
+你可能想要做这个的情况有很多，但一些非常常见的用例是：
 
-1. User hovers over a navigation element
-2. User hovers over a list element that is a link
-3. User hovers over a next pagination button
-4. User navigates to a page and you know that some components down the tree will require said data. This way, you can prevent fetching waterfalls.
+1. 用户悬停在导航元素上
+2. 用户悬停在列表元素上，该元素是一个链接
+3. 用户悬停在下一个分页按钮上
+4. 用户导航到一个页面，你知道树下的一些组件将需要这些数据。这样，你可以防止获取瀑布。
 
-## Prefetching with React Hooks
+## 使用 React Hooks 进行预取
 
-Similar to the [`useMutation`](./mutations) hook, the `usePrefetch` hook will not run automatically — it returns a "trigger function" that can be used to initiate the behavior.
+类似于 [`useMutation`](./mutations) 钩子，`usePrefetch` 钩子不会自动运行 - 它返回一个"触发函数"，可以用来启动行为。
 
-It accepts two arguments: the first is the key of a query action that you [defined in your API service](../api/createApi#endpoints), and the second is an object of two optional parameters:
+它接受两个参数：第一个是你在 API 服务中定义的查询操作的键，第二个是两个可选参数的对象：
 
-```ts title="usePrefetch Signature" no-transpile
+```ts title="usePrefetch 签名" no-transpile
 export type PrefetchOptions =
   | { force?: boolean }
   | {
@@ -38,48 +38,48 @@ usePrefetch<EndpointName extends QueryKeys<Definitions>>(
   ): (arg: QueryArgFrom<Definitions[EndpointName]>, options?: PrefetchOptions) => void;
 ```
 
-### Customizing the Hook Behavior
+### 自定义钩子行为
 
-You can specify these prefetch options when declaring the hook or at the call site. The call site will take priority over the defaults.
+你可以在声明钩子或在调用站点时指定这些预取选项。调用站点将优先于默认值。
 
 1. [summary](docblock://query/core/module.ts?token=PrefetchOptions)
 2. [overloadSummary](docblock://query/core/module.ts?token=PrefetchOptions)
 
-### Trigger Function Behavior
+### 触发函数行为
 
-1. The trigger function _always_ returns `void`.
-2. If `force: true` is set during the declaration or at the call site, the query will be run no matter what. The one exception to that is if the same query is already in-flight.
-3. If no options are specified and the query exists in the cache, the query will not be performed.
-4. If no options are specified and the query _does not exist_ in the cache, the query will be performed.
-   - **Assuming** you have a `useQuery` hook in the tree that is subscribed to the same query that you are prefetching:
-     - `useQuery` will return `{isLoading: true, isFetching: true, ...rest`}
-5. If `ifOlderThan` is specified but evaluates to false and the query is in the cache, the query will not be performed.
-6. If `ifOlderThan` is specified and evaluates to true, the query will be performed even if there is an existing cache entry.
-   - **Assuming** you have a `useQuery` hook in the tree that is subscribed to the same query that you are prefetching:
-     - `useQuery` will return `{isLoading: false, isFetching: true, ...rest`}
+1. 触发函数 _总是_ 返回 `void`。
+2. 如果在声明或调用站点设置了 `force: true`，无论如何都会运行查询。唯一的例外是如果相同的查询已经在进行中。
+3. 如果没有指定选项并且查询存在于缓存中，将不会执行查询。
+4. 如果没有指定选项并且查询 _不存在于_ 缓存中，将会执行查询。
+   - **假设** 你在树中有一个订阅了你正在预取的相同查询的 `useQuery` 钩子：
+     - `useQuery` 将返回 `{isLoading: true, isFetching: true, ...rest}`
+5. 如果指定了 `ifOlderThan` 但计算结果为 false 并且查询在缓存中，将不会执行查询。
+6. 如果指定了 `ifOlderThan` 并且计算结果为 true，即使存在现有的缓存条目，也会执行查询。
+   - **假设** 你在树中有一个订阅了你正在预取的相同查询的 `useQuery` 钩子：
+     - `useQuery` 将返回 `{isLoading: false, isFetching: true, ...rest}`
 
-```tsx no-transpile title="usePrefetch Example"
+```tsx no-transpile title="usePrefetch 示例"
 function User() {
   const prefetchUser = usePrefetch('getUser')
 
-  // Low priority hover will not fire unless the last request happened more than 35s ago
-  // High priority hover will _always_ fire
+  // 低优先级的悬停将不会触发，除非上次请求发生在35s前
+  // 高优先级的悬停将 _总是_ 触发
   return (
     <div>
       <button onMouseEnter={() => prefetchUser(4, { ifOlderThan: 35 })}>
-        Low priority
+        低优先级
       </button>
       <button onMouseEnter={() => prefetchUser(4, { force: true })}>
-        High priority
+        高优先级
       </button>
     </div>
   )
 }
 ```
 
-### Recipe: Prefetch Immediately
+### 食谱：立即预取
 
-In some cases, you may want to prefetch a resource immediately. You can implement this in just a few lines of code:
+在某些情况下，你可能希望立即预取一个资源。你可以用几行代码实现这个功能：
 
 ```ts title="hooks/usePrefetchImmediately.ts" no-transpile
 type EndpointNames = keyof typeof api.endpoints
@@ -95,33 +95,33 @@ export function usePrefetchImmediately<T extends EndpointNames>(
   }, [])
 }
 
-// In a component
+// 在一个组件中
 usePrefetchImmediately('getUser', 5)
 ```
 
-## Prefetching Without Hooks
+## 不使用钩子的预取
 
-If you're not using the `usePrefetch` hook, you can recreate the same behavior on your own in any framework.
+如果你不使用 `usePrefetch` 钩子，你可以在任何框架中自己重现相同的行为。
 
-When dispatching the `prefetch` thunk as shown below you will see the same exact behavior as [described here](#trigger-function-behavior).
+当你像下面这样分派 `prefetch` thunk 时，你会看到与[这里描述的](#trigger-function-behavior)完全相同的行为。
 
-```ts title="Non-hook prefetching example" no-transpile
+```ts title="非钩子预取示例" no-transpile
 store.dispatch(
   api.util.prefetch(endpointName, arg, { force: false, ifOlderThan: 10 }),
 )
 ```
 
-You can also dispatch the query action, but you would be responsible for implementing any additional logic.
+你也可以分派查询操作，但你需要负责实现任何额外的逻辑。
 
-```ts title="Alternate method of manual prefetching" no-transpile
+```ts title="手动预取的替代方法" no-transpile
 dispatch(api.endpoints[endpointName].initiate(arg, { forceRefetch: true }))
 ```
 
-## Prefetching Examples
+## 预取示例
 
-### Basic Prefetching
+### 基本预取
 
-This is a very basic example that shows how you can prefetch when a user hovers over the next arrow. This is probably not the optimal solution, because if they hover, click, then change pages without moving their mouse, we wouldn't know to prefetch the next page because we wouldn't see the next `onMouseEnter` event. In this case, you would need to handle this on your own. You could also consider automatically prefetching the next page...
+这是一个非常基本的示例，展示了当用户悬停在下一个箭头上时，你可以如何预取。这可能不是最优的解决方案，因为如果他们悬停，点击，然后在不移动鼠标的情况下更改页面，我们不会知道要预取下一页，因为我们不会看到下一个 `onMouseEnter` 事件。在这种情况下，你需要自己处理这个问题。你也可以考虑自动预取下一页...
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/prefetching?fontsize=12&runonclick=1&hidenavigation=1&theme=dark"
@@ -137,9 +137,9 @@ This is a very basic example that shows how you can prefetch when a user hovers 
   sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"
 ></iframe>
 
-### Automatic Prefetching
+### 自动预取
 
-Picking up on our last example, we automatically `prefetch` the next page, giving the appearance of no network delay.
+在我们的最后一个例子中，我们自动 `prefetch` 下一页，给人一种没有网络延迟的感觉。
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/prefetching-automatic?fontsize=12&runonclick=1&hidenavigation=1&theme=dark"
@@ -155,9 +155,9 @@ Picking up on our last example, we automatically `prefetch` the next page, givin
   sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"
 ></iframe>
 
-### Prefetching All Known Pages
+### 预取所有已知页面
 
-After the first query initialized by `useQuery` runs, we automatically fetch all remaining pages.
+在 `useQuery` 初始化的第一个查询运行后，我们会自动获取所有剩余的页面。
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/prefetching-automatic-waterfall?fontsize=12&runonclick=1&hidenavigation=1&theme=dark&module=%2Fsrc%2Ffeatures%2Fposts%2FPostsManager.tsx"

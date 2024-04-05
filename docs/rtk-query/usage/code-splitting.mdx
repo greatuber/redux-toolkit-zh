@@ -8,31 +8,31 @@ description: 'RTK Query > Usage > Code Splitting: dynamic injection of endpoints
 
 &nbsp;
 
-# Code Splitting
+# 代码分割
 
-RTK Query makes it possible to trim down your initial bundle size by allowing you to inject additional endpoints after you've set up your initial service definition. This can be very beneficial for larger applications that may have _many_ endpoints.
+RTK Query 通过允许你在设置完初始服务定义后注入额外的端点，使得减小初始包大小成为可能。这对于可能有 _许多_ 端点的大型应用程序来说非常有益。
 
-`injectEndpoints` accepts a collection of endpoints, as well as an optional `overrideExisting` parameter.
+`injectEndpoints` 接受一组端点，以及一个可选的 `overrideExisting` 参数。
 
-Calling `injectEndpoints` will inject the endpoints into the original API, but also give you that same API with correct types for these endpoints back. (Unfortunately, it cannot modify the types for the original definition.)
+调用 `injectEndpoints` 将把端点注入到原始 API 中，但也会返回具有这些端点正确类型的相同 API。（不幸的是，它不能修改原始定义的类型。）
 
-A typical approach would be to have one empty central API slice definition:
+典型的做法是有一个空的中心 API 切片定义：
 
-```ts title="Basic setup"
-// Or from '@reduxjs/toolkit/query' if not using the auto-generated hooks
+```ts title="基本设置"
+// 或者从 '@reduxjs/toolkit/query' 导入，如果不使用自动生成的钩子
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-// initialize an empty api service that we'll inject endpoints into later as needed
+// 初始化一个空的 api 服务，我们稍后将根据需要注入端点
 export const emptySplitApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: () => ({}),
 })
 ```
 
-and then inject the api endpoints in other files and export them from there - that way you will be sure to always import the endpoints in a way that they are definitely injected.
+然后在其他文件中注入 api 端点并从那里导出它们 - 这样你就可以确保总是以一种肯定已经注入的方式导入端点。
 
-```ts title="Injecting & exporting additional endpoints"
-// file: emptySplitApi.ts noEmit
+```ts title="注入 & 导出额外的端点"
+// 文件: emptySplitApi.ts noEmit
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const emptySplitApi = createApi({
@@ -40,7 +40,7 @@ export const emptySplitApi = createApi({
   endpoints: () => ({}),
 })
 
-// file: extendedApi.ts
+// 文件: extendedApi.ts
 import { emptySplitApi } from './emptySplitApi'
 
 const extendedApi = emptySplitApi.injectEndpoints({
@@ -56,7 +56,5 @@ export const { useExampleQuery } = extendedApi
 ```
 
 :::tip
-If you inject an endpoint that already exists and don't explicitly specify `overrideExisting: true`, the endpoint
-will not be overridden. In development mode, you will get a warning about this if `overrideExisting` is set to `false`,
-and an error will be throw if set to `'throw'`.
+如果你注入了一个已经存在的端点，并且没有明确指定 `overrideExisting: true`，那么该端点将不会被覆盖。在开发模式下，如果 `overrideExisting` 设置为 `false`，你会收到关于此的警告，如果设置为 `'throw'`，将会抛出错误。
 :::

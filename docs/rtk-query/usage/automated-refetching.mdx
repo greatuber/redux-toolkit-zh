@@ -8,56 +8,56 @@ description: 'RTK Query > Usage > Automated Refetching: cache invalidation manag
 
 &nbsp;
 
-# Automated Re-fetching
+# 自动重新获取
 
-As seen under [Default Cache Behavior](./cache-behavior.mdx#default-cache-behavior), when a subscription is added for a query endpoint, a request will be sent only if the cache data does not already exist. If it exists, the existing data will be served instead.
+如在[默认缓存行为](./cache-behavior.mdx#default-cache-behavior)下所见，当为查询端点添加订阅时，只有当缓存数据不存在时才会发送请求。如果存在，将提供现有数据。
 
-RTK Query uses a "cache tag" system to automate re-fetching for query endpoints that have data affected by mutation endpoints. This enables designing your API such that firing a specific mutation will cause a certain query endpoint to consider its cached data _invalid_, and re-fetch the data if there is an active subscription.
+RTK Query 使用一个 "缓存标签" 系统，自动为受突变端点影响的查询端点重新获取数据。这使得你可以设计你的 API，使得触发特定的突变将导致某个查询端点认为其缓存数据 _无效_ ，并在存在活动订阅时重新获取数据。
 
-Each endpoint + parameter combination contributes its own `queryCacheKey`. The cache tag system enables the ability to inform RTK Query that a particular query cache has _provided_ specific tags. If a mutation is fired which is said to `invalidate` tags that a query cache has _provided_, the cached data will be considered _invalidated_, and re-fetch if there is an active subscription to the cached data.
+每个端点 + 参数组合都贡献其自己的 `queryCacheKey`。缓存标签系统使得能够通知 RTK Query，特定的查询缓存已经 _提供_ 特定的标签。如果触发了一个突变，该突变被认为 `invalidate` 了查询缓存已经 _提供_ 的标签，那么缓存数据将被认为是 _无效的_ ，并在对缓存数据有活动订阅的情况下重新获取。
 
-For triggering re-fetching through other means, see [Manipulating Cache Behavior](./cache-behavior.mdx#manipulating-cache-behavior).
+对于通过其他方式触发重新获取，请参见[操作缓存行为](./cache-behavior.mdx#manipulating-cache-behavior)。
 
-## Definitions
+## 定义
 
-### Tags
+### 标签
 
-_see also: [tagTypes API reference](../api/createApi.mdx#tagtypes)_
+_参见：[tagTypes API 参考](../api/createApi.mdx#tagtypes)_
 
-For RTK Query, _tags_ are just a name that you can give to a specific collection of data to control caching and invalidation behavior for re-fetching purposes. It can be considered as a 'label' attached to cached data that is read after a mutation, to decide whether the data should be affected by the mutation.
+对于 RTK Query，_标签_ 只是你可以给特定的数据集合命名，以控制缓存和无效化行为以便重新获取。它可以被视为附加到缓存数据的 '标签'，在突变后读取，以决定数据是否应该受到突变的影响。
 
-Tags are defined in the `tagTypes` argument when defining an api. For example, in an application that has both `Posts` and `Users`, you might define `tagTypes: ['Post', 'User']` when calling `createApi`.
+在定义 api 时，标签在 `tagTypes` 参数中定义。例如，在一个既有 `Posts` 又有 `Users` 的应用中，你可能在调用 `createApi` 时定义 `tagTypes: ['Post', 'User']`。
 
-An individual `tag` has a `type`, represented as a `string` name, and an optional `id`, represented as a `string` or `number`. It can be represented as a plain string (such as `'Post'`), or an object in the shape `{type: string, id?: string|number}` (such as `[{type: 'Post', id: 1}]`).
+一个单独的 `tag` 有一个 `type`，表示为 `string` 名称，和一个可选的 `id`，表示为 `string` 或 `number`。它可以被表示为一个简单的字符串（如 `'Post'`），或者一个形状为 `{type: string, id?: string|number}` 的对象（如 `[{type: 'Post', id: 1}]`）。
 
-### Providing tags
+### 提供标签
 
-_see also: [providesTags API reference](../api/createApi.mdx#providestags)_
+_参见：[providesTags API 参考](../api/createApi.mdx#providestags)_
 
-A _query_ can have its cached data _provide_ tags. Doing so determines which 'tag' is attached to the cached data returned by the query.
+一个 _查询_ 可以让其缓存数据 _提供_ 标签。这样做决定了哪个 '标签' 附加到查询返回的缓存数据上。
 
-The `providesTags` argument can either be an array of `string` (such as `['Post']`), `{type: string, id?: string|number}` (such as `[{type: 'Post', id: 1}]`), or a callback that returns such an array. That function will be passed the result as the first argument, the response error as the second argument, and the argument originally passed into the `query` method as the third argument. Note that either the result or error arguments may be undefined based on whether the query was successful or not.
+`providesTags` 参数可以是 `string` 的数组（如 `['Post']`）、`{type: string, id?: string|number}`（如 `[{type: 'Post', id: 1}]`），或者一个返回这样的数组的回调函数。该函数将结果作为第一个参数，响应错误作为第二个参数，原始传入 `query` 方法的参数作为第三个参数。注意，根据查询是否成功，结果或错误参数可能会未定义。
 
-### Invalidating tags
+### 使标签无效
 
-_see also: [invalidatesTags API reference](../api/createApi.mdx#invalidatestags)_
+_参见：[invalidatesTags API 参考](../api/createApi.mdx#invalidatestags)_
 
-A _mutation_ can _invalidate_ specific cached data based on the tags. Doing so determines which cached data will be either refetched or removed from the cache.
+一个 _变更_ 可以基于标签 _使_ 特定的缓存数据 _无效_。这样做决定了哪些缓存数据将被重新获取或从缓存中移除。
 
-The `invalidatesTags` argument can either be an array of `string` (such as `['Post']`), `{type: string, id?: string|number}` (such as `[{type: 'Post', id: 1}]`), or a callback that returns such an array. That function will be passed the result as the first argument, the response error as the second argument, and the argument originally passed into the `query` method as the third argument. Note that either the result or error arguments may be undefined based on whether the mutation was successful or not.
+`invalidatesTags` 参数可以是 `string` 的数组（如 `['Post']`）、`{type: string, id?: string|number}`（如 `[{type: 'Post', id: 1}]`），或者一个返回这样的数组的回调函数。该函数将结果作为第一个参数，响应错误作为第二个参数，原始传入 `query` 方法的参数作为第三个参数。注意，根据变更是否成功，结果或错误参数可能会未定义。
 
-## Cache tags
+## 缓存标签
 
-RTK Query uses the concept of 'tags' to determine whether a mutation for one endpoint intends to _invalidate_ some data that was _provided_ by a query from another endpoint.
+RTK Query 使用 '标签' 的概念来确定一个端点的变更是否意图 _使_ 另一个端点的查询 _提供_ 的一些数据 _无效_。
 
-If cache data is being invalidated, it will either refetch the providing query (if components are still using that data) or remove the data from the cache.
+如果缓存数据正在被使无效，它将重新获取提供查询（如果组件仍在使用该数据）或从缓存中移除数据。
 
-When defining an API slice, `createApi` accepts an array of tag type names for the `tagTypes` property, which is a list of possible tag name options that the queries for the API slice could provide.
+在定义 API 切片时，`createApi` 接受 `tagTypes` 属性的标签类型名称数组，这是 API 切片的查询可能提供的可能标签名称选项的列表。
 
-The example below declares that endpoints can possibly provide 'Posts' and/or 'Users' to the cache:
+下面的示例声明端点可能向缓存提供 'Posts' 和/或 'Users'：
 
-```ts title="Example of declaring cache tags"
-// file: types.ts noEmit
+```ts title="声明缓存标签的示例"
+// 文件：types.ts noEmit
 export interface Post {
   id: number
   name: string
@@ -68,7 +68,7 @@ export interface User {
   name: string
 }
 
-// file: api.ts
+// 文件：api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { Post, User } from './types'
 
@@ -76,9 +76,9 @@ const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: '/',
   }),
-  // highlight-start
+  // 高亮开始
   tagTypes: ['Post', 'User'],
-  // highlight-end
+  // 高亮结束
   endpoints: (build) => ({
     getPosts: build.query<Post[], void>({
       query: () => '/posts',
@@ -104,24 +104,24 @@ const api = createApi({
 })
 ```
 
-By declaring these tags as what can possibly be provided to the cache, it enables control for individual mutation endpoints to claim whether they affect specific portions of the cache or not, in conjunction with `providesTags` and `invalidatesTags` on individual endpoints.
+通过声明这些标签作为可能提供给缓存的内容，它使得单个变更端点能够声明它们是否影响缓存的特定部分，这与单个端点上的 `providesTags` 和 `invalidatesTags` 结合使用。
 
-### Providing cache data
+### 提供缓存数据
 
-Each individual `query` endpoint can have its cached data _provide_ particular tags. Doing so enables a relationship between cached data from one or more query endpoints and the behaviour of one or more mutation endpoints.
+每个单独的 `query` 端点都可以让其缓存数据 _提供_ 特定的标签。这样做可以在一个或多个查询端点的缓存数据和一个或多个变更端点的行为之间建立关系。
 
-The `providesTags` property on a `query` endpoint is used for this purpose.
+`query` 端点上的 `providesTags` 属性用于此目的。
 
 :::info
 
-Provided tags have no inherent relationship across separate `query` endpoints. Provided tags are used to determine whether cached data returned by an endpoint should be `invalidated` and either be refetched or removed from the cache. If two separate endpoints provide the same tags, they will still contribute their own distinct cached data, which could later both be invalidated by a single tag declared from a mutation.
+在不同的 `query` 端点之间，提供的标签没有固有的关系。提供的标签用于确定是否应该 `invalidate` 端点返回的缓存数据，并重新获取或从缓存中移除。如果两个不同的端点提供相同的标签，它们仍然会贡献自己独特的缓存数据，这些数据可能会被来自变更的单个标签同时使无效。
 
 :::
 
-The example below declares that the `getPosts` `query` endpoint `provides` the `'Post'` tag to the cache, using the `providesTags` property for a `query` endpoint.
+下面的示例声明 `getPosts` `query` 端点使用 `providesTags` 属性向缓存 `提供` `'Post'` 标签。
 
-```ts title="Example of providing tags to the cache"
-// file: types.ts noEmit
+```ts title="向缓存提供标签的示例"
+// 文件：types.ts noEmit
 export interface Post {
   id: number
   name: string
@@ -132,7 +132,7 @@ export interface User {
   name: string
 }
 
-// file: api.ts
+// 文件：api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { Post, User } from './types'
 
@@ -144,15 +144,15 @@ const api = createApi({
   endpoints: (build) => ({
     getPosts: build.query<Post[], void>({
       query: () => '/posts',
-      // highlight-start
+      // 高亮开始
       providesTags: ['Post'],
-      // highlight-end
+      // 高亮结束
     }),
     getUsers: build.query<User[], void>({
       query: () => '/users',
-      // highlight-start
+      // 高亮开始
       providesTags: ['User'],
-      // highlight-end
+      // 高亮结束
     }),
     addPost: build.mutation<Post, Omit<Post, 'id'>>({
       query: (body) => ({
@@ -172,12 +172,12 @@ const api = createApi({
 })
 ```
 
-For more granular control over the provided data, provided `tags` can have an associated `id`. This enables a distinction between 'any of a particular tag type', and 'a specific instance of a particular tag type'.
+为了更精细地控制提供的数据，提供的 `tags` 可以有关联的 `id`。这使得可以区分 '特定类型的任何标签' 和 '特定类型的特定实例标签'。
 
-The example below declares that the provided posts are associated with particular IDs as determined by the result returned by the endpoint:
+下面的示例声明提供的帖子与端点返回的结果确定的特定 ID 相关联：
 
-```ts title="Example of providing tags with IDs to the cache"
-// file: types.ts noEmit
+```ts title="向缓存提供带有 ID 的标签的示例"
+// 文件：types.ts noEmit
 export interface Post {
   id: number
   name: string
@@ -188,7 +188,7 @@ export interface User {
   name: string
 }
 
-// file: api.ts
+// 文件：api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { Post, User } from './types'
 
@@ -200,12 +200,12 @@ const api = createApi({
   endpoints: (build) => ({
     getPosts: build.query<Post[], void>({
       query: () => '/posts',
-      // highlight-start
+      // 高亮开始
       providesTags: (result, error, arg) =>
         result
           ? [...result.map(({ id }) => ({ type: 'Post' as const, id })), 'Post']
           : ['Post'],
-      // highlight-end
+      // 高亮结束
     }),
     getUsers: build.query<User[], void>({
       query: () => '/users',
@@ -229,22 +229,22 @@ const api = createApi({
 })
 ```
 
-Note that for the example above, the `id` is used where possible on a successful result. In the case of an error, no result is supplied, and we still consider that it has provided the general `'Post'` tag type rather than any specific instance of that tag.
+注意，对于上面的示例，如果结果成功，尽可能使用 `id`。在出现错误的情况下，没有提供结果，我们仍然认为它提供了通用的 `'Post'` 标签类型，而不是该标签的任何特定实例。
 
-:::tip Advanced List Invalidation
-In order to provide stronger control over invalidating the appropriate data, you can use an arbitrary ID such as `'LIST'` for a given tag. See [Advanced Invalidation with abstract tag IDs](#advanced-invalidation-with-abstract-tag-ids) for additional details.
+:::tip 高级列表无效化
+为了更强地控制无效化适当的数据，你可以为给定的标签使用一个任意的 ID，如 `'LIST'`。请参阅 [使用抽象标签 ID 的高级无效化](#使用抽象标签-id-的高级无效化) 以获取更多详情。
 :::
 
-### Invalidating cache data
+### 使缓存数据无效
 
-Each individual mutation endpoint can `invalidate` particular tags for existing cached data. Doing so enables a relationship between cached data from one or more query endpoints and the behaviour of one or more mutation endpoints.
+每个单独的变更（mutation）端点都可以使现有缓存数据的特定标签`无效`。这样做可以在一个或多个查询端点的缓存数据和一个或多个变更端点的行为之间建立关系。
 
-The `invalidatesTags` property on a mutation endpoint is used for this purpose.
+变更端点上的 `invalidatesTags` 属性用于此目的。
 
-The example below declares that the `addPost` and `editPost` mutation endpoints `invalidate` any cached data with the `'Post'` tag, using the `invalidatesTags` property for a mutation endpoint:
+下面的示例声明 `addPost` 和 `editPost` 变更端点使用 `invalidatesTags` 属性使任何带有 `'Post'` 标签的缓存数据无效：
 
-```ts title="Example of invalidating tags in the cache"
-// file: types.ts noEmit
+```ts title="使缓存中的标签无效的示例"
+// 文件：types.ts noEmit
 export interface Post {
   id: number
   name: string
@@ -255,7 +255,7 @@ export interface User {
   name: string
 }
 
-// file: api.ts
+// 文件：api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { Post, User } from './types'
 
@@ -282,9 +282,9 @@ const api = createApi({
         method: 'POST',
         body,
       }),
-      // highlight-start
+      // 高亮开始
       invalidatesTags: ['Post'],
-      // highlight-end
+      // 高亮结束
     }),
     editPost: build.mutation<Post, Partial<Post> & Pick<Post, 'id'>>({
       query: (body) => ({
@@ -292,21 +292,21 @@ const api = createApi({
         method: 'POST',
         body,
       }),
-      // highlight-start
+      // 高亮开始
       invalidatesTags: ['Post'],
-      // highlight-end
+      // 高亮结束
     }),
   }),
 })
 ```
 
-For the example above, this tells RTK Query that after the `addPost` and/or `editPost` mutations are called and completed, any cache data supplied with the `'Post'` tag is no longer valid. If a component is currently subscribed to the cached data for a `'Post'` tag after the above mutations are called and complete, it will automatically re-fetch in order to retrieve up to date data from the server.
+对于上面的示例，这告诉 RTK Query 在调用并完成 `addPost` 和/或 `editPost` 变更后，任何带有 `'Post'` 标签的缓存数据都不再有效。如果一个组件在上述变更调用并完成后仍订阅了带有 `'Post'` 标签的缓存数据，它将自动重新获取，以便从服务器获取最新数据。
 
-An example scenario would be like so:
+一个示例场景可能是这样的：
 
-1. A component is rendered which is using the `useGetPostsQuery()` hook to subscribe to that endpoint's cached data
-2. The `/posts` request is fired off, and server responds with posts with IDs 1, 2 & 3
-3. The `getPosts` endpoint stores the received data in the cache, and internally registers that the following tags have been provided:
+1. 渲染一个组件，该组件使用 `useGetPostsQuery()` 钩子订阅该端点的缓存数据
+2. 触发 `/posts` 请求，服务器响应带有 ID 1、2 和 3 的帖子
+3. `getPosts` 端点将接收到的数据存储在缓存中，并内部注册已提供以下标签：
    <!-- prettier-ignore -->
    ```js
    [
@@ -315,16 +315,16 @@ An example scenario would be like so:
      { type: 'Post', id: 3 },
    ]
    ```
-4. The `editPost` mutation is fired off to alter a particular post
-5. Upon completion, RTK Query internally registers that the `'Post'` tag is now invalidated, and removes the previously provided `'Post'` tags from the cache
-6. Since the `getPosts` endpoint has provided tags of type `'Post'` which now has invalid cache data, and the component is still subscribed to the data, the `/posts` request is automatically fired off again, fetching new data and registering new tags for the updated cached data
+4. 触发 `editPost` 变更以修改特定帖子
+5. 完成后，RTK Query 内部注册 `'Post'` 标签现在已无效，并从缓存中移除先前提供的 `'Post'` 标签
+6. 由于 `getPosts` 端点提供了现在缓存数据无效的 `'Post'` 类型的标签，且组件仍订阅该数据，`/posts` 请求会自动再次触发，获取新数据并为更新的缓存数据注册新标签
 
-For more granular control over the invalidated data, invalidated `tags` can have an associated `id` in the same manner as `providesTags`. This enables a distinction between 'any of a particular tag type' and 'a specific instance of a particular tag type'.
+为了更精细地控制无效的数据，无效的 `tags` 可以有关联的 `id`，就像 `providesTags` 一样。这使得可以区分 '特定类型的任何标签' 和 '特定类型的特定实例标签'。
 
-The example below declares that the `editPost` mutation invalidates a specific instance of a `Post` tag, using the ID passed in when calling the mutation function:
+下面的示例声明 `editPost` 变更使特定实例的 `Post` 标签无效，使用在调用变更函数时传入的 ID：
 
-```ts title="Example of invalidating tags with IDs to the cache"
-// file: types.ts noEmit
+```ts title="使带有 ID 的标签无效的示例"
+// 文件：types.ts noEmit
 export interface Post {
   id: number
   name: string
@@ -335,7 +335,7 @@ export interface User {
   name: string
 }
 
-// file: api.ts
+// 文件：api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { Post, User } from './types'
 
@@ -370,35 +370,35 @@ const api = createApi({
         method: 'POST',
         body,
       }),
-      // highlight-start
+      // 高亮开始
       invalidatesTags: (result, error, arg) => [{ type: 'Post', id: arg.id }],
-      // highlight-end
+      // 高亮结束
     }),
   }),
 })
 ```
 
-For the example above, rather than invalidating any tag with the type `'Post'`, calling the `editPost` mutation function will now only invalidate a tag for the provided `id`. I.e. if cached data from an endpoint does not provide a `'Post'` for that same `id`, it will remain considered as 'valid', and will not be triggered to automatically re-fetch.
+对于上面的示例，而不是使任何类型为 `'Post'` 的标签无效，调用 `editPost` 变更函数现在只会使提供的 `id` 的标签无效。即，如果端点的缓存数据没有为同一 `id` 提供 `'Post'`，它将仍被视为 '有效'，并且不会被触发自动重新获取。
 
-:::tip Using abstract tag IDs
-In order to provide stronger control over invalidating the appropriate data, you can use an arbitrary ID such as `'LIST'` for a given tag. See [Advanced Invalidation with abstract tag IDs](#advanced-invalidation-with-abstract-tag-ids) for additional details.
+:::tip 使用抽象标签 ID
+为了更强地控制无效化适当的数据，你可以为给定的标签使用一个任意的 ID，如 `'LIST'`。请参阅 [使用抽象标签 ID 的高级无效化](#使用抽象标签-id-的高级无效化) 以获取更多详情。
 :::
 
-## Tag Invalidation Behavior
+## 标签失效行为
 
-The matrix below shows examples of which invalidated tags will affect and invalidate which provided tags:
+下面的矩阵展示了哪些失效的标签会影响和使哪些提供的标签失效的例子：
 
 <table className="checkbox-table">
   <thead>
     <tr>
       <th className="diagonal-cell">
         <div className="diagonal-cell--content">
-          <div className="diagonal-cell--topRight">Provided</div>
-          <div className="diagonal-cell--bottomLeft">Invalidated</div>
+          <div className="diagonal-cell--topRight">提供的</div>
+          <div className="diagonal-cell--bottomLeft">失效的</div>
         </div>
       </th>
       <th>
-        <div>General tag A</div>
+        <div>通用标签 A</div>
         <div style={{ fontWeight: 'normal', fontSize: '0.9rem' }}>
           {"['Post']"}
           <br />
@@ -408,7 +408,7 @@ The matrix below shows examples of which invalidated tags will affect and invali
         </div>
       </th>
       <th>
-        <div>General tag B</div>
+        <div>通用标签 B</div>
         <div style={{ fontWeight: 'normal', fontSize: '0.9rem' }}>
           {"['User']"}
           <br />
@@ -418,7 +418,7 @@ The matrix below shows examples of which invalidated tags will affect and invali
         </div>
       </th>
       <th>
-        <div>Specific tag A1</div>
+        <div>特定标签 A1</div>
         <div style={{ fontWeight: 'normal', fontSize: '0.9rem' }}>
           {"[{ type: 'Post',"}
           <br />
@@ -426,13 +426,13 @@ The matrix below shows examples of which invalidated tags will affect and invali
         </div>
       </th>
       <th>
-        <div>Specific tag A2</div>
+        <div>特定标签 A2</div>
         <div style={{ fontWeight: 'normal', fontSize: '0.9rem' }}>
           {"[{ type: 'Post', id: 'LIST' }]"}
         </div>
       </th>
       <th>
-        <div>Specific tag B1</div>
+        <div>特定标签 B1</div>
         <div style={{ fontWeight: 'normal', fontSize: '0.9rem' }}>
           {"[{ type: 'User',"}
           <br />
@@ -440,7 +440,7 @@ The matrix below shows examples of which invalidated tags will affect and invali
         </div>
       </th>
       <th>
-        <div>Specific tag B2</div>
+        <div>特定标签 B2</div>
         <div style={{ fontWeight: 'normal', fontSize: '0.9rem' }}>
           {"[{ type: 'User',"}
           <br />
@@ -452,7 +452,7 @@ The matrix below shows examples of which invalidated tags will affect and invali
   <tbody>
     <tr>
       <td>
-        <div style={{ fontWeight: 'bold' }}>General tag A</div>
+        <div style={{ fontWeight: 'bold' }}>通用标签 A</div>
         <div style={{ fontSize: '0.9rem' }}>
           {"['Post'] / [{ type: 'Post' }]"}
         </div>
@@ -466,7 +466,7 @@ The matrix below shows examples of which invalidated tags will affect and invali
     </tr>
     <tr>
       <td>
-        <div style={{ fontWeight: 'bold' }}>General tag B</div>
+        <div style={{ fontWeight: 'bold' }}>通用标签 B</div>
         <div style={{ fontSize: '0.9rem' }}>
           {"['User'] /"}
           <br />
@@ -482,7 +482,7 @@ The matrix below shows examples of which invalidated tags will affect and invali
     </tr>
     <tr>
       <td>
-        <div style={{ fontWeight: 'bold' }}>Specific tag A1</div>
+        <div style={{ fontWeight: 'bold' }}>特定标签 A1</div>
         <div style={{ fontSize: '0.9rem' }}>{"[{ type: 'Post', id: 1 }]"}</div>
       </td>
       <td></td>
@@ -494,7 +494,7 @@ The matrix below shows examples of which invalidated tags will affect and invali
     </tr>
     <tr>
       <td>
-        <div style={{ fontWeight: 'bold' }}>Specific tag A2</div>
+        <div style={{ fontWeight: 'bold' }}>特定标签 A2</div>
         <div style={{ fontSize: '0.9rem' }}>
           {"[{ type: 'Post', id: 'LIST' }]"}
         </div>
@@ -508,7 +508,7 @@ The matrix below shows examples of which invalidated tags will affect and invali
     </tr>
     <tr>
       <td>
-        <div style={{ fontWeight: 'bold' }}>Specific tag B1</div>
+        <div style={{ fontWeight: 'bold' }}>特定标签 B1</div>
         <div style={{ fontSize: '0.9rem' }}>{"[{ type: 'User', id: 1 }]"}</div>
       </td>
       <td></td>
@@ -520,7 +520,7 @@ The matrix below shows examples of which invalidated tags will affect and invali
     </tr>
     <tr>
       <td>
-        <div style={{ fontWeight: 'bold' }}>Specific tag B2</div>
+        <div style={{ fontWeight: 'bold' }}>特定标签 B2</div>
         <div style={{ fontSize: '0.9rem' }}>{"[{ type: 'User', id: 2 }]"}</div>
       </td>
       <td></td>
@@ -533,16 +533,16 @@ The matrix below shows examples of which invalidated tags will affect and invali
   </tbody>
 </table>
 
-The invalidation behavior is summarized based on tag specificity in the sections below.
+以下部分根据标签的特异性总结了失效行为。
 
-### General tag
+### 通用标签
 
-e.g. `['Post'] / [{ type: 'Post' }]`
+例如，`['Post'] / [{ type: 'Post' }]`
 
-Will `invalidate` any `provided` tag with the matching type, including general and specific tags.
+将使任何具有匹配类型的`提供`的标签`失效`，包括通用和特定标签。
 
-Example:
-If a general tag of `Post` was invalidated, endpoints whose data `provided` the following tags would all have their data invalidated:
+示例：
+如果一个`Post`的通用标签被使无效，那么`提供`以下标签的数据的端点都会使其数据无效：
 
 - `['Post']`
 - `[{ type: 'Post' }]`
@@ -552,7 +552,7 @@ If a general tag of `Post` was invalidated, endpoints whose data `provided` the 
 - `[{ type: 'Post', id: 'LIST' }]`
 - `[{ type: 'Post', id: 1 }, { type: 'Post', id: 'LIST' }]`
 
-Endpoints whose data `provided` the following tags would _not_ have their data invalidated:
+提供以下标签的数据的端点，其数据将_不会_被使无效：
 
 - `['User']`
 - `[{ type: 'User' }]`
@@ -560,21 +560,21 @@ Endpoints whose data `provided` the following tags would _not_ have their data i
 - `[{ type: 'User', id: 'LIST' }]`
 - `[{ type: 'User', id: 1 }, { type: 'User', id: 'LIST' }]`
 
-### Specific tag
+### 特定标签
 
-e.g. `[{ type: 'Post', id: 1 }]`
+例如，`[{ type: 'Post', id: 1 }]`
 
-Will `invalidate` any `provided` tag with both the matching type, _and_ matching id. Will not cause a `general` tag to be invalidated directly, but _might_ invalidate data for an endpoint that provides a `general` tag _if_ it also provides a matching `specific` tag.
+将使任何具有匹配类型和匹配ID的`provided`标签`失效`。不会直接导致`general`标签失效，但如果它也提供了匹配的`specific`标签，_可能_会使提供`general`标签的端点的数据失效。
 
-Example 1:
-If a specific tag of `{ type: 'Post', id: 1 }` was invalidated, endpoints whose data `provided` the following tags would all have their data invalidated:
+示例1：
+如果一个特定标签`{ type: 'Post', id: 1 }`被使无效，那么数据`provided`以下标签的端点都会使其数据失效：
 
 - `[{ type: 'Post' }, { type: 'Post', id: 1 }]`
 - `[{ type: 'Post', id: 1 }]`
 - `[{ type: 'Post', id: 1 }, { type: 'User' }]`
 - `[{ type: 'Post', id: 1 }, { type: 'Post', id: 'LIST' }]`
 
-Endpoints whose data `provided` the following tags would _not_ have their data invalidated:
+提供以下标签数据的端点，其数据将_不会_被无效化：
 
 - `['Post']`
 - `[{ type: 'Post' }]`
@@ -585,13 +585,13 @@ Endpoints whose data `provided` the following tags would _not_ have their data i
 - `[{ type: 'User', id: 'LIST' }]`
 - `[{ type: 'User', id: 1 }, { type: 'User', id: 'LIST' }]`
 
-Example 2:
-If a specific tag of `{ type: 'Post', id: 'LIST' }` was invalidated, endpoints whose data `provided` the following tags would all have their data invalidated:
+示例 2：
+如果 `{ type: 'Post', id: 'LIST' }` 的特定标签被无效化，那么`提供`以下标签数据的所有端点都会被无效化：
 
 - `[{ type: 'Post', id: 'LIST' }]`
 - `[{ type: 'Post', id: 1 }, { type: 'Post', id: 'LIST' }]`
 
-Endpoints whose data `provided` the following tags would _not_ have their data invalidated:
+`提供`以下标签数据的端点，其数据将_不会_被无效化：
 
 - `['Post']`
 - `[{ type: 'Post' }]`
@@ -604,29 +604,29 @@ Endpoints whose data `provided` the following tags would _not_ have their data i
 - `[{ type: 'User', id: 'LIST' }]`
 - `[{ type: 'User', id: 1 }, { type: 'User', id: 'LIST' }]`
 
-## Recipes
+## 食谱
 
-### Advanced Invalidation with abstract tag IDs
+### 使用抽象标签 ID 进行高级失效处理
 
-While using an 'entity ID' for a tag `id` is a common use case, the `id` property is not intended to be limited to database IDs alone. The `id` is simply a way to label a subset of a particular collection of data for a particular `tag type`.
+虽然使用'实体 ID'作为标签 `id` 是一个常见的用例，但 `id` 属性并不仅限于数据库 ID。`id` 只是一种标记特定 `标签类型` 的数据子集的方式。
 
-A powerful use-case is to use an ID like `'LIST'` as a label for data provided by a bulk query, _as well as_ using entity IDs for the individual items. Doing so allows future `mutations` to declare whether they invalidate the data only if it contains a particular item (e.g. `{ type: 'Post', id: 5 }`), or invalidate the data if it is a `'LIST'` (e.g. `{ type: 'Post', id: 'LIST' }`).
+一个强大的用例是使用像 `'LIST'` 这样的 ID 作为批量查询提供的数据的标签，_以及_ 使用实体 ID 作为单个项目的标签。这样做可以让未来的 `mutations` 声明它们是否使包含特定项目的数据失效（例如 `{ type: 'Post', id: 5 }`），或者如果它是一个 `'LIST'`，则使数据失效（例如 `{ type: 'Post', id: 'LIST' }`）。
 
-:::info 'LIST' Tag and IDs
+:::info 'LIST' 标签和 ID
 
-1. `LIST` is an arbitrary string - technically speaking, you could use anything you want here, such as `ALL` or `*`. The important thing when choosing a custom id is to make sure there is no possibility of it colliding with an id that is returned by a query result. If you have unknown ids in your query results and don't want to risk it, you can go with point 3 below.
-2. You can add _many_ tag types for even more control
+1. `LIST` 是一个任意字符串 - 严格来说，你可以在这里使用任何你想要的东西，比如 `ALL` 或 `*`。选择自定义 id 时的重要事项是确保它不可能与查询结果返回的 id 冲突。如果你的查询结果中有未知的 id，并且你不想冒险，你可以选择下面的第3点。
+2. 你可以添加 _许多_ 标签类型以获得更多的控制
    - `[{ type: 'Posts', id: 'LIST' }, { type: 'Posts', id: 'SVELTE_POSTS' }, { type: 'Posts', id: 'REACT_POSTS' }]`
-3. If the concept of using an `id` like 'LIST' seems strange to you, you can always add another `tagType` and invalidate its root, but we recommend using the `id` approach as shown.
+3. 如果使用像 'LIST' 这样的 `id` 的概念对你来说感觉奇怪，你可以总是添加另一个 `tagType` 并使其根失效，但我们推荐使用如上所示的 `id` 方法。
 
 :::
 
-We can compare the scenarios below to see how using a `'LIST'` id can be leveraged to optimize behaviour.
+我们可以比较下面的场景，看看如何利用 `'LIST'` id 来优化行为。
 
-#### Invalidating everything of a type
+#### 使一个类型的所有内容失效
 
-```ts title="API Definition"
-// file: types.ts noEmit
+```ts title="API 定义"
+// 文件: types.ts noEmit
 export interface Post {
   id: number
   name: string
@@ -637,7 +637,7 @@ export interface User {
   name: string
 }
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Post, User } from './types'
 
@@ -677,7 +677,7 @@ function App() {
     <div>
       <AddPost onAdd={addPost} />
       <PostsList />
-      {/* Assume each PostDetail is subscribed via `const {data} = useGetPostQuery(id)` */}
+      {/* 假设每个 PostDetail 都通过 `const {data} = useGetPostQuery(id)` 订阅 */}
       <PostDetail id={1} />
       <PostDetail id={2} />
       <PostDetail id={3} />
@@ -686,14 +686,14 @@ function App() {
 }
 ```
 
-**What to expect**
+**期望的结果**
 
-When `addPost` is triggered, it would cause each `PostDetail` component to go back into a `isFetching` state because `addPost` invalidates the root tag, which causes _every query_ that provides 'Posts' to be re-run. In most cases, this may not be what you want to do. Imagine if you had 100 posts on the screen that all subscribed to a `getPost` query – in this case, you'd create 100 requests and send a ton of unnecessary traffic to your server, which we're trying to avoid in the first place! Even though the user would still see the last good cached result and potentially not notice anything other than their browser hiccuping, you still want to avoid this.
+当触发 `addPost` 时，它会使每个 `PostDetail` 组件回到 `isFetching` 状态，因为 `addPost` 使根标签失效，这导致提供 'Posts' 的 _每个查询_ 都被重新运行。在大多数情况下，这可能不是你想做的。想象一下，如果你的屏幕上有100篇帖子，它们都订阅了一个 `getPost` 查询 - 在这种情况下，你会创建100个请求，并向你的服务器发送大量不必要的流量，这是我们首先试图避免的！尽管用户仍然会看到最后一个好的缓存结果，并可能没有注意到除了他们的浏览器出现故障之外的任何事情，你仍然想要避免这种情况。
 
-#### Selectively invalidating lists
+#### 选择性地使列表失效
 
-```ts title="API Definition"
-// file: types.ts noEmit
+```ts title="API 定义"
+// 文件: types.ts noEmit
 export interface Post {
   id: number
   name: string
@@ -704,7 +704,7 @@ export interface User {
   name: string
 }
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Post, User } from './types'
 
@@ -751,7 +751,7 @@ function App() {
     <div>
       <AddPost onAdd={addPost} />
       <PostsList />
-      {/* Assume each PostDetail is subscribed via `const {data} = useGetPostQuery(id)` */}
+      {/* 假设每个 PostDetail 都通过 `const {data} = useGetPostQuery(id)` 订阅 */}
       <PostDetail id={1} />
       <PostDetail id={2} />
       <PostDetail id={3} />
@@ -760,47 +760,51 @@ function App() {
 }
 ```
 
-**What to expect**
+**期望结果**
 
-When `addPost` is fired, it will only cause the `PostsList` to go into an `isFetching` state because `addPost` only invalidates the `'LIST'` id, which causes `getPosts` to rerun (because it provides that specific id). So in your network tab, you would only see 1 new request fire for `GET /posts`. As the singular `getPost` queries have not been invalidated, they will not re-run as a result of `addPost`.
+当触发 `addPost` 时，它只会使 `PostsList` 进入 `isFetching` 状态，因为 `addPost` 只使 `'LIST'` id 失效，这导致 `getPosts` 重新运行（因为它提供了特定的 id）。所以在你的网络标签页中，你只会看到一个新的 `GET /posts` 请求被触发。由于单个的 `getPost` 查询没有被使无效，所以它们不会因 `addPost` 的结果而重新运行。
 
 :::info
 
-If you intend for the `addPost` mutation to refresh all posts including individual `PostDetail` components while still only making 1 new `GET /posts` request, this can be done by selecting a part of the data using [`selectFromResult`](./queries.mdx#selecting-data-from-a-query-result).
+如果你希望 `addPost` 变异能刷新所有包括单个 `PostDetail` 组件的帖子，同时仍然只发出一个新的 `GET /posts` 请求，这可以通过使用 [`selectFromResult`](./queries.mdx#selecting-data-from-a-query-result) 选择部分数据来实现。
 
 :::
 
-### Providing errors to the cache
+### 向缓存提供错误信息
 
-The information provided to the cache is not limited to successful data fetches. The concept can be used to inform RTK Query that when a particular failure has been encountered, to `provide` a specific `tag` for that failed cache data. A separate endpoint can then `invalidate` the data for that `tag`, telling RTK Query to re-attempt the previously failed endpoints if a component is still subscribed to the failed data.
+提供给缓存的信息不仅限于成功获取的数据。这个概念可以用来告知 RTK Query，当遇到特定的失败时，为失败的缓存数据 `provide` 一个特定的 `tag`。然后，另一个端点可以 `invalidate` 那个 `tag` 的数据，告诉 RTK Query 如果一个组件仍然订阅了失败的数据，那么重新尝试之前失败的端点。
 
-The example below demonstrates an example with the following behaviour:
+下面的例子展示了以下行为：
 
-- Provides an `UNAUTHORIZED` cache tag if a query fails with an error code of `401 UNAUTHORIZED`
-- Provides an `UNKNOWN_ERROR` cache tag if a query fails with a different error
-- Enables a 'login' mutation, which when _successful_, will `invalidate` the data with the `UNAUTHORIZED` tag.
-  This will trigger the `postById` endpoint to re-fire if:
-  1. The last call for `postById` had encountered an unauthorized error, and
-  2. A component is still subscribed to the cached data
-- Enables a 'refetchErroredQueries' mutation which when _called_, will `invalidate` the data with the `UNKNOWN_ERROR` tag.
-  This will trigger the `postById` endpoint to re-fire if:
-  1. The last call for `postById` had encountered an unknown error, and
-  2. A component is still subscribed to the cached data
+- 如果查询失败并返回错误代码 `401 UNAUTHORIZED`，则提供一个 `UNAUTHORIZED` 缓存标签
+- 如果查询失败并返回其他错误，则提供一个 `UNKNOWN_ERROR` 缓存标签
+- 启用一个 'login' 变异，当 _成功_ 时，将 `invalidate` 带有 `UNAUTHORIZED` 标签的数据。
+  这将触发 `postById` 端点重新触发，如果：
+  1. `postById` 的最后一次调用遇到了未授权的错误，且
+  2. 一个组件仍然订阅了缓存的数据
+- 启用一个 'refetchErroredQueries' 变异，当 _调用_ 时，将 `invalidate` 带有 `UNKNOWN_ERROR` 标签的数据。
+  这将触发 `postById` 端点重新触发，如果：
+  1. `postById` 的最后一次调用遇到了未知的错误，且
+  2. 一个组件仍然订阅了缓存的数据
 
 ```ts
-// file: types.ts noEmit
+// 文件: types.ts noEmit
 export interface Post {
   id: number
   name: string
 }
 export interface LoginResponse {}
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import { Post, LoginResponse } from './types'
 
 const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://example.com' }),
+  baseQuery
+
+:
+
+ fetchBaseQuery({ baseUrl: 'https://example.com' }),
   tagTypes: ['Post', 'UNAUTHORIZED', 'UNKNOWN_ERROR'],
   endpoints: (build) => ({
     postById: build.query<Post, number>({
@@ -814,8 +818,8 @@ const api = createApi({
     }),
     login: build.mutation<LoginResponse, void>({
       query: () => '/login',
-      // on successful login, will refetch all currently
-      // 'UNAUTHORIZED' queries
+      // 登录成功后，将重新获取所有当前
+      // 'UNAUTHORIZED' 的查询
       invalidatesTags: (result) => (result ? ['UNAUTHORIZED'] : []),
     }),
     refetchErroredQueries: build.mutation<null, void>({
@@ -826,21 +830,21 @@ const api = createApi({
 })
 ```
 
-### Abstracting common provides/invalidates usage
+### 提供/使无效常用用法的抽象
 
-The code written to `provide` & `invalidate` tags for a given API slice will be dependent on multiple factors, including:
+为给定的 API 切片编写 `provide` 和 `invalidate` 标签的代码将取决于多个因素，包括：
 
-- The shape of the data returned by your backend
-- Which tags you expect a given query endpoint to provide
-- Which tags you expect a given mutation endpoint to invalidate
-- The extent that you wish to use the invalidation feature for
+- 你的后端返回的数据的形状
+- 你期望给定查询端点提供哪些标签
+- 你期望给定变异端点使哪些标签无效
+- 你希望使用无效化功能的程度
 
-When declaring your API slice, you may feel as though you're duplicating your code. For instance, for two separate endpoints that both provide a list of a particular entity, the `providesTags` declaration may only differ in the `tagType` provided.
+在声明你的 API 切片时，你可能会觉得你在复制你的代码。例如，对于两个分别提供特定实体列表的不同端点，`providesTags` 声明可能只在提供的 `tagType` 上有所不同。
 
-e.g.
+例如：
 
 ```ts
-// file: types.ts noEmit
+// 文件: types.ts noEmit
 export interface Post {
   id: number
   name: string
@@ -851,7 +855,7 @@ export interface User {
   name: string
 }
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { Post, User } from './types'
 
@@ -861,7 +865,7 @@ const api = createApi({
   endpoints: (build) => ({
     getPosts: build.query<Post[], void>({
       query: () => `posts`,
-      // highlight-start
+      // 高亮开始
       providesTags: (result) =>
         result
           ? [
@@ -869,11 +873,11 @@ const api = createApi({
               ...result.map(({ id }) => ({ type: 'Post' as const, id })),
             ]
           : [{ type: 'Post', id: 'LIST' }],
-      // highlight-end
+      // 高亮结束
     }),
     getUsers: build.query<User[], void>({
       query: () => `users`,
-      // highlight-start
+      // 高亮开始
       providesTags: (result) =>
         result
           ? [
@@ -881,16 +885,16 @@ const api = createApi({
               ...result.map(({ id }) => ({ type: 'User' as const, id })),
             ]
           : [{ type: 'User', id: 'LIST' }],
-      // highlight-end
+      // 高亮结束
     }),
   }),
 })
 ```
 
-You may find it beneficial to define helper functions designed for your particular api to reduce this boilerplate across endpoint definitions, e.g.
+你可能会发现定义专为你的特定 api 设计的辅助函数来减少这种在端点定义中的样板代码是有益的。
 
 ```ts
-// file: types.ts noEmit
+// 文件: types.ts noEmit
 export interface Post {
   id: number
   name: string
@@ -901,11 +905,11 @@ export interface User {
   name: string
 }
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { Post, User } from './types'
 
-// highlight-start
+// 高亮开始
 function providesList<R extends { id: string | number }[], T extends string>(
   resultsWithIds: R | undefined,
   tagType: T,
@@ -917,7 +921,7 @@ function providesList<R extends { id: string | number }[], T extends string>(
       ]
     : [{ type: tagType, id: 'LIST' }]
 }
-// highlight-end
+// 高亮结束
 
 const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: 'https://example.com' }),
@@ -925,18 +929,18 @@ const api = createApi({
   endpoints: (build) => ({
     getPosts: build.query({
       query: () => `posts`,
-      // highlight-start
+      // 高亮开始
       providesTags: (result) => providesList(result, 'Post'),
-      // highlight-end
+      // 高亮结束
     }),
     getUsers: build.query({
       query: () => `users`,
-      // highlight-start
+      // 高亮开始
       providesTags: (result) => providesList(result, 'User'),
-      // highlight-end
+      // 高亮结束
     }),
   }),
 })
 ```
 
-An example of various abstractions for tag providing/invalidating designed for common rest data formats can be seen in the following gist, including typescript support, and factoring both ['LIST' style advanced tag invalidation](#advanced-invalidation-with-abstract-tag-ids) and ['error' style tag invalidation](#providing-errors-to-the-cache): **[RTK Query cache utils](https://gist.github.com/Shrugsy/6b6af02aef1f783df9d636526c1e05fa)**.
+以下是各种抽象的示例，这些抽象是为常见的REST数据格式设计的，用于提供/使标签无效，包括TypeScript支持，并考虑到['LIST'样式的高级标签无效化](#advanced-invalidation-with-abstract-tag-ids)和['error'样式的标签无效化](#providing-errors-to-the-cache)：**[RTK Query缓存工具](https://gist.github.com/Shrugsy/6b6af02aef1f783df9d636526c1e05fa)**。

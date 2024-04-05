@@ -8,38 +8,38 @@ description: 'RTK Query > Usage > Code Generation: automated creation of API cod
 
 &nbsp;
 
-# Code Generation
+# 代码生成
 
-RTK Query's API and architecture is oriented around declaring API endpoints up front. This lends itself well to automatically generating API slice definitions from external API schema definitions, such as OpenAPI and GraphQL.
+RTK Query的API和架构是围绕预先声明API端点进行设计的。这非常适合从外部API模式定义（如OpenAPI和GraphQL）自动生成API切片定义。
 
-We have early previews of code generation capabilities available as separate tools.
+我们提供了代码生成能力的早期预览作为单独的工具。
 
 ## GraphQL
 
-We provide a [Plugin for GraphQL Codegen](https://www.graphql-code-generator.com/docs/plugins/typescript-rtk-query). You can find the documentation to that on the graphql-codegen homepage.
+我们提供了一个[GraphQL Codegen的插件](https://www.graphql-code-generator.com/docs/plugins/typescript-rtk-query)。你可以在graphql-codegen主页上找到该文档。
 
-For a full example on how to use it, you can see [this example project](https://github.com/reduxjs/redux-toolkit/tree/master/examples/query/react/graphql-codegen).
+要查看如何使用它的完整示例，你可以查看[此示例项目](https://github.com/reduxjs/redux-toolkit/tree/master/examples/query/react/graphql-codegen)。
 
 ## OpenAPI
 
-We provide a package for RTK Query code generation from OpenAPI schemas. It is published as `@rtk-query/codegen-openapi` and you can find the source code at [`packages/rtk-query-codegen-openapi`](https://github.com/reduxjs/redux-toolkit/tree/master/packages/rtk-query-codegen-openapi).
+我们提供了一个从OpenAPI模式生成RTK Query代码的包。它被发布为`@rtk-query/codegen-openapi`，你可以在[`packages/rtk-query-codegen-openapi`](https://github.com/reduxjs/redux-toolkit/tree/master/packages/rtk-query-codegen-openapi)找到源代码。
 
-### Usage
+### 使用方法
 
-Create an empty api using `createApi` like
+使用`createApi`创建一个空的api，如下所示
 
 ```ts no-transpile title="src/store/emptyApi.ts"
-// Or from '@reduxjs/toolkit/query' if not using the auto-generated hooks
+// 或者从'@reduxjs/toolkit/query'导入，如果不使用自动生成的钩子
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-// initialize an empty api service that we'll inject endpoints into later as needed
+// 初始化一个空的api服务，我们将在后面根据需要注入端点
 export const emptySplitApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: () => ({}),
 })
 ```
 
-Generate a config file (json, js or ts) with contents like
+生成一个配置文件（json，js或ts）内容如下
 
 ```ts no-transpile title="openapi-config.ts"
 import type { ConfigFile } from '@rtk-query/codegen-openapi'
@@ -56,22 +56,21 @@ const config: ConfigFile = {
 export default config
 ```
 
-and then call the code generator:
+然后调用代码生成器：
 
 ```bash
 npx @rtk-query/codegen-openapi openapi-config.ts
 ```
 
-#### Generating tags
+#### 生成标签
 
-If your OpenAPI specification uses [tags](https://swagger.io/docs/specification/grouping-operations-with-tags/), you can specify the `tag` option to the codegen.
-That will result in all generated endpoints having `providesTags`/`invalidatesTags` declarations for the `tags` of their respective operation definition.
+如果你的OpenAPI规范使用了[标签](https://swagger.io/docs/specification/grouping-operations-with-tags/)，你可以指定`tag`选项给codegen。这将导致所有生成的端点都有`providesTags`/`invalidatesTags`声明，用于他们各自的操作定义的`tags`。
 
-Note that this will only result in string tags with no ids, so it might lead to scenarios where too much is invalidated and unneccessary requests are made on mutation.
+注意，这只会导致没有id的字符串标签，所以可能会导致过多的无效和不必要的请求在突变上进行。
 
-In that case it is still recommended to manually specify tags by using [`enhanceEndpoints`](../api/created-api/code-splitting.mdx) on top of the generated api and manually declare `providesTags`/`invalidatesTags`.
+在这种情况下，仍然建议通过在生成的api上使用[`enhanceEndpoints`](../api/created-api/code-splitting.mdx)手动指定标签，并手动声明`providesTags`/`invalidatesTags`。
 
-### Programmatic usage
+### 程序化使用
 
 ```ts no-transpile title="src/store/petApi.ts"
 import { generateEndpoints } from '@rtk-query/codegen-openapi'
@@ -84,9 +83,9 @@ const api = await generateEndpoints({
 })
 ```
 
-### Config file options
+### 配置文件选项
 
-#### Simple usage
+#### 简单使用
 
 ```ts no-transpile
 interface SimpleUsage {
@@ -116,21 +115,21 @@ export type EndpointMatcherFunction = (
 ) => boolean
 ```
 
-#### Filtering endpoints
+#### 过滤端点
 
-If you only want to include a few endpoints, you can use the `filterEndpoints` config option to filter your endpoints.
+如果你只想包含一些端点，你可以使用`filterEndpoints`配置选项来过滤你的端点。
 
 ```ts no-transpile title="openapi-config.ts"
 const filteredConfig: ConfigFile = {
   // ...
-  // should only have endpoints loginUser, placeOrder, getOrderById, deleteOrder
+  // 只应包含端点loginUser, placeOrder, getOrderById, deleteOrder
   filterEndpoints: ['loginUser', /Order/],
 }
 ```
 
-#### Endpoint overrides
+#### 端点覆盖
 
-If an endpoint is generated as a mutation instead of a query or the other way round, you can override that:
+如果一个端点被生成为突变而不是查询，或者反过来，你可以覆盖它：
 
 ```ts no-transpile title="openapi-config.ts"
 const withOverride: ConfigFile = {
@@ -144,11 +143,11 @@ const withOverride: ConfigFile = {
 }
 ```
 
-#### Generating hooks
+#### 生成钩子
 
-Setting `hooks: true` will generate `useQuery` and `useMutation` hook exports. If you also want `useLazyQuery` hooks generated or more granular control, you can also pass an object in the shape of: `{ queries: boolean; lazyQueries: boolean; mutations: boolean }`.
+设置`hooks: true`将生成`useQuery`和`useMutation`钩子导出。如果你也想生成`useLazyQuery`钩子或者更细粒度的控制，你也可以传递一个形状为：`{ queries: boolean; lazyQueries: boolean; mutations: boolean }`的对象。
 
-#### Multiple output files
+#### 多个输出文件
 
 ```ts no-transpile title="openapi-config.ts"
 const config: ConfigFile = {

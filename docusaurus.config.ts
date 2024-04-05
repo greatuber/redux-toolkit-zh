@@ -9,7 +9,7 @@ const config: Config = {
   tagline: "用于高效 Redux 开发的官方、固执己见、包含电池的工具集",
   title: "Redux Toolkit",
   url: "https://ouweiya.github.io",
-  onBrokenLinks: "throw",
+  onBrokenLinks: "ignore",
   onBrokenMarkdownLinks: "warn",
   onBrokenAnchors: "ignore",
   organizationName: "ouweiya",

@@ -8,76 +8,70 @@ description: 'RTK Query > Usage > Manual Cache Updates: Updating and creating ca
 
 &nbsp;
 
-# Manual Cache Updates
+# 手动缓存更新
 
-## Overview
+## 概述
 
-For most cases, in order to receive up to date data after a triggering a change in the backend, you can take advantage of cache tag invalidation to perform [automated re-fetching](./automated-refetching). This will cause a query to re-fetch its data when it has been told that a mutation has occurred which would cause its data to become out of date.
+在大多数情况下，为了在后端触发更改后接收最新的数据，你可以利用缓存标签失效来执行[自动重新获取](./automated-refetching)。这将导致查询在被告知发生了会使其数据过时的变更后重新获取其数据。
 
-We recommend using automated re-fetching as a preference over manual cache updates in most situations.
+我们建议在大多数情况下优先使用自动重新获取而不是手动缓存更新。
 
-However, there _are_ use cases when manual cache updates are necessary, such as "optimistic" or "pessimistic" updates, or modifying data as part of cache entry lifecycles.
+然而，_确实有_手动缓存更新必要的使用场景，例如"乐观"或"悲观"更新，或者作为缓存条目生命周期的一部分修改数据。
 
-RTK Query exports thunks for these use cases, attached to `api.utils`:
+RTK Query为这些使用场景导出了thunks，附加到`api.utils`：
 
-- [`updateQueryData`](../api/created-api/api-slice-utils.mdx#updatequerydata): updates an already existing cache entry
-- [`upsertQueryData`](../api/created-api/api-slice-utils.mdx#upsertquerydata): creates or replaces cache entries
+- [`updateQueryData`](../api/created-api/api-slice-utils.mdx#updatequerydata)：更新已经存在的缓存条目
+- [`upsertQueryData`](../api/created-api/api-slice-utils.mdx#upsertquerydata)：创建或替换缓存条目
 
-Since these are thunks, you can dispatch them anywhere you have access to `dispatch`.
+由于这些是thunks，你可以在任何有访问`dispatch`的地方分派它们。
 
-### Updating existing cache entries
+### 更新现有缓存条目
 
-For updates of existing cache entries, use [`updateQueryData`](../api/created-api/api-slice-utils.mdx#updatequerydata).
+对于现有缓存条目的更新，使用[`updateQueryData`](../api/created-api/api-slice-utils.mdx#updatequerydata)。
 
-`updateQueryData` is strictly intended to perform _updates_ to existing cache entries, not create new entries. If an `updateQueryData` thunk action is dispatched and the `endpointName` + `args` combination that does not match any existing cache entry, the provided `recipe` callback will not be called, and no `patches` or `inversePatches` will be returned.
+`updateQueryData`严格用于对现有缓存条目执行_更新_，而不是创建新条目。如果分派了一个`updateQueryData` thunk操作，并且`endpointName` + `args`组合不匹配任何现有的缓存条目，那么提供的`recipe`回调将不会被调用，也不会返回任何`patches`或`inversePatches`。
 
-Use cases for manual update of cache entries:
+手动更新缓存条目的使用场景：
 
-- Providing immediate feedback to the user when a mutation is attempted
-- After a mutation, updating a single item in a large list of items that is already cached, rather than re-fetching the whole list
-- Debouncing a large number of mutations with immediate feedback as though they are being applied, followed by a single request sent to the server to update the debounced attempts
+- 当尝试进行变更时，向用户提供即时反馈
+- 在变更后，更新已经缓存的大量项目列表中的单个项目，而不是重新获取整个列表
+- 通过立即反馈，将大量的变更进行防抖处理，就像它们正在被应用一样，然后向服务器发送单个请求来更新防抖尝试
 
-### Creating new cache entries or replacing existing ones
+### 创建新的缓存条目或替换现有的
 
-To create or replace existing cache entries, use [`upsertQueryData`](../api/created-api/api-slice-utils.mdx#upsertquerydata).
+要创建或替换现有的缓存条目，使用[`upsertQueryData`](../api/created-api/api-slice-utils.mdx#upsertquerydata)。
 
-`upsertQueryData` is intended to perform _replacements_ to existing cache entries or _creation_ of new ones. Since `upsertQueryData` does not have access to the previous state of the cache entry, the update may be performed only as a replacement. In comparison, `updateQueryData` allows patching of the existing cache entry, but cannot create a new one.
+`upsertQueryData`旨在对现有的缓存条目执行_替换_或_创建_新的。由于`upsertQueryData`无法访问缓存条目的先前状态，更新可能只能作为替换进行。相比之下，`updateQueryData`允许对现有的缓存条目进行修补，但不能创建新的。
 
-One example use case is [pessimistic updates](../usage/manual-cache-updates.mdx#pessimistic-updates). If the client makes an API call to create a `Post`, the backend could return its complete data including the `id`. Then we can use `upsertQueryData` to create a new cache entry for the `getPostById(id)` query, preventing an extra fetch to retrieve the item later.
+一个示例使用场景是[悲观更新](../usage/manual-cache-updates.mdx#pessimistic-updates)。如果客户端发起一个API调用来创建一个`Post`，后端可能会返回其完整的数据，包括`id`。然后我们可以使用`upsertQueryData`为`getPostById(id)`查询创建一个新的缓存条目，防止后续再次获取该项目。
 
-## Recipes
+## 配方
 
-### Optimistic Updates
+### 乐观更新
 
-When you wish to perform an update to cache data immediately after a [`mutation`](./mutations) is
-triggered, you can apply an `optimistic update`. This can be a useful pattern for when you want to
-give the user the impression that their changes are immediate, even while the mutation request is
-still in flight.
+当你希望在触发[`mutation`](./mutations)后立即对缓存数据进行更新时，你可以应用一个`乐观更新`。当你希望给用户的印象是他们的更改是即时的，即使变更请求仍在进行中，这可以是一个有用的模式。
 
-The core concepts for an optimistic update are:
+乐观更新的核心概念是：
 
-- when you start a query or mutation, `onQueryStarted` will be executed
-- you manually update the cached data by dispatching `api.util.updateQueryData` within `onQueryStarted`
-- then, in the case that `queryFulfilled` rejects:
-  - you roll it back via the `.undo` property of the object you got back from the earlier dispatch,
-    OR
-  - you invalidate the cache data via `api.util.invalidateTags` to trigger a full re-fetch of the data
+- 当你开始一个查询或变更，`onQueryStarted`将被执行
+- 你通过分派`api.util.updateQueryData`在`onQueryStarted`中手动更新缓存数据
+- 然后，在`queryFulfilled`拒绝的情况下：
+  - 你通过从早期分派得到的对象的`.undo`属性回滚它，
+    或者
+  - 你通过`api.util.invalidateTags`使缓存数据无效，以触发数据的完全重新获取
 
 :::tip
-Where many mutations are potentially triggered in short succession causing overlapping requests,
-you may encounter race conditions if attempting to roll back patches using the `.undo` property
-on failures. For these scenarios, it is often simplest and safest to invalidate the tags on error
-instead, and re-fetch truly up-to-date data from the server.
+在许多变更可能在短时间内被触发，导致请求重叠的情况下，如果尝试使用`.undo`属性在失败时回滚补丁，你可能会遇到竞态条件。对于这些场景，最简单和最安全的方法通常是在错误时使标签无效，然后从服务器重新获取真正最新的数据。
 :::
 
-```ts title="Optimistic update mutation example (async await)"
-// file: types.ts noEmit
+```ts title="乐观更新变更示例 (async await)"
+// 文件: types.ts noEmit
 export interface Post {
   id: number
   name: string
 }
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { Post } from './types'
 
@@ -97,7 +91,7 @@ const api = createApi({
         method: 'PATCH',
         body: patch,
       }),
-      // highlight-start
+      // 高亮开始
       async onQueryStarted({ id, ...patch }, { dispatch, queryFulfilled }) {
         const patchResult = dispatch(
           api.util.updateQueryData('getPost', id, (draft) => {
@@ -110,19 +104,19 @@ const api = createApi({
           patchResult.undo()
 
           /**
-           * Alternatively, on failure you can invalidate the corresponding cache tags
-           * to trigger a re-fetch:
+           * 或者，失败时你可以使相应的缓存标签无效
+           * 来触发重新获取：
            * dispatch(api.util.invalidateTags(['Post']))
            */
         }
       },
-      // highlight-end
+      // 高亮结束
     }),
   }),
 })
 ```
 
-or, if you prefer the slightly shorter version with `.catch`
+或者，如果你更喜欢稍微短一点的版本，使用`.catch`
 
 ```diff
 -      async onQueryStarted({ id, ...patch }, { dispatch, queryFulfilled }) {
@@ -141,36 +135,29 @@ or, if you prefer the slightly shorter version with `.catch`
       }
 ```
 
-#### Example
+#### 示例
 
-[React Optimistic Updates](./examples#react-optimistic-updates)
+[React 乐观更新](./examples#react-optimistic-updates)
 
-### Pessimistic Updates
+### 悲观更新
 
-When you wish to perform an update to cache data based on the response received from the server
-after a [`mutation`](./mutations) is triggered, you can apply a `pessimistic update`.
-The distinction between a `pessimistic update` and an `optimistic update` is that the
-`pessimistic update` will instead wait for the response from the server prior to updating
-the cached data.
+当你希望在触发 [`mutation`](./mutations) 后，根据从服务器收到的响应来更新缓存数据时，你可以应用一个 `悲观更新`。`悲观更新` 和 `乐观更新` 的区别在于，`悲观更新` 会等待服务器的响应后再更新缓存数据。
 
-The core concepts for a pessimistic update are:
+悲观更新的核心概念包括：
 
-- when you start a query or mutation, `onQueryStarted` will be executed
-- you await `queryFulfilled` to resolve to an object containing the transformed response from the
-  server in the `data` property
-- you manually update the cached data by dispatching `api.util.updateQueryData` within
-  `onQueryStarted`, using the data in the response from the server for your draft updates
-- you manually create a new cache entry by dispatching `api.util.upsertQueryData` within `onQueryStarted`,
-  using the complete Post object returned by backend.
+- 当你开始一个查询或变异时，`onQueryStarted` 将被执行
+- 你等待 `queryFulfilled` 解析为一个对象，该对象包含服务器返回的转换响应在 `data` 属性中
+- 你通过在 `onQueryStarted` 中分派 `api.util.updateQueryData`，使用服务器响应中的数据手动更新缓存数据
+- 你通过在 `onQueryStarted` 中分派 `api.util.upsertQueryData`，使用后端返回的完整 Post 对象手动创建一个新的缓存条目。
 
-```ts title="Pessimistic update mutation example (async await)"
-// file: types.ts noEmit
+```ts title="悲观更新变异示例 (async await)"
+// 文件: types.ts noEmit
 export interface Post {
   id: number
   name: string
 }
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { Post } from './types'
 
@@ -190,7 +177,7 @@ const api = createApi({
         method: 'PATCH',
         body: patch,
       }),
-      // highlight-start
+      // 高亮开始
       async onQueryStarted({ id, ...patch }, { dispatch, queryFulfilled }) {
         try {
           const { data: updatedPost } = await queryFulfilled
@@ -201,7 +188,7 @@ const api = createApi({
           )
         } catch {}
       },
-      // highlight-end
+      // 高亮结束
     }),
     createPost: build.mutation<Post, Pick<Post, 'id'> & Partial<Post>>({
       query: ({ id, ...body }) => ({
@@ -209,7 +196,7 @@ const api = createApi({
         method: 'POST',
         body,
       }),
-      // highlight-start
+      // 高亮开始
       async onQueryStarted({ id }, { dispatch, queryFulfilled }) {
         try {
           const { data: createdPost } = await queryFulfilled
@@ -218,27 +205,21 @@ const api = createApi({
           )
         } catch {}
       },
-      // highlight-end
+      // 高亮结束
     }),
   }),
 })
 ```
 
-### General Updates
+### 通用更新
 
-If you find yourself wanting to update cache data elsewhere in your application, you can do so
-anywhere you have access to the `store.dispatch` method, including within React components via
-the [useDispatch](https://react-redux.js.org/api/hooks#usedispatch) hook (or a typed version such
-as [useAppDispatch](https://react-redux.js.org/using-react-redux/usage-with-typescript#define-typed-hooks)
-for typescript users).
+如果你发现自己想在应用程序的其他地方更新缓存数据，只要你能访问到 `store.dispatch` 方法，包括在 React 组件中通过 [useDispatch](https://react-redux.js.org/api/hooks#usedispatch) 钩子（或者对于 TypeScript 用户，如 [useAppDispatch](https://react-redux.js.org/using-react-redux/usage-with-typescript#define-typed-hooks) 的类型版本）就可以做到。
 
 :::info
-You should generally avoid manually updating the cache outside of the `onQueryStarted`
-callback for a mutation without a good reason, as RTK Query is intended to be used by considering
-your cached data as a reflection of the server-side state.
+你应该通常避免在 `onQueryStarted` 回调之外的变异中手动更新缓存，除非有充分的理由，因为 RTK Query 的使用方式是将你的缓存数据视为服务器端状态的反映。
 :::
 
-```tsx no-transpile title="General manual cache update example"
+```tsx no-transpile title="通用手动缓存更新示例"
 import { api } from './api'
 import { useAppDispatch } from './store/hooks'
 
@@ -247,8 +228,8 @@ function App() {
 
   function handleClick() {
     /**
-     * This will update the cache data for the query corresponding to the `getPosts` endpoint,
-     * when that endpoint is used with no argument (undefined).
+     * 这将更新对应于 `getPosts` 端点的查询的缓存数据，
+     * 当该端点使用无参数（undefined）时。
      */
     const patchCollection = dispatch(
       api.util.updateQueryData('getPosts', undefined, (draftPosts) => {
@@ -257,6 +238,6 @@ function App() {
     )
   }
 
-  return <button onClick={handleClick}>Add post to cache</button>
+  return <button onClick={handleClick}>添加帖子到缓存</button>
 }
 ```
