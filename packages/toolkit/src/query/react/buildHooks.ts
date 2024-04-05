@@ -77,19 +77,19 @@ export interface MutationHooks<
 }
 
 /**
- * A React hook that automatically triggers fetches of data from an endpoint, 'subscribes' the component to the cached data, and reads the request status and cached data from the Redux store. The component will re-render as the loading status changes and the data becomes available.
+ * 一个 React 钩子，它会自动触发从端点获取数据的请求，将组件'订阅'到缓存数据，并从 Redux 存储中读取请求状态和缓存数据。随着加载状态的变化和数据的可用性，组件将重新渲染。
  *
- * The query arg is used as a cache key. Changing the query arg will tell the hook to re-fetch the data if it does not exist in the cache already, and the hook will return the data for that query arg once it's available.
+ * 查询参数被用作缓存键。改变查询参数将告诉钩子如果缓存中不存在数据则重新获取数据，一旦数据可用，钩子将返回该查询参数的数据。
  *
- * This hook combines the functionality of both [`useQueryState`](#usequerystate) and [`useQuerySubscription`](#usequerysubscription) together, and is intended to be used in the majority of situations.
+ * 这个钩子将 [`useQueryState`](#usequerystate) 和 [`useQuerySubscription`](#usequerysubscription) 的功能结合在一起，预期在大多数情况下使用。
  *
- * #### Features
+ * #### 特性
  *
- * - Automatically triggers requests to retrieve data based on the hook argument and whether cached data exists by default
- * - 'Subscribes' the component to keep cached data in the store, and 'unsubscribes' when the component unmounts
- * - Accepts polling/re-fetching options to trigger automatic re-fetches when the corresponding criteria is met
- * - Returns the latest request status and cached data from the Redux store
- * - Re-renders as the request status changes and data becomes available
+ * - 根据钩子参数和是否存在缓存数据，默认自动触发获取数据的请求
+ * - 将组件'订阅'以在存储中保持缓存数据，并在组件卸载时'取消订阅'
+ * - 接受轮询/重新获取选项，当满足相应条件时触发自动重新获取
+ * - 从 Redux 存储中返回最新的请求状态和缓存数据
+ * - 随着请求状态的变化和数据的可用性重新渲染
  */
 export type UseQuery<D extends QueryDefinition<any, any, any, any>> = <
   R extends Record<string, any> = UseQueryStateDefaultResult<D>,
@@ -110,8 +110,7 @@ export type UseQueryHookResult<
 > = UseQueryStateResult<D, R> & UseQuerySubscriptionResult<D>
 
 /**
- * Helper type to manually type the result
- * of the `useQuery` hook in userland code.
+ * 辅助类型，用于在用户代码中手动输入 `useQuery` 钩子的结果。
  */
 export type TypedUseQueryHookResult<
   ResultType,
@@ -125,24 +124,24 @@ export type TypedUseQueryHookResult<
 
 interface UseQuerySubscriptionOptions extends SubscriptionOptions {
   /**
-   * Prevents a query from automatically running.
+   * 阻止查询自动运行。
    *
    * @remarks
-   * When `skip` is true (or `skipToken` is passed in as `arg`):
+   * 当 `skip` 为 true（或者 `arg` 中传入 `skipToken`）时：
    *
-   * - **If the query has cached data:**
-   *   * The cached data **will not be used** on the initial load, and will ignore updates from any identical query until the `skip` condition is removed
-   *   * The query will have a status of `uninitialized`
-   *   * If `skip: false` is set after the initial load, the cached result will be used
-   * - **If the query does not have cached data:**
-   *   * The query will have a status of `uninitialized`
-   *   * The query will not exist in the state when viewed with the dev tools
-   *   * The query will not automatically fetch on mount
-   *   * The query will not automatically run when additional components with the same query are added that do run
+   * - **如果查询有缓存数据：**
+   *   * 初始加载时**不会使用**缓存数据，并且在 `skip` 条件被移除之前，将忽略来自任何相同查询的更新
+   *   * 查询的状态将为 `uninitialized`
+   *   * 如果在初始加载后设置 `skip: false`，将使用缓存结果
+   * - **如果查询没有缓存数据：**
+   *   * 查询的状态将为 `uninitialized`
+   *   * 在使用开发工具查看时，查询不会存在于状态中
+   *   * 查询不会在挂载时自动获取
+   *   * 当添加了其他运行相同查询的组件时，查询不会自动运行
    *
    * @example
    * ```tsx
-   * // codeblock-meta no-transpile title="Skip example"
+   * // 代码块元数据 不转译 标题="Skip 示例"
    * const Pokemon = ({ name, skip }: { name: string; skip: boolean }) => {
    *   const { data, error, status } = useGetPokemonByNameQuery(name, {
    *     skip,
@@ -158,28 +157,28 @@ interface UseQuerySubscriptionOptions extends SubscriptionOptions {
    */
   skip?: boolean
   /**
-   * Defaults to `false`. This setting allows you to control whether if a cached result is already available, RTK Query will only serve a cached result, or if it should `refetch` when set to `true` or if an adequate amount of time has passed since the last successful query result.
-   * - `false` - Will not cause a query to be performed _unless_ it does not exist yet.
-   * - `true` - Will always refetch when a new subscriber to a query is added. Behaves the same as calling the `refetch` callback or passing `forceRefetch: true` in the action creator.
-   * - `number` - **Value is in seconds**. If a number is provided and there is an existing query in the cache, it will compare the current time vs the last fulfilled timestamp, and only refetch if enough time has elapsed.
+   * 默认为 `false`。此设置允许你控制如果已有缓存结果，RTK Query 是否只提供缓存结果，或者如果设置为 `true` 或者自上次成功查询结果已经过去足够的时间，它应该 `refetch`。
+   * - `false` - 不会导致查询被执行，_除非_ 它还不存在。
+   * - `true` - 当添加新的查询订阅者时，总是会重新获取。行为与调用 `refetch` 回调或在 action 创建器中传递 `forceRefetch: true` 相同。
+   * - `number` - **值以秒为单位**。如果提供了一个数字并且缓存中存在一个查询，它将比较当前时间与上次满足的时间戳，并且只有当足够的时间已经过去时才会重新获取。
    *
-   * If you specify this option alongside `skip: true`, this **will not be evaluated** until `skip` is false.
+   * 如果你在 `skip: true` 旁边指定了此选项，这个**不会被评估**，直到 `skip` 为 false。
    */
   refetchOnMountOrArgChange?: boolean | number
 }
 
 /**
- * A React hook that automatically triggers fetches of data from an endpoint, and 'subscribes' the component to the cached data.
+ * 一个 React 钩子，它自动触发从端点获取数据，并将组件 '订阅' 到缓存数据。
  *
- * The query arg is used as a cache key. Changing the query arg will tell the hook to re-fetch the data if it does not exist in the cache already.
+ * 查询参数被用作缓存键。改变查询参数将告诉钩子如果数据在缓存中不存在则重新获取数据。
  *
- * Note that this hook does not return a request status or cached data. For that use-case, see [`useQuery`](#usequery) or [`useQueryState`](#usequerystate).
+ * 注意，这个钩子不返回请求状态或缓存数据。对于这种用例，请查看 [`useQuery`](#usequery) 或 [`useQueryState`](#usequerystate)。
  *
- * #### Features
+ * #### 特性
  *
- * - Automatically triggers requests to retrieve data based on the hook argument and whether cached data exists by default
- * - 'Subscribes' the component to keep cached data in the store, and 'unsubscribes' when the component unmounts
- * - Accepts polling/re-fetching options to trigger automatic re-fetches when the corresponding criteria is met
+ * - 根据钩子参数和是否存在缓存数据，默认自动触发请求以检索数据
+ * - '订阅' 组件以保持缓存数据在存储中，并在组件卸载时 '取消订阅'
+ * - 接受轮询/重新获取选项，当满足相应条件时触发自动重新获取
  */
 export type UseQuerySubscription<
   D extends QueryDefinition<any, any, any, any>,
@@ -201,8 +200,8 @@ export type UseQuerySubscriptionResult<
 > = Pick<QueryActionCreatorResult<D>, 'refetch'>
 
 /**
- * Helper type to manually type the result
- * of the `useQuerySubscription` hook in userland code.
+ * 辅助类型，用于在用户代码中手动类型化
+ * `useQuerySubscription` 钩子的结果。
  */
 export type TypedUseQuerySubscriptionResult<
   ResultType,
@@ -219,21 +218,21 @@ export type UseLazyQueryLastPromiseInfo<
 }
 
 /**
- * A React hook similar to [`useQuery`](#usequery), but with manual control over when the data fetching occurs.
+ * 一个类似于 [`useQuery`](#usequery) 的 React 钩子，但对数据获取的时间有手动控制。
  *
- * This hook includes the functionality of [`useLazyQuerySubscription`](#uselazyquerysubscription).
+ * 这个钩子包含了 [`useLazyQuerySubscription`](#uselazyquerysubscription) 的功能。
  *
- * #### Features
+ * #### 特性
  *
- * - Manual control over firing a request to retrieve data
- * - 'Subscribes' the component to keep cached data in the store, and 'unsubscribes' when the component unmounts
- * - Returns the latest request status and cached data from the Redux store
- * - Re-renders as the request status changes and data becomes available
- * - Accepts polling/re-fetching options to trigger automatic re-fetches when the corresponding criteria is met and the fetch has been manually called at least once
+ * - 手动控制触发请求以检索数据
+ * - '订阅' 组件以保持缓存数据在存储中，并在组件卸载时 '取消订阅'
+ * - 从 Redux 存储中返回最新的请求状态和缓存数据
+ * - 随着请求状态的变化和数据的可用性重新渲染
+ * - 接受轮询/重新获取选项，当满足相应条件并且至少手动调用了一次获取时，触发自动重新获取
  *
- * #### Note
+ * #### 注意
  *
- * When the trigger function returned from a LazyQuery is called, it always initiates a new request to the server even if there is cached data. Set `preferCacheValue`(the second argument to the function) as `true` if you want it to immediately return a cached value if one exists.
+ * 当从 LazyQuery 返回的触发函数被调用时，即使有缓存数据，它总是启动一个新的请求到服务器。如果你希望它立即返回一个缓存值（如果存在的话），请将 `preferCacheValue`（函数的第二个参数）设置为 `true`。
  */
 export type UseLazyQuery<D extends QueryDefinition<any, any, any, any>> = <
   R extends Record<string, any> = UseQueryStateDefaultResult<D>,
@@ -255,17 +254,16 @@ export type TypedUseLazyQuery<
 
 export type LazyQueryTrigger<D extends QueryDefinition<any, any, any, any>> = {
   /**
-   * Triggers a lazy query.
+   * 触发一个懒查询。
    *
-   * By default, this will start a new request even if there is already a value in the cache.
-   * If you want to use the cache value and only start a request if there is no cache value, set the second argument to `true`.
+   * 默认情况下，即使缓存中已经有值，这也会启动一个新的请求。如果你希望使用缓存值，并且只有在没有缓存值的情况下才开始请求，将第二个参数设置为 `true`。
    *
    * @remarks
-   * If you need to access the error or success payload immediately after a lazy query, you can chain .unwrap().
+   * 如果你需要在懒查询后立即访问错误或成功的负载，你可以链式调用 .unwrap()。
    *
    * @example
    * ```ts
-   * // codeblock-meta title="Using .unwrap with async await"
+   * // 代码块元数据 标题="使用 .unwrap 和 async await"
    * try {
    *   const payload = await getUserById(1).unwrap();
    *   console.log('fulfilled', payload)
@@ -289,15 +287,15 @@ export type TypedLazyQueryTrigger<
 >
 
 /**
- * A React hook similar to [`useQuerySubscription`](#usequerysubscription), but with manual control over when the data fetching occurs.
+ * 一个类似于 [`useQuerySubscription`](#usequerysubscription) 的 React 钩子，但对数据获取的时间有手动控制。
  *
- * Note that this hook does not return a request status or cached data. For that use-case, see [`useLazyQuery`](#uselazyquery).
+ * 注意，这个钩子不返回请求状态或缓存数据。对于这种用例，请查看 [`useLazyQuery`](#uselazyquery)。
  *
- * #### Features
+ * #### 特性
  *
- * - Manual control over firing a request to retrieve data
- * - 'Subscribes' the component to keep cached data in the store, and 'unsubscribes' when the component unmounts
- * - Accepts polling/re-fetching options to trigger automatic re-fetches when the corresponding criteria is met and the fetch has been manually called at least once
+ * - 手动控制触发请求以检索数据
+ * - '订阅' 组件以保持缓存数据在存储中，并在组件卸载时 '取消订阅'
+ * - 接受轮询/重新获取选项，当满足相应条件并且至少手动调用了一次获取时，触发自动重新获取
  */
 export type UseLazyQuerySubscription<
   D extends QueryDefinition<any, any, any, any>,
@@ -319,14 +317,14 @@ export type QueryStateSelector<
 > = (state: UseQueryStateDefaultResult<D>) => R
 
 /**
- * A React hook that reads the request status and cached data from the Redux store. The component will re-render as the loading status changes and the data becomes available.
+ * 一个React钩子，从Redux存储中读取请求状态和缓存数据。当加载状态改变和数据变得可用时，组件将重新渲染。
  *
- * Note that this hook does not trigger fetching new data. For that use-case, see [`useQuery`](#usequery) or [`useQuerySubscription`](#usequerysubscription).
+ * 注意，这个钩子不会触发获取新数据。对于这种用例，请查看 [`useQuery`](#usequery) 或 [`useQuerySubscription`](#usequerysubscription)。
  *
- * #### Features
+ * #### 特性
  *
- * - Returns the latest request status and cached data from the Redux store
- * - Re-renders as the request status changes and data becomes available
+ * - 从Redux存储中返回最新的请求状态和缓存数据
+ * - 当请求状态改变和数据变得可用时重新渲染
  */
 export type UseQueryState<D extends QueryDefinition<any, any, any, any>> = <
   R extends Record<string, any> = UseQueryStateDefaultResult<D>,
@@ -348,24 +346,24 @@ export type UseQueryStateOptions<
   R extends Record<string, any>,
 > = {
   /**
-   * Prevents a query from automatically running.
+   * 阻止查询自动运行。
    *
    * @remarks
-   * When skip is true:
+   * 当skip为true时：
    *
-   * - **If the query has cached data:**
-   *   * The cached data **will not be used** on the initial load, and will ignore updates from any identical query until the `skip` condition is removed
-   *   * The query will have a status of `uninitialized`
-   *   * If `skip: false` is set after skipping the initial load, the cached result will be used
-   * - **If the query does not have cached data:**
-   *   * The query will have a status of `uninitialized`
-   *   * The query will not exist in the state when viewed with the dev tools
-   *   * The query will not automatically fetch on mount
-   *   * The query will not automatically run when additional components with the same query are added that do run
+   * - **如果查询有缓存数据：**
+   *   * 初始加载**不会使用**缓存数据，并且会忽略任何相同查询的更新，直到移除`skip`条件
+   *   * 查询将有一个`uninitialized`的状态
+   *   * 如果在跳过初始加载后设置`skip: false`，将使用缓存结果
+   * - **如果查询没有缓存数据：**
+   *   * 查询将有一个`uninitialized`的状态
+   *   * 当使用开发工具查看时，查询将不会存在于状态中
+   *   * 查询将不会在挂载时自动获取
+   *   * 当添加了其他运行相同查询的组件时，查询不会自动运行
    *
    * @example
    * ```ts
-   * // codeblock-meta title="Skip example"
+   * // 代码块元数据 标题="跳过示例"
    * const Pokemon = ({ name, skip }: { name: string; skip: boolean }) => {
    *   const { data, error, status } = useGetPokemonByNameQuery(name, {
    *     skip,
@@ -381,13 +379,13 @@ export type UseQueryStateOptions<
    */
   skip?: boolean
   /**
-   * `selectFromResult` allows you to get a specific segment from a query result in a performant manner.
-   * When using this feature, the component will not rerender unless the underlying data of the selected item has changed.
-   * If the selected item is one element in a larger collection, it will disregard changes to elements in the same collection.
+   * `selectFromResult`允许你以高效的方式从查询结果中获取特定段落。
+   * 使用此功能时，除非所选项的底层数据已更改，否则组件不会重新渲染。
+   * 如果所选项是更大集合中的一个元素，它将忽略同一集合中的元素的更改。
    *
    * @example
    * ```ts
-   * // codeblock-meta title="Using selectFromResult to extract a single result"
+   * // 代码块元数据 标题="使用selectFromResult提取单个结果"
    * function PostsList() {
    *   const { data: posts } = api.useGetPostsQuery();
    *
@@ -401,7 +399,7 @@ export type UseQueryStateOptions<
    * }
    *
    * function PostById({ id }: { id: number }) {
-   *   // Will select the post with the given id, and will only rerender if the given posts data changes
+   *   // 将选择给定id的帖子，并且只有在给定帖子的数据更改时才会重新渲染
    *   const { post } = api.useGetPostsQuery(undefined, {
    *     selectFromResult: ({ data }) => ({ post: data?.find((post) => post.id === id) }),
    *   });
@@ -419,8 +417,7 @@ export type UseQueryStateResult<
 > = TSHelpersNoInfer<R>
 
 /**
- * Helper type to manually type the result
- * of the `useQueryState` hook in userland code.
+ * 辅助类型，用于在用户代码中手动类型化`useQueryState`钩子的结果。
  */
 export type TypedUseQueryStateResult<
   ResultType,
@@ -434,29 +431,29 @@ export type TypedUseQueryStateResult<
 type UseQueryStateBaseResult<D extends QueryDefinition<any, any, any, any>> =
   QuerySubState<D> & {
     /**
-     * Where `data` tries to hold data as much as possible, also re-using
-     * data from the last arguments passed into the hook, this property
-     * will always contain the received data from the query, for the current query arguments.
+     * `data`尽可能地持有数据，也重用
+     * 钩子传入的最后参数的数据，此属性
+     * 将始终包含查询的接收数据，对于当前的查询参数。
      */
     currentData?: ResultTypeFrom<D>
     /**
-     * Query has not started yet.
+     * 查询尚未开始。
      */
     isUninitialized: false
     /**
-     * Query is currently loading for the first time. No data yet.
+     * 查询当前正在首次加载。还没有数据。
      */
     isLoading: false
     /**
-     * Query is currently fetching, but might have data from an earlier request.
+     * 查询当前正在获取，但可能有来自早期请求的数据。
      */
     isFetching: false
     /**
-     * Query has data from a successful load.
+     * 查询有来自成功加载的数据。
      */
     isSuccess: false
     /**
-     * Query is currently in "error" state.
+     * 查询当前处于"错误"状态。
      */
     isError: false
   }
@@ -496,9 +493,9 @@ type UseQueryStateDefaultResult<D extends QueryDefinition<any, any, any, any>> =
       >
   > & {
     /**
-     * @deprecated Included for completeness, but discouraged.
-     * Please use the `isLoading`, `isFetching`, `isSuccess`, `isError`
-     * and `isUninitialized` flags instead
+     * @deprecated 包含在内以完整性，但不推荐使用。
+     * 请使用 `isLoading`，`isFetching`，`isSuccess`，`isError`
+     * 和 `isUninitialized` 标志代替
      */
     status: QueryStatus
   }
@@ -522,15 +519,14 @@ export type UseMutationStateResult<
 > = TSHelpersNoInfer<R> & {
   originalArgs?: QueryArgFrom<D>
   /**
-   * Resets the hook state to it's initial `uninitialized` state.
-   * This will also remove the last result from the cache.
+   * 将钩子状态重置为其初始的 `uninitialized` 状态。
+   * 这也将从缓存中移除最后的结果。
    */
   reset: () => void
 }
 
 /**
- * Helper type to manually type the result
- * of the `useMutation` hook in userland code.
+ * 辅助类型，用于在用户代码中手动输入 `useMutation` 钩子的结果。
  */
 export type TypedUseMutationResult<
   ResultType,
@@ -545,14 +541,14 @@ export type TypedUseMutationResult<
 >
 
 /**
- * A React hook that lets you trigger an update request for a given endpoint, and subscribes the component to read the request status from the Redux store. The component will re-render as the loading status changes.
+ * 一个React钩子，它让你触发给定端点的更新请求，并让组件订阅从Redux存储中读取请求状态。当加载状态改变时，组件将重新渲染。
  *
- * #### Features
+ * #### 特性
  *
- * - Manual control over firing a request to alter data on the server or possibly invalidate the cache
- * - 'Subscribes' the component to keep cached data in the store, and 'unsubscribes' when the component unmounts
- * - Returns the latest request status and cached data from the Redux store
- * - Re-renders as the request status changes and data becomes available
+ * - 手动控制触发请求以更改服务器上的数据或可能使缓存失效
+ * - '订阅' 组件以保持缓存数据在存储中，并在组件卸载时 '取消订阅'
+ * - 从Redux存储中返回最新的请求状态和缓存数据
+ * - 当请求状态改变和数据变得可用时重新渲染
  */
 export type UseMutation<D extends MutationDefinition<any, any, any, any>> = <
   R extends Record<string, any> = MutationResultSelectorResult<D>,
@@ -571,13 +567,13 @@ export type TypedUseMutation<
 export type MutationTrigger<D extends MutationDefinition<any, any, any, any>> =
   {
     /**
-     * Triggers the mutation and returns a Promise.
+     * 触发变异并返回一个Promise。
      * @remarks
-     * If you need to access the error or success payload immediately after a mutation, you can chain .unwrap().
+     * 如果你需要在变异后立即访问错误或成功的负载，你可以链式调用 .unwrap()。
      *
      * @example
      * ```ts
-     * // codeblock-meta title="Using .unwrap with async await"
+     * // 代码块元数据 标题="使用 .unwrap 和 async await"
      * try {
      *   const payload = await addPost({ id: 1, name: 'Example' }).unwrap();
      *   console.log('fulfilled', payload)
@@ -598,10 +594,10 @@ export type TypedMutationTrigger<
 >
 
 /**
- * Wrapper around `defaultQueryStateSelector` to be used in `useQuery`.
- * We want the initial render to already come back with
+ * `useQuery`中使用的`defaultQueryStateSelector`的包装器。
+ * 我们希望初始渲染已经返回
  * `{ isUninitialized: false, isFetching: true, isLoading: true }`
- * to prevent that the library user has to do an additional check for `isUninitialized`/
+ * 以防止库用户必须进行额外的`isUninitialized`检查。
  */
 const noPendingQueryStateSelector: QueryStateSelector<any, any> = (
   selected,
@@ -626,11 +622,11 @@ type GenericPrefetchThunk = (
 
 /**
  *
- * @param opts.api - An API with defined endpoints to create hooks for
- * @param opts.moduleOptions.batch - The version of the `batchedUpdates` function to be used
- * @param opts.moduleOptions.useDispatch - The version of the `useDispatch` hook to be used
- * @param opts.moduleOptions.useSelector - The version of the `useSelector` hook to be used
- * @returns An object containing functions to generate hooks based on an endpoint
+ * @param opts.api - 一个定义了端点以创建钩子的API
+ * @param opts.moduleOptions.batch - 要使用的 `batchedUpdates` 函数的版本
+ * @param opts.moduleOptions.useDispatch - 要使用的 `useDispatch` 钩子的版本
+ * @param opts.moduleOptions.useSelector - 要使用的 `useSelector` 钩子的版本
+ * @returns 一个包含基于端点生成钩子的函数的对象
  */
 export function buildHooks<Definitions extends EndpointDefinitions>({
   api,
@@ -660,9 +656,9 @@ export function buildHooks<Definitions extends EndpointDefinitions>({
     lastResult: UseQueryStateDefaultResult<any> | undefined,
     queryArgs: any,
   ): UseQueryStateDefaultResult<any> {
-    // if we had a last result and the current result is uninitialized,
-    // we might have called `api.util.resetApiState`
-    // in this case, reset the hook
+    // 如果我们有上一次的结果，而当前的结果是未初始化的，
+    // 我们可能已经调用了 `api.util.resetApiState`
+    // 在这种情况下，重置钩子
     if (lastResult?.endpointName && currentState.isUninitialized) {
       const { endpointName } = lastResult
       const endpointDefinition = context.endpointDefinitions[endpointName]
@@ -681,17 +677,17 @@ export function buildHooks<Definitions extends EndpointDefinitions>({
         lastResult = undefined
     }
 
-    // data is the last known good request result we have tracked - or if none has been tracked yet the last good result for the current args
+    // data 是我们已经跟踪的最后一个已知的良好请求结果 - 或者如果还没有跟踪到任何结果，那么就是当前参数的最后一个良好结果
     let data = currentState.isSuccess ? currentState.data : lastResult?.data
     if (data === undefined) data = currentState.data
 
     const hasData = data !== undefined
 
-    // isFetching = true any time a request is in flight
+    // 当请求在执行时，isFetching = true
     const isFetching = currentState.isLoading
-    // isLoading = true only when loading while no data is present yet (initial load with no data in the cache)
+    // 当加载时还没有数据（缓存中没有数据的初始加载），isLoading = true
     const isLoading = !hasData && isFetching
-    // isSuccess = true when data is present
+    // 当数据存在时，isSuccess = true
     const isSuccess = currentState.isSuccess || (isFetching && hasData)
 
     return {
@@ -763,11 +759,11 @@ export function buildHooks<Definitions extends EndpointDefinitions>({
       }
       const stableArg = useStableQueryArgs(
         skip ? skipToken : arg,
-        // Even if the user provided a per-endpoint `serializeQueryArgs` with
-        // a consistent return value, _here_ we want to use the default behavior
-        // so we can tell if _anything_ actually changed. Otherwise, we can end up
-        // with a case where the query args did change but the serialization doesn't,
-        // and then we never try to initiate a refetch.
+        // 即使用户为每个端点提供了一个 `serializeQueryArgs` ，并且
+        // 返回值是一致的，_在这里_ 我们想使用默认行为
+        // 这样我们可以判断 _是否有任何东西_ 实际上发生了变化。否则，我们可能会遇到
+        // 查询参数确实发生了变化，但序列化没有变化，
+        // 然后我们永远不会尝试启动重新获取。
         defaultSerializeQueryArgs,
         context.endpointDefinitions[name],
         name,
@@ -785,8 +781,8 @@ export function buildHooks<Definitions extends EndpointDefinitions>({
 
       let { queryCacheKey, requestId } = promiseRef.current || {}
 
-      // HACK We've saved the middleware subscription lookup callbacks into a ref,
-      // so we can directly check here if the subscription exists for this query.
+      // HACK 我们已经将中间件订阅查找回调保存到一个ref中，
+      // 所以我们可以直接在这里检查这个查询的订阅是否存在。
       let currentRenderHasSubscription = false
       if (queryCacheKey && requestId) {
         currentRenderHasSubscription =

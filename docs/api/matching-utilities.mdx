@@ -7,47 +7,47 @@ hide_title: true
 
 &nbsp;
 
-# Matching Utilities
+# 匹配工具
 
-Redux Toolkit exports several type-safe action matching utilities that you can leverage when checking for specific kinds of actions. These are primarily useful for the `builder.addMatcher()` cases in `createSlice` and `createReducer`, as well as when writing custom middleware.
+Redux Toolkit 导出了几个类型安全的动作匹配工具，你可以在检查特定类型的动作时使用它们。这些主要用于 `createSlice` 和 `createReducer` 中的 `builder.addMatcher()` 情况，以及编写自定义中间件时。
 
-### General Purpose
+### 通用目的
 
-- [`isAllOf`](#isallof) - returns true when **all** conditions are met
-- [`isAnyOf`](#isanyof) - returns true when **at least one of** the conditions are met
+- [`isAllOf`](#isallof) - 当满足**所有**条件时返回 true
+- [`isAnyOf`](#isanyof) - 当满足**至少一个**条件时返回 true
 
-### `createAsyncThunk`-specific matchers
+### `createAsyncThunk`-特定匹配器
 
-All these matchers can either be called with one or more thunks as arguments, in which case they will return a matcher function for that condition and thunks, or with one actions, in which case they will match for any thunk action with said condition.
+所有这些匹配器都可以用一个或多个 thunk 作为参数调用，在这种情况下，它们将返回一个匹配器函数，用于该条件和 thunk，或者用一个动作调用，在这种情况下，它们将匹配任何具有所述条件的 thunk 动作。
 
-- [`isAsyncThunkAction`](#isasyncthunkaction) - accepts one or more action creators and returns true when all match
-- [`isPending`](#ispending) - accepts one or more action creators and returns true when all match
-- [`isFulfilled`](#isfulfilled) - accepts one or more action creators and returns true when all match
-- [`isRejected`](#isrejected) - accepts one or more action creators and returns true when all match
-- [`isRejectedWithValue`](#isrejectedwithvalue) - accepts one or more action creators and returns true when all match
+- [`isAsyncThunkAction`](#isasyncthunkaction) - 接受一个或多个动作创建器并在所有匹配时返回 true
+- [`isPending`](#ispending) - 接受一个或多个动作创建器并在所有匹配时返回 true
+- [`isFulfilled`](#isfulfilled) - 接受一个或多个动作创建器并在所有匹配时返回 true
+- [`isRejected`](#isrejected) - 接受一个或多个动作创建器并在所有匹配时返回 true
+- [`isRejectedWithValue`](#isrejectedwithvalue) - 接受一个或多个动作创建器并在所有匹配时返回 true
 
 ## `isAllOf`
 
-A higher-order function that accepts one or more of:
+一个高阶函数，接受一个或多个：
 
-- `redux-toolkit` action creator functions such as the ones produced by:
+- `redux-toolkit` 动作创建函数，例如由以下产生的：
   - [`createAction`](./createAction.mdx)
   - [`createSlice`](./createSlice.mdx#return-value)
   - [`createAsyncThunk`](./createAsyncThunk.mdx#promise-lifecycle-actions)
-- type guard functions
-- custom action creator functions that have a `.match` property that is a type guard
+- 类型保护函数
+- 自定义动作创建函数，具有 `.match` 属性，该属性是类型保护
 
-It will return a type guard function that returns `true` if _all_ of the provided functions match.
+它将返回一个类型保护函数，如果提供的所有函数都匹配，则返回 `true`。
 
 ## `isAnyOf`
 
-Accepts the same inputs as `isAllOf` and will return a type guard function that returns `true` if at least one of the provided functions match.
+接受与 `isAllOf` 相同的输入，并将返回一个类型保护函数，如果至少有一个提供的函数匹配，则返回 `true`。
 
 ## `isAsyncThunkAction`
 
-A higher-order function that returns a type guard function that may be used to check whether an action was created by [`createAsyncThunk`](./createAsyncThunk.mdx).
+一个高阶函数，返回一个类型保护函数，可以用来检查一个动作是否由 [`createAsyncThunk`](./createAsyncThunk.mdx) 创建。
 
-```ts title="isAsyncThunkAction usage"
+```ts title="isAsyncThunkAction 使用"
 import { isAsyncThunkAction } from '@reduxjs/toolkit'
 import type { UnknownAction } from '@reduxjs/toolkit'
 import { requestThunk1, requestThunk2 } from '@virtual/matchers'
@@ -56,16 +56,16 @@ const isARequestAction = isAsyncThunkAction(requestThunk1, requestThunk2)
 
 function handleRequestAction(action: UnknownAction) {
   if (isARequestAction(action)) {
-    // action is an action dispatched by either `requestThunk1` or `requestThunk2`
+    // 动作是由 `requestThunk1` 或 `requestThunk2` 分派的动作
   }
 }
 ```
 
 ## `isPending`
 
-A higher-order function that returns a type guard function that may be used to check whether an action is a 'pending' action creator from the `createAsyncThunk` promise lifecycle.
+一个高阶函数，返回一个类型保护函数，可以用来检查一个动作是否是 `createAsyncThunk` promise 生命周期中的 'pending' 动作创建器。
 
-```ts title="isPending usage"
+```ts title="isPending 使用"
 import { isPending } from '@reduxjs/toolkit'
 import type { UnknownAction } from '@reduxjs/toolkit'
 import { requestThunk1, requestThunk2 } from '@virtual/matchers'
@@ -74,16 +74,16 @@ const isAPendingAction = isPending(requestThunk1, requestThunk2)
 
 function handlePendingAction(action: UnknownAction) {
   if (isAPendingAction(action)) {
-    // action is a pending action dispatched by either `requestThunk1` or `requestThunk2`
+    // 动作是由 `requestThunk1` 或 `requestThunk2` 分派的 pending 动作
   }
 }
 ```
 
 ## `isFulfilled`
 
-A higher-order function that returns a type guard function that may be used to check whether an action is a 'fulfilled'' action creator from the `createAsyncThunk` promise lifecycle.
+一个高阶函数，返回一个类型保护函数，可以用来检查一个动作是否是 `createAsyncThunk` promise 生命周期中的 'fulfilled' 动作创建器。
 
-```ts title="isFulfilled usage"
+```ts title="isFulfilled 使用"
 import { isFulfilled } from '@reduxjs/toolkit'
 import type { UnknownAction } from '@reduxjs/toolkit'
 import { requestThunk1, requestThunk2 } from '@virtual/matchers'
@@ -92,16 +92,16 @@ const isAFulfilledAction = isFulfilled(requestThunk1, requestThunk2)
 
 function handleFulfilledAction(action: UnknownAction) {
   if (isAFulfilledAction(action)) {
-    // action is a fulfilled action dispatched by either `requestThunk1` or `requestThunk2`
+    // 动作是由 `requestThunk1` 或 `requestThunk2` 分派的 fulfilled 动作
   }
 }
 ```
 
 ## `isRejected`
 
-A higher-order function that returns a type guard function that may be used to check whether an action is a 'rejected' action creator from the `createAsyncThunk` promise lifecycle.
+一个高阶函数，返回一个类型保护函数，可以用来检查一个动作是否是 `createAsyncThunk` promise 生命周期中的 'rejected' 动作创建器。
 
-```ts title="isRejected usage"
+```ts title="isRejected 使用"
 import { isRejected } from '@reduxjs/toolkit'
 import type { UnknownAction } from '@reduxjs/toolkit'
 import { requestThunk1, requestThunk2 } from '@virtual/matchers'
@@ -110,16 +110,16 @@ const isARejectedAction = isRejected(requestThunk1, requestThunk2)
 
 function handleRejectedAction(action: UnknownAction) {
   if (isARejectedAction(action)) {
-    // action is a rejected action dispatched by either `requestThunk1` or `requestThunk2`
+    // 动作是由 `requestThunk1` 或 `requestThunk2` 分派的 rejected 动作
   }
 }
 ```
 
 ## `isRejectedWithValue`
 
-A higher-order function that returns a type guard function that may be used to check whether an action is a 'rejected' action creator from the `createAsyncThunk` promise lifecycle that was created by [`rejectWithValue`](./createAsyncThunk.mdx#handling-thunk-errors).
+一个高阶函数，返回一个类型保护函数，可以用来检查一个动作是否是 `createAsyncThunk` promise 生命周期中的 'rejected' 动作创建器，该动作是由 [`rejectWithValue`](./createAsyncThunk.mdx#handling-thunk-errors) 创建的。
 
-```ts title="isRejectedWithValue usage"
+```ts title="isRejectedWithValue 使用"
 import { isRejectedWithValue } from '@reduxjs/toolkit'
 import type { UnknownAction } from '@reduxjs/toolkit'
 import { requestThunk1, requestThunk2 } from '@virtual/matchers'
@@ -131,20 +131,19 @@ const isARejectedWithValueAction = isRejectedWithValue(
 
 function handleRejectedWithValueAction(action: UnknownAction) {
   if (isARejectedWithValueAction(action)) {
-    // action is a rejected action dispatched by either `requestThunk1` or `requestThunk2`
-    // where rejectWithValue was used
+    // 动作是由 `requestThunk1` 或 `requestThunk2` 分派的 rejected 动作
+    // rejectWithValue 被使用
   }
 }
 ```
 
-## Using matchers to reduce code complexity, duplication and boilerplate
+## 使用匹配器减少代码复杂性、重复和样板代码
 
-When using the `builder` pattern to construct a reducer, we add cases or matchers one at a time. However, by using `isAnyOf` or `isAllOf`,
-we're able to easily use the same matcher for several cases in a type-safe manner.
+当使用 `builder` 模式构建一个 reducer 时，我们一次添加一个 case 或匹配器。然而，通过使用 `isAnyOf` 或 `isAllOf`，我们能够以类型安全的方式轻松地为多个 case 使用相同的匹配器。
 
-First, let's examine an unnecessarily complex example:
+首先，让我们看一个不必要复杂的例子：
 
-```ts title="Example without using a matcher utility"
+```ts title="未使用匹配器实用程序的示例"
 import { createAsyncThunk, createReducer } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
@@ -193,7 +192,7 @@ export const isSpecialAndInterestingThunk = createAsyncThunk(
   },
 )
 
-// This has unnecessary complexity
+// 这里有不必要的复杂性
 const loadingReducer = createReducer(initialState, (builder) => {
   builder.addCase(isSpecialAndInterestingThunk.fulfilled, (state, action) => {
     if (isSpecial(action)) {
@@ -206,17 +205,17 @@ const loadingReducer = createReducer(initialState, (builder) => {
 })
 ```
 
-In this scenario, we can use `isAllOf` to simplify our code and reduce some of the boilerplate.
+在这种情况下，我们可以使用 `isAllOf` 来简化我们的代码并减少一些样板代码。
 
-```ts title="Refactoring with isAllOf"
+```ts title="使用 isAllOf 重构"
 import { createReducer, isAllOf } from '@reduxjs/toolkit'
 import {
   isSpecialAndInterestingThunk,
   initialState,
   isSpecial,
   isInteresting,
-} from '@virtual/matchers' // This is a fake pkg that provides the types shown above
-import type { Data } from '@virtual/matchers' // This is a fake pkg that provides the types shown above
+} from '@virtual/matchers' // 这是一个提供上述类型的虚构包
+import type { Data } from '@virtual/matchers' // 这是一个提供上述类型的虚构包
 
 const loadingReducer = createReducer(initialState, (builder) => {
   builder
@@ -235,42 +234,42 @@ const loadingReducer = createReducer(initialState, (builder) => {
 })
 ```
 
-## Using matchers as a TypeScript Type Guard
+## 将匹配器用作 TypeScript 类型保护
 
-The function returned by `isAllOf` and `isAnyOf` can also be used as a TypeScript type guard in other contexts.
+由 `isAllOf` 和 `isAnyOf` 返回的函数也可以在其他上下文中用作 TypeScript 类型保护。
 
-```ts title="Using isAllOf as a type guard"
+```ts title="将 isAllOf 用作类型保护"
 import { isAllOf } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { isSpecial, isInteresting } from '@virtual/matchers' // This is a fake pkg that provides the types shown above
-import type { Data } from '@virtual/matchers' // This is a fake pkg that provides the types shown above
+import { isSpecial, isInteresting } from '@virtual/matchers' // 这是一个提供上述类型的虚构包
+import type { Data } from '@virtual/matchers' // 这是一个提供上述类型的虚构包
 
 const isSpecialAndInteresting = isAllOf(isSpecial, isInteresting)
 
 function someFunction(action: PayloadAction<Data>) {
   if (isSpecialAndInteresting(action)) {
-    // "action" will be correctly typed as:
+    // "action" 将被正确地类型化为：
     // `PayloadAction<Special> & PayloadAction<Interesting>`
   }
 }
 ```
 
-```ts title="Using isAnyOf as a type guard"
+```ts title="将 isAnyOf 用作类型保护"
 import { isAnyOf } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { Data, isSpecial, isInteresting } from '@virtual/matchers' // this is a fake pkg that provides the types shown above
+import { Data, isSpecial, isInteresting } from '@virtual/matchers' // 这是一个提供上述类型的虚构包
 
 const isSpecialOrInteresting = isAnyOf(isSpecial, isInteresting)
 
 function someFunction(action: PayloadAction<Data>) {
   if (isSpecialOrInteresting(action)) {
-    // "action" will be correctly typed as:
+    // "action" 将被正确地类型化为：
     // `PayloadAction<Special> | PayloadAction<Interesting>`
   }
 }
 ```
 
-## Example
+## 示例
 
 <iframe
   src="https://codesandbox.io/embed/redux-toolkit-matchers-example-e765q?fontsize=14&hidenavigation=1&module=%2Fsrc%2Ffeatures%2Fcounter%2FcounterSlice.ts&theme=dark&runonclick=1"

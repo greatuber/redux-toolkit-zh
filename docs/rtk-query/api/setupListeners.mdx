@@ -11,9 +11,9 @@ description: 'RTK Query > API: setupListeners reference'
 
 # `setupListeners`
 
-A utility used to enable `refetchOnFocus` and `refetchOnReconnect` behaviors. It requires the `dispatch` method from your store. Calling `setupListeners(store.dispatch)` will configure listeners with the recommended defaults, but you have the option of providing a callback for more granular control.
+这是一个用于启用 `refetchOnFocus` 和 `refetchOnReconnect` 行为的实用工具。它需要你的存储中的 `dispatch` 方法。调用 `setupListeners(store.dispatch)` 将使用推荐的默认值配置监听器，但你也可以提供一个回调函数以进行更精细的控制。
 
-```ts title="setupListeners default configuration" no-transpile
+```ts title="setupListeners 默认配置" no-transpile
 let initialized = false
 export function setupListeners(
   dispatch: ThunkDispatch<any, any, any>,
@@ -42,7 +42,7 @@ export function setupListeners(
 
     if (!initialized) {
       if (typeof window !== 'undefined' && window.addEventListener) {
-        // Handle focus events
+        // 处理焦点事件
         window.addEventListener(
           'visibilitychange',
           handleVisibilityChange,
@@ -50,7 +50,7 @@ export function setupListeners(
         )
         window.addEventListener('focus', handleFocus, false)
 
-        // Handle connection events
+        // 处理连接事件
         window.addEventListener('online', handleOnline, false)
         window.addEventListener('offline', handleOffline, false)
         initialized = true
@@ -72,8 +72,8 @@ export function setupListeners(
 }
 ```
 
-If you notice, `onFocus`, `onFocusLost`, `onOffline`, `onOnline` are all actions that are provided to the callback. Additionally, these actions are made available to `api.internalActions` and are able to be used by dispatching them like this:
+如果你注意到，`onFocus`，`onFocusLost`，`onOffline`，`onOnline` 都是提供给回调的操作。此外，这些操作都可以通过 `api.internalActions` 使用，并且可以通过像这样分派它们来使用：
 
-```ts title="Manual onFocus event" no-transpile
+```ts title="手动 onFocus 事件" no-transpile
 dispatch(api.internalActions.onFocus())
 ```

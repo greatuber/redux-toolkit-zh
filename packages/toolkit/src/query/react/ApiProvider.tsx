@@ -9,11 +9,11 @@ import { setupListeners } from '@reduxjs/toolkit/query'
 import type { Api } from '@reduxjs/toolkit/query'
 
 /**
- * Can be used as a `Provider` if you **do not already have a Redux store**.
+ * 如果你**还没有 Redux store**，可以将此用作 `Provider`。
  *
  * @example
  * ```tsx
- * // codeblock-meta no-transpile title="Basic usage - wrap your App with ApiProvider"
+ * // 代码块元数据 不转译 标题="基本用法 - 用 ApiProvider 包裹你的 App"
  * import * as React from 'react';
  * import { ApiProvider } from '@reduxjs/toolkit/query/react';
  * import { Pokemon } from './features/Pokemon';
@@ -28,9 +28,8 @@ import type { Api } from '@reduxjs/toolkit/query'
  * ```
  *
  * @remarks
- * Using this together with an existing redux store, both will
- * conflict with each other - please use the traditional redux setup
- * in that case.
+ * 如果将此与现有的 redux store 一起使用，两者会
+ * 彼此冲突 - 在这种情况下，请使用传统的 redux 设置。
  */
 export function ApiProvider(props: {
   children: any

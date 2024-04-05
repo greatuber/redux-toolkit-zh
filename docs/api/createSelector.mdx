@@ -9,37 +9,35 @@ hide_title: true
 
 # `createSelector`
 
-## Overview
+## 概述
 
-The `createSelector` utility from the [Reselect library](https://github.com/reduxjs/reselect), re-exported for ease of use.
+`createSelector` 是 [Reselect 库](https://github.com/reduxjs/reselect)的实用工具，为了方便使用而重新导出。
 
-For more details on using `createSelector`, see:
+关于如何使用 `createSelector` 的更多细节，请参见：
 
-- The [Reselect API documentation](https://github.com/reduxjs/reselect)
-- [React-Redux docs: Hooks API - Using memoizing selectors](https://react-redux.js.org/next/api/hooks#using-memoizing-selectors)
-- [Idiomatic Redux: Using Reselect Selectors for Encapsulation and Performance](https://blog.isquaredsoftware.com/2017/12/idiomatic-redux-using-reselect-selectors/)
-- [React/Redux Links: Reducers and Selectors](https://github.com/markerikson/react-redux-links/blob/master/redux-reducers-selectors.md)
+- [Reselect API 文档](https://github.com/reduxjs/reselect)
+- [React-Redux 文档：Hooks API - 使用记忆选择器](https://react-redux.js.org/next/api/hooks#using-memoizing-selectors)
+- [惯用 Redux：使用 Reselect 选择器进行封装和性能优化](https://blog.isquaredsoftware.com/2017/12/idiomatic-redux-using-reselect-selectors/)
+- [React/Redux 链接：Reducers 和 Selectors](https://github.com/markerikson/react-redux-links/blob/master/redux-reducers-selectors.md)
 
 :::note
-Prior to v0.7, RTK re-exported `createSelector` from [`selectorator`](https://github.com/planttheidea/selectorator), which
-allowed using string keypaths as input selectors. This was removed, as it ultimately did not provide enough benefits, and
-the string keypaths made static typing for selectors difficult.
+在 v0.7 之前，RTK 从 [`selectorator`](https://github.com/planttheidea/selectorator) 重新导出了 `createSelector`，这允许使用字符串键路径作为输入选择器。这被移除了，因为它最终没有提供足够的好处，而且字符串键路径使得选择器的静态类型化变得困难。
 :::
 
 ## `createDraftSafeSelector`
 
-In general, we recommend against using selectors inside of reducers:
+通常，我们不建议在 reducers 中使用选择器：
 
-- Selectors typically expect the entire Redux state object as an argument, while slice reducers only have access to a specific subset of the entire Redux state
-- Reselect's `createSelector` relies on reference comparisons to determine if inputs have changed, and if an Immer Proxy-wrapped draft value is passed in to a selector, the selector may see the same reference and think nothing has changed.
+- 选择器通常期望整个 Redux 状态对象作为参数，而切片 reducers 只能访问整个 Redux 状态的特定子集
+- Reselect 的 `createSelector` 依赖于引用比较来确定输入是否已更改，如果将 Immer Proxy 包装的草稿值传递给选择器，选择器可能会看到相同的引用并认为没有任何改变。
 
-However, some users have requested the ability to create selectors that will work correctly inside of Immer-powered reducers. One use case for this might be collecting an ordered set of items when using `createEntityAdapter`, such as `const orderedTodos = todosSelectors.selectAll(todosState)`, and then using `orderedTodos` in the rest of the reducer logic.
+然而，一些用户请求创建能在 Immer-powered reducers 中正确工作的选择器。这样的一个用例可能是当使用 `createEntityAdapter` 收集有序的项目集时，例如 `const orderedTodos = todosSelectors.selectAll(todosState)`，然后在剩余的 reducer 逻辑中使用 `orderedTodos`。
 
-Besides re-exporting `createSelector`, RTK also exports a wrapped version of `createSelector` named `createDraftSafeSelector` that allows you to create selectors that can safely be used inside of `createReducer` and `createSlice` reducers with Immer-powered mutable logic. When used with plain state values, the selector will still memoize normally based on the inputs. But, when used with Immer draft values, the selector will err on the side of recalculating the results, just to be safe.
+除了重新导出 `createSelector`，RTK 还导出了一个名为 `createDraftSafeSelector` 的 `createSelector` 包装版本，允许你创建可以安全地在 `createReducer` 和 `createSlice` reducers 中使用的选择器，这些 reducer 使用 Immer-powered 可变逻辑。当与普通状态值一起使用时，选择器将根据输入正常地进行记忆化。但是，当与 Immer 草稿值一起使用时，选择器将倾向于重新计算结果，以确保安全。
 
-All selectors created by `entityAdapter.getSelectors` are "draft safe" selectors by default.
+所有由 `entityAdapter.getSelectors` 创建的选择器默认都是 "draft safe" 选择器。
 
-Example:
+示例：
 
 ```ts no-transpile
 const selectSelf = (state: State) => state
@@ -49,7 +47,7 @@ const draftSafeSelector = createDraftSafeSelector(
   (state) => state.value,
 )
 
-// in your reducer:
+// 在你的 reducer 中：
 
 state.value = 1
 
@@ -62,14 +60,11 @@ const unsafe2 = unsafeSelector(state)
 const safe2 = draftSafeSelector(state)
 ```
 
-After executing that, `unsafe1` and `unsafe2` will be of the same value, because the memoized selector was
-executed on the same object - but `safe2` will actually be different from `safe1` (with the updated value of `2`),
-because the safe selector detected that it was executed on a Immer draft object and recalculated using the current
-value instead of returning a cached value.
+执行后，`unsafe1` 和 `unsafe2` 将具有相同的值，因为记忆化的选择器在同一对象上执行 - 但 `safe2` 实际上会与 `safe1` 不同（更新值为 `2`），因为安全选择器检测到它在 Immer 草稿对象上执行并使用当前值重新计算，而不是返回缓存值。
 
 :::tip `createDraftSafeSelectorCreator`
 
-RTK also exports a `createDraftSafeSelectorCreator` function, the "draft safe" equivalent of [`createSelectorCreator`](https://github.com/reduxjs/reselect#createselectorcreatormemoize-memoizeoptions).
+RTK 还导出了一个 `createDraftSafeSelectorCreator` 函数，这是 [`createSelectorCreator`](https://github.com/reduxjs/reselect#createselectorcreatormemoize-memoizeoptions) 的 "draft safe" 等价物。
 
 ```ts no-transpile
 import {
@@ -89,24 +84,24 @@ const draftSafeSelector = createWeakMapDraftSafeSelector(
 
 :::
 
-### Defining a Pre-Typed `createDraftSelector`
+### 定义预类型的 `createDraftSelector`
 
-As of RTK 2.1, you can define a "pre-typed" version of `createDraftSafeSelector` that can have the type for `state` built in. This lets you set up those types once, so you don't have to repeat them each time you call `createDraftSafeSelector`.
+从 RTK 2.1 开始，你可以定义一个 "预类型" 的 `createDraftSafeSelector`，可以内置 `state` 的类型。这让你可以一次设置这些类型，所以你不必每次调用 `createDraftSafeSelector` 时都重复它们。
 
 ```ts no-transpile
 const createTypedDraftSafeSelector =
   createDraftSafeSelector.withTypes<RootState>()
 ```
 
-Import and use the pre-typed `createTypedDraftSafeSelector` function, and it will automatically know that the `state` argument is of type `RootState`.
+导入并使用预类型的 `createTypedDraftSafeSelector` 函数，它将自动知道 `state` 参数的类型是 `RootState`。
 
-:::warning Known Limitations
-Currently this approach only works if input selectors are provided as a single array.
+:::warning 已知的限制
+目前这种方法只在输入选择器作为单个数组提供时有效。
 
-If you pass the input selectors as separate inline arguments, the parameter types of the result function will not be inferred. As a workaround you can either
+如果你将输入选择器作为单独的内联参数传递，结果函数的参数类型将不会被推断。作为解决方案，你可以
 
-1. Wrap your input selectors in a single array
-2. You can annotate the parameter types of the result function:
+1. 将你的输入选择器包装在一个数组中
+2. 你可以注解结果函数的参数类型：
 
 ```ts no-transpile
 import { createSelector } from 'reselect'
@@ -130,10 +125,10 @@ export const createTypedDraftSafeSelector =
   createDraftSafeSelector.withTypes<RootState>()
 
 const selectTodoIds = createTypedDraftSafeSelector(
-  // Type of `state` is set to `RootState`, no need to manually set the type
+  // `state` 的类型设置为 `RootState`，无需手动设置类型
   (state) => state.todos,
-  // ❌ Known limitation: Parameter types are not inferred in this scenario
-  // so you will have to manually annotate them.
+  // ❌ 已知的限制：在这种情况下，参数类型不会被推断
+  // 所以你将不得不手动注解它们。
   (todos: Todo[]) => todos.map(({ id }) => id),
 )
 ```

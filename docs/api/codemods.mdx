@@ -9,19 +9,19 @@ hide_title: true
 
 # Codemods
 
-Per [the description in `1.9.0`](https://github.com/reduxjs/redux-toolkit/releases/tag/v1.9.0), we have removed the "object" argument from `createReducer` and `createSlice.extraReducers` in the RTK 2.0 major version. We've also added a new optional form of `createSlice.reducers` that uses a callback instead of an object.
+根据 [`1.9.0` 中的描述](https://github.com/reduxjs/redux-toolkit/releases/tag/v1.9.0)，我们在 RTK 2.0 主版本中移除了 `createReducer` 和 `createSlice.extraReducers` 的 "object" 参数。我们还添加了一种新的可选形式的 `createSlice.reducers`，它使用回调而不是对象。
 
-To simplify upgrading codebases, we've published a set of codemods that will automatically transform the deprecated "object" syntax into the equivalent "builder" syntax.
+为了简化代码库的升级，我们发布了一套 codemods，它们会自动将已弃用的 "object" 语法转换为等效的 "builder" 语法。
 
-The codemods package is available on NPM as [**`@reduxjs/rtk-codemods`**](https://www.npmjs.com/package/@reduxjs/rtk-codemods). It currently contains these codemods:
+codemods 包可在 NPM 上获取，名为 [**`@reduxjs/rtk-codemods`**](https://www.npmjs.com/package/@reduxjs/rtk-codemods)。它目前包含以下 codemods：
 
-- `createReducerBuilder`: migrates `createReducer` calls that use the removed object syntax to the builder callback syntax
-- `createSliceBuilder`: migrates `createSlice` calls that use the removed object syntax for `extraReducers` to the builder callback syntax
-- `createSliceReducerBuilder`: migrates `createSlice` calls that use the still-standard object syntax for `reducers` to the optional new builder callback syntax, including uses of prepared reducers
+- `createReducerBuilder`：将使用已移除的对象语法的 `createReducer` 调用迁移到 builder 回调语法
+- `createSliceBuilder`：将 `createSlice` 调用中对 `extraReducers` 使用已移除的对象语法迁移到 builder 回调语法
+- `createSliceReducerBuilder`：将 `createSlice` 调用中对 `reducers` 使用仍然标准的对象语法迁移到新的可选 builder 回调语法，包括准备好的 reducers 的使用
 
-To run the codemods against your codebase, run `npx @reduxjs/rtk-codemods <TRANSFORM NAME> path/of/files/ or/some**/*glob.js`.
+要对您的代码库运行 codemods，请运行 `npx @reduxjs/rtk-codemods <TRANSFORM NAME> path/of/files/ or/some**/*glob.js`。
 
-Examples:
+示例：
 
 ```bash
 npx @reduxjs/rtk-codemods createReducerBuilder ./src
@@ -29,16 +29,16 @@ npx @reduxjs/rtk-codemods createReducerBuilder ./src
 npx @reduxjs/rtk-codemods createSliceBuilder ./packages/my-app/**/*.ts
 ```
 
-We also recommend re-running Prettier on the codebase before committing the changes.
+我们还建议在提交更改之前重新运行 Prettier 对代码库进行格式化。
 
-**These codemods _should_ work, but we would greatly appreciate testing and feedback on more real-world codebases!**
+**这些 codemods _应该_ 能够工作，但我们非常欢迎在更多实际的代码库上进行测试和反馈！**
 
-Before:
+之前：
 
 ```js
 createReducer(initialState, {
   [todoAdded1a]: (state, action) => {
-    // stuff
+    // 一些操作
   },
   [todoAdded1b]: (state, action) => action.payload,
 })
@@ -48,19 +48,19 @@ const slice1 = createSlice({
   initialState: {},
   extraReducers: {
     [todoAdded1a]: (state, action) => {
-      // stuff
+      // 一些操作
     },
     [todoAdded1b]: (state, action) => action.payload,
   },
 })
 ```
 
-After:
+之后：
 
 ```js
 createReducer(initialState, (builder) => {
   builder.addCase(todoAdded1a, (state, action) => {
-    // stuff
+    // 一些操作
   })
 
   builder.addCase(todoAdded1b, (state, action) => action.payload)
@@ -72,7 +72,7 @@ const slice1 = createSlice({
 
   extraReducers: (builder) => {
     builder.addCase(todoAdded1a, (state, action) => {
-      // stuff
+      // 一些操作
     })
 
     builder.addCase(todoAdded1b, (state, action) => action.payload)

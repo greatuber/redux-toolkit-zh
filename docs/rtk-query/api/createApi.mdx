@@ -10,48 +10,52 @@ description: 'RTK Query > API: createApi reference'
 
 # `createApi`
 
-`createApi` is the core of RTK Query's functionality. It allows you to define a set of "endpoints" that describe how to retrieve data from backend APIs and other async sources, including the configuration of how to fetch and transform that data. It generates [an "API slice" structure](./created-api/overview.mdx) that contains Redux logic (and optionally React hooks) that encapsulate the data fetching and caching process for you.
+`createApi` 是 RTK Query 功能的核心。它允许你定义一组"端点"，描述如何从后端 API 和其他异步源获取数据，包括如何获取和转换这些数据的配置。它生成[一个 "API 切片" 结构](./created-api/overview.mdx)，该结构包含 Redux 逻辑（可选的 React 钩子），为你封装了数据获取和缓存过程。
 
 :::tip
 
-Typically, you should only have one API slice per base URL that your application needs to communicate with. For example, if your site fetches data from both `/api/posts` and `/api/users`, you would have a single API slice with `/api/` as the base URL, and separate endpoint definitions for `posts` and `users`. This allows you to effectively take advantage of [automated re-fetching](../usage/automated-refetching.mdx) by defining [tag](../usage/automated-refetching.mdx#tags) relationships across endpoints.
+通常，你应该只有一个 API 切片用于你的应用需要通信的每个基础 URL。例如，如果你的网站从 `/api/posts` 和 `/api/users` 获取数据，你应该有一个单独的 API 切片，其基础 URL 为 `/api/`，并为 `posts` 和 `users` 定义单独的端点。这样你可以有效地利用[自动重新获取](../usage/automated-refetching.mdx)功能，通过定义跨端点的 [tag](../usage/automated-refetching.mdx#tags) 关系。
 
-For maintainability purposes, you may wish to split up endpoint definitions across multiple files, while still maintaining a single API slice which includes all of these endpoints. See [code splitting](../usage/code-splitting.mdx) for how you can use the `injectEndpoints` property to inject API endpoints from other files into a single API slice definition.
+出于可维护性的考虑，你可能希望在多个文件中分割端点定义，同时仍然维护一个包含所有这些端点的单一 API 切片。请参阅 [代码分割](../usage/code-splitting.mdx) 了解如何使用 `injectEndpoints` 属性将 API 端点从其他文件注入到单一 API 切片定义中。
 
 :::
 
-```ts title="Example: src/services/pokemon.ts"
-// file: src/services/types.ts noEmit
+```ts title="示例：src/services/pokemon.ts"
+// 文件：src/services/types.ts noEmit
 export type Pokemon = {}
 
-// file: src/services/pokemon.ts
-// Need to use the React-specific entry point to allow generating React hooks
+// 文件：src/services/pokemon.ts
+// 需要使用 React-specific 入口点以生成 React 钩子
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Pokemon } from './types'
 
-// highlight-start
-// Define a service using a base URL and expected endpoints
+// 高亮开始
+// 使用基础 URL 和预期的端点定义服务
 export const pokemonApi = createApi({
   reducerPath: 'pokemonApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://pokeapi.co/api/v2/' }),
+  baseQuery: fetch
+
+Base
+
+Query({ baseUrl: 'https://pokeapi.co/api/v2/' }),
   endpoints: (builder) => ({
     getPokemonByName: builder.query<Pokemon, string>({
       query: (name) => `pokemon/${name}`,
     }),
   }),
 })
-//highlight-end
+// 高亮结束
 
-// highlight-start
-// Export hooks for usage in function components, which are
-// auto-generated based on the defined endpoints
+// 高亮开始
+// 导出用于函数组件的钩子，这些钩子是
+// 基于定义的端点自动生成的
 export const { useGetPokemonByNameQuery } = pokemonApi
-// highlight-end
+// 高亮结束
 ```
 
-## Parameters
+## 参数
 
-`createApi` accepts a single configuration object parameter with the following options:
+`createApi` 接受一个包含以下选项的单一配置对象参数：
 
 ```ts no-transpile
   baseQuery(args: InternalQueryArgs, api: BaseQueryApi, extraOptions?: DefinitionExtraOptions): any;
@@ -69,8 +73,8 @@ export const { useGetPokemonByNameQuery } = pokemonApi
   tagTypes?: readonly TagTypes[];
   reducerPath?: ReducerPath;
   serializeQueryArgs?: SerializeQueryArgs<InternalQueryArgs>;
-  keepUnusedDataFor?: number; // value is in seconds
-  refetchOnMountOrArgChange?: boolean | number; // value is in seconds
+  keepUnusedDataFor?: number; // 值以秒为单位
+  refetchOnMountOrArgChange?: boolean | number; // 值以秒为单位
   refetchOnFocus?: boolean;
   refetchOnReconnect?: boolean;
 ```
@@ -79,23 +83,23 @@ export const { useGetPokemonByNameQuery } = pokemonApi
 
 [summary](docblock://query/createApi.ts?token=CreateApiOptions.baseQuery)
 
-#### baseQuery function arguments
+#### baseQuery 函数参数
 
-- `args` - The return value of the `query` function for a given endpoint
-- `api` - The `BaseQueryApi` object contains:
-  - `signal` - An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) object that may be used to abort DOM requests and/or read whether the request is aborted.
-  - `abort` - The [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort) method of the AbortController attached to `signal`.
-  - `dispatch` - The `store.dispatch` method for the corresponding Redux store
-  - `getState` - A function that may be called to access the current store state
-  - `extra` - Provided as thunk.extraArgument to the configureStore getDefaultMiddleware option.
-  - `endpoint` - The name of the endpoint.
-  - `type` - Type of request (`query` or `mutation`).
-  - `forced` - Indicates if a query has been forced.
-- `extraOptions` - The value of the optional `extraOptions` property provided for a given endpoint
+- `args` - 给定端点的 `query` 函数的返回值
+- `api` - `BaseQueryApi` 对象包含：
+  - `signal` - 一个 [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) 对象，可用于中止 DOM 请求和/或读取请求是否被中止。
+  - `abort` - 附加到 `signal` 的 AbortController 的 [`abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort) 方法。
+  - `dispatch` - 对应 Redux 存储的 `store.dispatch` 方法
+  - `getState` - 可调用的函数，用于访问当前存储状态
+  - `extra` - 作为 thunk.extraArgument 提供给 configureStore 的 getDefaultMiddleware 选项。
+  - `endpoint` - 端点的名称。
+  - `type` - 请求类型（`query` 或 `mutation`）。
+  - `forced` - 表示查询是否被强制。
+- `extraOptions` - 给定端点提供的可选 `extraOptions` 属性的值
 
-#### baseQuery function signature
+#### baseQuery 函数签名
 
-```ts title="Base Query signature" no-transpile
+```ts title="Base Query 签名" no-transpile
 export type BaseQueryFn<
   Args = any,
   Result = unknown,
@@ -138,11 +142,11 @@ export type QueryReturnValue<T = unknown, E = unknown, M = unknown> =
 
 [summary](docblock://query/createApi.ts?token=CreateApiOptions.endpoints)
 
-See [Anatomy of an endpoint](#anatomy-of-an-endpoint) for details on individual properties.
+请参阅 [端点的解剖](#anatomy-of-an-endpoint) 了解单个属性的详细信息。
 
-#### Query endpoint definition
+#### 查询端点定义
 
-```ts title="Query endpoint definition" no-transpile
+```ts title="查询端点定义" no-transpile
 export type QueryDefinition<
   QueryArg,
   BaseQuery extends BaseQueryFn,
@@ -152,7 +156,7 @@ export type QueryDefinition<
 > = {
   query(arg: QueryArg): BaseQueryArg<BaseQuery>
 
-  /* either `query` or `queryFn` can be present, but not both simultaneously */
+  /* `query` 或 `queryFn` 可以存在，但不能同时存在 */
   queryFn(
     arg: QueryArg,
     api: BaseQueryApi,
@@ -160,14 +164,14 @@ export type QueryDefinition<
     baseQuery: (arg: Parameters<BaseQuery>[0]) => ReturnType<BaseQuery>,
   ): MaybePromise<QueryReturnValue<ResultType, BaseQueryError<BaseQuery>>>
 
-  /* transformResponse only available with `query`, not `queryFn` */
+  /* transformResponse 只在 `query` 中可用，不在 `queryFn` 中可用 */
   transformResponse?(
     baseQueryReturnValue: BaseQueryResult<BaseQuery>,
     meta: BaseQueryMeta<BaseQuery>,
     arg: QueryArg,
   ): ResultType | Promise<ResultType>
 
-  /* transformErrorResponse only available with `query`, not `queryFn` */
+  /* transformErrorResponse 只在 `query` 中可用，不在 `queryFn` 中可用 */
   transformErrorResponse?(
     baseQueryReturnValue: BaseQueryError<BaseQuery>,
     meta: BaseQueryMeta<BaseQuery>,
@@ -194,7 +198,7 @@ export type QueryDefinition<
       requestId,
       queryFulfilled,
       getCacheEntry,
-      updateCachedData, // available for query endpoints only
+      updateCachedData, // 只在查询端点可用
     }: QueryLifecycleApi,
   ): Promise<void>
 
@@ -208,15 +212,15 @@ export type QueryDefinition<
       cacheEntryRemoved,
       cacheDataLoaded,
       getCacheEntry,
-      updateCachedData, // available for query endpoints only
+      updateCachedData, // 只在查询端点可用
     }: QueryCacheLifecycleApi,
   ): Promise<void>
 }
 ```
 
-#### Mutation endpoint definition
+#### 变更端点定义
 
-```ts title="Mutation endpoint definition" no-transpile
+```ts title="变更端点定义" no-transpile
 export type MutationDefinition<
   QueryArg,
   BaseQuery extends BaseQueryFn,
@@ -227,7 +231,7 @@ export type MutationDefinition<
 > = {
   query(arg: QueryArg): BaseQueryArg<BaseQuery>
 
-  /* either `query` or `queryFn` can be present, but not both simultaneously */
+  /* `query` 或 `queryFn` 可以存在，但不能同时存在 */
   queryFn(
     arg: QueryArg,
     api: BaseQueryApi,
@@ -235,14 +239,14 @@ export type MutationDefinition<
     baseQuery: (arg: Parameters<BaseQuery>[0]) => ReturnType<BaseQuery>,
   ): MaybePromise<QueryReturnValue<ResultType, BaseQueryError<BaseQuery>>>
 
-  /* transformResponse only available with `query`, not `queryFn` */
+  /* transformResponse 只在 `query` 中可用，不在 `queryFn` 中可用 */
   transformResponse?(
     baseQueryReturnValue: BaseQueryResult<BaseQuery>,
     meta: BaseQueryMeta<BaseQuery>,
     arg: QueryArg,
   ): ResultType | Promise<ResultType>
 
-  /* transformErrorResponse only available with `query`, not `queryFn` */
+  /* transformErrorResponse 只在 `query` 中可用，不在 `queryFn` 中可用 */
   transformErrorResponse?(
     baseQueryReturnValue: BaseQueryError<BaseQuery>,
     meta: BaseQueryMeta<BaseQuery>,
@@ -280,9 +284,9 @@ export type MutationDefinition<
 }
 ```
 
-#### How endpoints get used
+#### 如何使用端点
 
-When defining a key like `getPosts` as shown below, it's important to know that this name will become exportable from `api` and be able to referenced under `api.endpoints.getPosts.useQuery()`, `api.endpoints.getPosts.initiate()` and `api.endpoints.getPosts.select()`. The same thing applies to `mutation`s but they reference `useMutation` instead of `useQuery`.
+当定义一个像下面的 `getPosts` 这样的键时，需要知道这个名称将从 `api` 中导出，并能在 `api.endpoints.getPosts.useQuery()`，`api.endpoints.getPosts.initiate()` 和 `api.endpoints.getPosts.select()` 下被引用。对于 `mutation` 也是一样，但它们引用的是 `useMutation` 而不是 `useQuery`。
 
 ```ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
@@ -312,16 +316,16 @@ const api = createApi({
   }),
 })
 
-// Auto-generated hooks
+// 自动生成的钩子
 export const { useGetPostsQuery, useAddPostMutation } = api
 
-// Possible exports
+// 可能的导出
 export const { endpoints, reducerPath, reducer, middleware } = api
-// reducerPath, reducer, middleware are only used in store configuration
-// endpoints will have:
+// reducerPath, reducer, middleware 只在存储配置中使用
+// endpoints 将有:
 // endpoints.getPosts.initiate(), endpoints.getPosts.select(), endpoints.getPosts.useQuery()
 // endpoints.addPost.initiate(), endpoints.addPost.select(), endpoints.addPost.useMutation()
-// see `createApi` overview for _all exports_
+// 查看 `createApi` 概述以获取 _所有导出_
 ```
 
 ### `extractRehydrationInfo`
@@ -330,8 +334,8 @@ export const { endpoints, reducerPath, reducer, middleware } = api
 
 [examples](docblock://query/createApi.ts?token=CreateApiOptions.extractRehydrationInfo)
 
-See also [Server Side Rendering](../usage/server-side-rendering.mdx) and
-[Persistence and Rehydration](../usage/persistence-and-rehydration.mdx).
+参见 [服务器端渲染](../usage/server-side-rendering.mdx) 和
+[持久化和重塑](../usage/persistence-and-rehydration.mdx)。
 
 ### `tagTypes`
 
@@ -349,7 +353,7 @@ See also [Server Side Rendering](../usage/server-side-rendering.mdx) and
 
 [summary](docblock://query/createApi.ts?token=CreateApiOptions.serializeQueryArgs)
 
-By default, this function will take the query arguments, sort object keys where applicable, stringify the result, and concatenate it with the endpoint name. This creates a cache key based on the combination of arguments + endpoint name (ignoring object key order), such that calling any given endpoint with the same arguments will result in the same cache key.
+默认情况下，此函数将获取查询参数，对适用的对象键进行排序，将结果字符串化，并将其与端点名称连接起来。这将根据参数+端点名称的组合（忽略对象键顺序）创建一个缓存键，以便调用任何给定的端点与相同的参数将产生相同的缓存键。
 
 ### `keepUnusedDataFor`
 
@@ -360,7 +364,7 @@ By default, this function will take the query arguments, sort object keys where 
 [summary](docblock://query/createApi.ts?token=CreateApiOptions.refetchOnMountOrArgChange)
 
 :::note
-You can set this globally in `createApi`, but you can also override the default value and have more granular control by passing `refetchOnMountOrArgChange` to each individual hook call or similarly by passing `forceRefetch: true` when dispatching the [`initiate`](./created-api/endpoints.mdx#initiate) action.
+你可以在 `createApi` 中全局设置这个，但你也可以通过将 `refetchOnMountOrArgChange` 传递给每个单独的 hook 调用或者通过在分发 [`initiate`](./created-api/endpoints.mdx#initiate) 动作时传递 `forceRefetch: true` 来覆盖默认值并有更精细的控制。
 :::
 
 ### `refetchOnFocus`
@@ -368,9 +372,9 @@ You can set this globally in `createApi`, but you can also override the default 
 [summary](docblock://query/createApi.ts?token=CreateApiOptions.refetchOnFocus)
 
 :::note
-You can set this globally in `createApi`, but you can also override the default value and have more granular control by passing `refetchOnFocus` to each individual hook call or when dispatching the [`initiate`](./created-api/endpoints.mdx#initiate) action.
+你可以在 `createApi` 中全局设置这个，但你也可以通过将 `refetchOnFocus` 传递给每个单独的 hook 调用或者在分发 [`initiate`](./created-api/endpoints.mdx#initiate) 动作时覆盖默认值并有更精细的控制。
 
-If you specify `track: false` when manually dispatching queries, RTK Query will not be able to automatically refetch for you.
+如果你在手动分发查询时指定 `track: false`，RTK Query 将无法为你自动重新获取。
 :::
 
 ### `refetchOnReconnect`
@@ -378,18 +382,18 @@ If you specify `track: false` when manually dispatching queries, RTK Query will 
 [summary](docblock://query/createApi.ts?token=CreateApiOptions.refetchOnReconnect)
 
 :::note
-You can set this globally in `createApi`, but you can also override the default value and have more granular control by passing `refetchOnReconnect` to each individual hook call or when dispatching the [`initiate`](./created-api/endpoints.mdx#initiate) action.
+你可以在 `createApi` 中全局设置这个，但你也可以通过将 `refetchOnReconnect` 传递给每个单独的 hook 调用或者在分发 [`initiate`](./created-api/endpoints.mdx#initiate) 动作时覆盖默认值并有更精细的控制。
 
-If you specify `track: false` when manually dispatching queries, RTK Query will not be able to automatically refetch for you.
+如果你在手动分发查询时指定 `track: false`，RTK Query 将无法为你自动重新获取。
 :::
 
-## Anatomy of an endpoint
+## 端点的解剖
 
 ### `query`
 
-_(required if no `queryFn` provided)_
+_(如果没有提供 `queryFn`，则必需)_
 
-```ts title="query signature" no-transpile
+```ts title="query 签名" no-transpile
 export type query = <QueryArg>(
   arg: QueryArg,
 ) => string | Record<string, unknown>
@@ -404,15 +408,15 @@ export type query = <QueryArg>(arg: QueryArg) => string | FetchArgs
 
 ### `queryFn`
 
-_(required if no `query` provided)_
+_(如果没有提供 `query`，则必需)_
 
 [summary](docblock://query/endpointDefinitions.ts?token=EndpointDefinitionWithQueryFn.queryFn)
 
-Called with the same arguments as `baseQuery`, as well as the provided `baseQuery` function itself. It is expected to return an object with either a `data` or `error` property, or a promise that resolves to return such an object.
+与 `baseQuery` 的相同参数一起调用，以及提供的 `baseQuery` 函数本身。它预期返回一个具有 `data` 或 `error` 属性的对象，或者一个解析为返回此类对象的 promise。
 
-See also [Customizing queries with queryFn](../usage/customizing-queries.mdx#customizing-queries-with-queryfn).
+参见 [使用 queryFn 自定义查询](../usage/customizing-queries.mdx#customizing-queries-with-queryfn)。
 
-```ts title="queryFn signature" no-transpile
+```ts title="queryFn 签名" no-transpile
 queryFn(
   arg: QueryArg,
   api: BaseQueryApi,
@@ -436,79 +440,79 @@ export interface BaseQueryApi {
 }
 ```
 
-#### queryFn function arguments
+#### queryFn 函数参数
 
-- `args` - The argument provided when the query itself is called
-- `api` - The `BaseQueryApi` object, containing `signal`, `dispatch` and `getState` properties
-  - `signal` - An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) object that may be used to abort DOM requests and/or read whether the request is aborted.
-  - `dispatch` - The `store.dispatch` method for the corresponding Redux store
-  - `getState` - A function that may be called to access the current store state
-- `extraOptions` - The value of the optional `extraOptions` property provided for the endpoint
-- `baseQuery` - The `baseQuery` function provided to the api itself
+- `args` - 调用查询本身时提供的参数
+- `api` - `BaseQueryApi` 对象，包含 `signal`、`dispatch` 和 `getState` 属性
+  - `signal` - 可用于中止 DOM 请求和/或读取请求是否被中止的 [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) 对象。
+  - `dispatch` - 对应 Redux 存储的 `store.dispatch` 方法
+  - `getState` - 可调用的函数，用于访问当前存储状态
+- `extraOptions` - 为端点提供的可选 `extraOptions` 属性的值
+- `baseQuery` - 提供给 api 本身的 `baseQuery` 函数
 
 [examples](docblock://query/endpointDefinitions.ts?token=EndpointDefinitionWithQueryFn.queryFn)
 
 ### `transformResponse`
 
-_(optional, not applicable with `queryFn`)_
+_(可选，与 `queryFn` 不适用)_
 
 [summary](docblock://query/endpointDefinitions.ts?token=EndpointDefinitionWithQuery.transformResponse)
 
-In some cases, you may want to manipulate the data returned from a query before you put it in the cache. In this instance, you can take advantage of `transformResponse`.
+在某些情况下，你可能希望在将查询返回的数据放入缓存之前对其进行操作。在这种情况下，你可以利用 `transformResponse`。
 
-See also [Customizing query responses with `transformResponse`](../usage/customizing-queries.mdx#customizing-query-responses-with-transformresponse)
+参见 [使用 `transformResponse` 自定义查询响应](../usage/customizing-queries.mdx#customizing-query-responses-with-transformresponse)
 
-```ts title="Unpack a deeply nested collection" no-transpile
+```ts title="解包深度嵌套的集合" no-transpile
 transformResponse: (response, meta, arg) =>
   response.some.deeply.nested.collection
 ```
 
 ### `transformErrorResponse`
 
-_(optional, not applicable with `queryFn`)_
+_(可选，与 `queryFn` 不适用)_
 
 [summary](docblock://query/endpointDefinitions.ts?token=EndpointDefinitionWithQuery.transformErrorResponse)
 
-In some cases, you may want to manipulate the error returned from a query before you put it in the cache. In this instance, you can take advantage of `transformErrorResponse`.
+在某些情况下，你可能希望在将查询返回的错误放入缓存之前对其进行操作。在这种情况下，你可以利用 `transformErrorResponse`。
 
-See also [Customizing query responses with `transformErrorResponse`](../usage/customizing-queries.mdx#customizing-query-responses-with-transformerrorresponse)
+参见 [使用 `transformErrorResponse` 自定义查询响应](../usage/customizing-queries.mdx#customizing-query-responses-with-transformerrorresponse)
 
-```ts title="Unpack a deeply nested error object" no-transpile
+```ts title="解包深度嵌套的错误对象" no-transpile
 transformErrorResponse: (response, meta, arg) =>
   response.data.some.deeply.nested.errorObject
 ```
 
 ### `extraOptions`
 
-_(optional)_
+_(可选)_
 
-Passed as the third argument to the supplied `baseQuery` function
+作为第三个参数传递给提供的 `baseQuery` 函数
 
 ### `providesTags`
 
-_(optional, only for query endpoints)_
+_(可选，仅适用于查询端点)_
 
 [summary](docblock://query/endpointDefinitions.ts?token=QueryExtraOptions.providesTags)
 
-See also [Providing cache data](../usage/automated-refetching.mdx#providing-cache-data).
+参见 [提供缓存数据](../usage/automated-refetching.mdx#providing-cache-data)。
 
 [examples](docblock://query/endpointDefinitions.ts?token=QueryExtraOptions.providesTags)
 
 ### `invalidatesTags`
 
-_(optional, only for mutation endpoints)_
+_(可选，仅适用于变更端点)_
 
 [summary](docblock://query/endpointDefinitions.ts?token=MutationExtraOptions.invalidatesTags)
 
-See also [Invalidating cache data](../usage/automated-refetching.mdx#invalidating-cache-data).
+参见 [使缓存数据无效](../usage/automated-refetching.mdx#invalidating-cache-data)。
 
 [examples](docblock://query/endpointDefinitions.ts?token=MutationExtraOptions.invalidatesTags)
 
 ### `keepUnusedDataFor`
 
-_(optional, only for query endpoints)_
+_(可选，仅适用于查询端点)_
 
-Overrides the api-wide definition of `keepUnusedDataFor` for this endpoint only.
+仅对此端点覆盖 api-wide 的 `keepUnusedDataFor` 定义。
 
 [summary](docblock://query/createApi.ts?token=CreateApiOptions.keepUnusedDataFor)
 
@@ -516,7 +520,7 @@ Overrides the api-wide definition of `keepUnusedDataFor` for this endpoint only.
 
 ### `serializeQueryArgs`
 
-_(optional, only for query endpoints)_
+_(可选，仅适用于查询端点)_
 
 [summary](docblock://query/endpointDefinitions.ts?token=QueryExtraOptions.serializeQueryArgs)
 
@@ -524,7 +528,7 @@ _(optional, only for query endpoints)_
 
 ### `merge`
 
-_(optional, only for query endpoints)_
+_(可选，仅适用于查询端点)_
 
 [summary](docblock://query/endpointDefinitions.ts?token=QueryExtraOptions.merge)
 
@@ -532,9 +536,9 @@ _(optional, only for query endpoints)_
 
 ### `forceRefetch`
 
-_(optional, only for query endpoints)_
+_(可选，仅适用于查询端点)_
 
-```ts title="forceRefetch signature" no-transpile
+```ts title="forceRefetch 签名" no-transpile
 type forceRefetch = (params: {
   currentArg: QueryArg | undefined
   previousArg: QueryArg | undefined
@@ -549,27 +553,25 @@ type forceRefetch = (params: {
 
 ### `onQueryStarted`
 
-_(optional)_
+_(可选)_
 
-Available to both [queries](../usage/queries.mdx) and [mutations](../usage/mutations.mdx).
+对 [查询](../usage/queries.mdx) 和 [变更](../usage/mutations.mdx) 都可用。
 
-A function that is called when you start each individual query or mutation. The function is called with a lifecycle api object containing properties such as `queryFulfilled`, allowing code to be run when a query is started, when it succeeds, and when it fails (i.e. throughout the lifecycle of an individual query/mutation call).
+当你开始每个单独的查询或变更时调用的函数。该函数被调用时会带有一个生命周期 api 对象，其中包含如 `queryFulfilled` 等属性，允许在查询开始、成功和失败时（即在单个查询/变更调用的整个生命周期中）运行代码。
 
-Can be used in `mutations` for [optimistic updates](../usage/manual-cache-updates.mdx#optimistic-updates).
+可以在 `mutations` 中用于 [乐观更新](../usage/manual-cache-updates.mdx#optimistic-updates)。
 
-#### Lifecycle API properties
+#### 生命周期 API 属性
 
-- `dispatch` - The dispatch method for the store.
-- `getState` - A method to get the current state for the store.
-- `extra` - `extra` as provided as `thunk.extraArgument` to the `configureStore` `getDefaultMiddleware` option.
-- `requestId` - A unique ID generated for the query/mutation.
-- `queryFulfilled` - A Promise that will resolve with a `data` property (the transformed query result),
-  and a `meta` property (`meta` returned by the `baseQuery`).
-  If the query fails, this Promise will reject with the error. This allows you to `await` for the query to finish.
-- `getCacheEntry` - A function that gets the current value of the cache entry.
-- `updateCachedData` _(query endpoints only)_ - A function that accepts a 'recipe' callback specifying how to update the data for the corresponding cache at the time it is called. This uses `immer` internally, and updates can be written 'mutably' while safely producing the next immutable state.
+- `dispatch` - 存储的调度方法。
+- `getState` - 获取存储的当前状态的方法。
+- `extra` - 作为 `thunk.extraArgument` 提供给 `configureStore` 的 `getDefaultMiddleware` 选项的 `extra`。
+- `requestId` - 为查询/变更生成的唯一 ID。
+- `queryFulfilled` - 一个 Promise，将解析为一个带有 `data` 属性（转换后的查询结果）和一个 `meta` 属性（`baseQuery` 返回的 `meta`）。如果查询失败，此 Promise 将拒绝错误。这允许你 `await` 查询完成。
+- `getCacheEntry` - 获取当前缓存条目值的函数。
+- `updateCachedData` _(仅查询端点)_ - 一个接受 'recipe' 回调的函数，指定如何在调用时更新对应缓存的数据。这在内部使用 `immer`，并且可以安全地编写 '可变' 的更新，同时生成下一个不可变状态。
 
-```ts title="Mutation onQueryStarted signature" no-transpile
+```ts title="Mutation onQueryStarted 签名" no-transpile
 async function onQueryStarted(
   arg: QueryArg,
   {
@@ -583,7 +585,7 @@ async function onQueryStarted(
 ): Promise<void>
 ```
 
-```ts title="Query onQueryStarted signature" no-transpile
+```ts title="Query onQueryStarted 签名" no-transpile
 async function onQueryStarted(
   arg: QueryArg,
   {
@@ -593,19 +595,19 @@ async function onQueryStarted(
     requestId,
     queryFulfilled,
     getCacheEntry,
-    updateCachedData, // available for query endpoints only
+    updateCachedData, // 仅查询端点可用
   }: QueryLifecycleApi,
 ): Promise<void>
 ```
 
-```ts title="onQueryStarted query lifecycle example"
-// file: notificationsSlice.ts noEmit
+```ts title="onQueryStarted 查询生命周期示例"
+// 文件: notificationsSlice.ts noEmit
 export const messageCreated = (msg: string) => ({
   type: 'notifications/messageCreated',
   payload: msg,
 })
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import { messageCreated } from './notificationsSlice'
 
@@ -622,15 +624,15 @@ const api = createApi({
     getPost: build.query<Post, number>({
       query: (id) => `post/${id}`,
       async onQueryStarted(id, { dispatch, queryFulfilled }) {
-        // `onStart` side-effect
-        dispatch(messageCreated('Fetching post...'))
+        // `onStart` 副作用
+        dispatch(messageCreated('正在获取帖子...'))
         try {
           const { data } = await queryFulfilled
-          // `onSuccess` side-effect
-          dispatch(messageCreated('Post received!'))
+          // `onSuccess` 副作用
+          dispatch(messageCreated('帖子已收到！'))
         } catch (err) {
-          // `onError` side-effect
-          dispatch(messageCreated('Error fetching post!'))
+          // `onError` 副作用
+          dispatch(messageCreated('获取帖子出错！'))
         }
       },
     }),
@@ -640,27 +642,26 @@ const api = createApi({
 
 ### `onCacheEntryAdded`
 
-_(optional)_
+_(可选)_
 
-Available to both [queries](../usage/queries.mdx) and [mutations](../usage/mutations.mdx).
+对于[查询](../usage/queries.mdx)和[变更](../usage/mutations.mdx)都可用。
 
-A function that is called when a new cache entry is added, i.e. when a new subscription for the endpoint + query parameters combination is created. The function is called with a lifecycle api object containing properties such as `cacheDataLoaded` & `cacheDataRemoved`, allowing code to be run when a cache entry is added, when cache data is loaded, and when the cache entry is removed (i.e. throughout the lifecycle of a cache entry).
+当添加新的缓存条目时调用的函数，即当为端点 + 查询参数组合创建新的订阅时。该函数会被一个生命周期 api 对象调用，该对象包含如 `cacheDataLoaded` 和 `cacheDataRemoved` 等属性，允许在添加缓存条目、加载缓存数据和移除缓存条目（即在缓存条目的整个生命周期）时运行代码。
 
-Can be used for [streaming updates](../usage/streaming-updates.mdx).
+可以用于[流式更新](../usage/streaming-updates.mdx)。
 
-#### Cache Lifecycle API properties
+#### 缓存生命周期 API 属性
 
-- `dispatch` - The dispatch method for the store.
-- `getState` - A method to get the current state for the store.
-- `extra` - `extra` as provided as `thunk.extraArgument` to the `configureStore` `getDefaultMiddleware` option.
-- `requestId` - A unique ID generated for the cache entry.
-- `cacheEntryRemoved` - A Promise that allows you to wait for the point in time when the cache entry has been removed from the cache, by not being used/subscribed to any more in the application for too long or by dispatching `api.util.resetApiState`.
-- `cacheDataLoaded` - A Promise that will resolve with the first value for this cache key. This allows you to `await` until an actual value is in the cache.  
-  Note: If the cache entry is removed from the cache before any value has ever been resolved, this Promise will reject with `new Error('Promise never resolved before cacheEntryRemoved.')` to prevent memory leaks. You can just re-throw that error (or not handle it at all) - it will be caught outside of `cacheEntryAdded`.
-- `getCacheEntry` - A function that gets the current value of the cache entry.
-- `updateCachedData` _(query endpoints only)_ - A function that accepts a 'recipe' callback specifying how to update the data at the time it is called. This uses `immer` internally, and updates can be written 'mutably' while safely producing the next immutable state.
+- `dispatch` - 存储的 dispatch 方法。
+- `getState` - 获取存储当前状态的方法。
+- `extra` - 作为 `thunk.extraArgument` 提供给 `configureStore` 的 `getDefaultMiddleware` 选项的 `extra`。
+- `requestId` - 为缓存条目生成的唯一 ID。
+- `cacheEntryRemoved` - 允许您等待缓存条目从缓存中被移除的时刻的 Promise，这是由于在应用程序中长时间未使用/订阅，或者通过分派 `api.util.resetApiState` 实现的。
+- `cacheDataLoaded` - 一个将以此缓存键的第一个值解析的 Promise。这允许您 `await` 直到实际的值在缓存中。注意：如果在任何值被解析之前，缓存条目从缓存中被移除，此 Promise 将以 `new Error('Promise never resolved before cacheEntryRemoved.')` 拒绝，以防止内存泄漏。您可以重新抛出该错误（或者根本不处理它）- 它将在 `cacheEntryAdded` 外部被捕获。
+- `getCacheEntry` - 获取缓存条目当前值的函数。
+- `updateCachedData` _(仅查询端点)_ - 一个接受 'recipe' 回调的函数，指定如何在调用时更新数据。这在内部使用 `immer`，并且可以安全地编写 '可变' 的更新，同时生成下一个不可变状态。
 
-```ts title="Mutation onCacheEntryAdded signature" no-transpile
+```ts title="Mutation onCacheEntryAdded 签名" no-transpile
 async function onCacheEntryAdded(
   arg: QueryArg,
   {
@@ -675,7 +676,7 @@ async function onCacheEntryAdded(
 ): Promise<void>
 ```
 
-```ts title="Query onCacheEntryAdded signature" no-transpile
+```ts title="Query onCacheEntryAdded 签名" no-transpile
 async function onCacheEntryAdded(
   arg: QueryArg,
   {
@@ -686,11 +687,11 @@ async function onCacheEntryAdded(
     cacheEntryRemoved,
     cacheDataLoaded,
     getCacheEntry,
-    updateCachedData, // available for query endpoints only
+    updateCachedData, // 仅对查询端点可用
   }: QueryCacheLifecycleApi,
 ): Promise<void>
 ```
 
-## Return value
+## 返回值
 
-See [the "created Api" API reference](./created-api/overview)
+参见[创建的 Api" API 参考](./created-api/overview)

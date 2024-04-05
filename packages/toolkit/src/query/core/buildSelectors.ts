@@ -26,26 +26,25 @@ import { flatten } from '../utils'
 
 export type SkipToken = typeof skipToken
 /**
- * Can be passed into `useQuery`, `useQueryState` or `useQuerySubscription`
- * instead of the query argument to get the same effect as if setting
- * `skip: true` in the query options.
+ * 可以传递给 `useQuery`，`useQueryState` 或 `useQuerySubscription`
+ * 作为查询参数，效果与在查询选项中设置 `skip: true` 相同。
  *
- * Useful for scenarios where a query should be skipped when `arg` is `undefined`
- * and TypeScript complains about it because `arg` is not allowed to be passed
- * in as `undefined`, such as
+ * 对于当 `arg` 为 `undefined` 时应跳过查询的场景非常有用，
+ * 并且 TypeScript 会因为不允许将 `arg` 传入为 `undefined` 而抱怨，
+ * 例如
  *
  * ```ts
- * // codeblock-meta title="will error if the query argument is not allowed to be undefined" no-transpile
+ * // codeblock-meta title="如果查询参数不允许为 undefined，将会报错" no-transpile
  * useSomeQuery(arg, { skip: !!arg })
  * ```
  *
  * ```ts
- * // codeblock-meta title="using skipToken instead" no-transpile
+ * // codeblock-meta title="使用 skipToken 替代" no-transpile
  * useSomeQuery(arg ?? skipToken)
  * ```
  *
- * If passed directly into a query or mutation selector, that selector will always
- * return an uninitialized state.
+ * 如果直接传递给查询或突变选择器，那么该选择器将始终
+ * 返回一个未初始化的状态。
  */
 export const skipToken = /* @__PURE__ */ Symbol.for('RTKQ/skipToken')
 

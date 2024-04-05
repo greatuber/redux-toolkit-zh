@@ -7,14 +7,14 @@ hide_title: true
 
 &nbsp;
 
-# API Slices: Redux Integration
+# API切片：Redux集成
 
-Internally, `createApi` will call [the Redux Toolkit `createSlice` API](https://redux-toolkit.js.org/api/createSlice) to generate a slice reducer and corresponding action creators with the appropriate logic for caching fetched data. It also automatically generates a custom Redux middleware that manages subscription counts and cache lifetimes.
+在内部，`createApi`会调用[Redux Toolkit的`createSlice` API](https://redux-toolkit.js.org/api/createSlice)来生成一个切片reducer和相应的action创建器，这些创建器具有缓存获取的数据的适当逻辑。它还自动生成一个自定义的Redux中间件，该中间件管理订阅计数和缓存生命周期。
 
-The generated slice reducer and the middleware both need to be added to your Redux store setup in `configureStore` in order to work correctly:
+生成的切片reducer和中间件都需要添加到你的Redux store设置中的`configureStore`中，以便正确工作：
 
 ```ts title="src/store.ts"
-// file: src/services/pokemon.ts noEmit
+// 文件：src/services/pokemon.ts noEmit
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 
 export const pokemonApi = createApi({
@@ -22,23 +22,23 @@ export const pokemonApi = createApi({
   endpoints: () => ({}),
 })
 
-// file: src/store.ts
+// 文件：src/store.ts
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
 import { pokemonApi } from './services/pokemon'
 
 export const store = configureStore({
   reducer: {
-    // Add the generated reducer as a specific top-level slice
+    // 将生成的reducer添加为特定的顶级切片
     [pokemonApi.reducerPath]: pokemonApi.reducer,
   },
-  // Adding the api middleware enables caching, invalidation, polling,
-  // and other useful features of `rtk-query`.
+  // 添加api中间件启用缓存，失效，轮询，
+  // 和`rtk-query`的其他有用特性。
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(pokemonApi.middleware),
 })
 
-// configure listeners using the provided defaults
+// 使用提供的默认值配置监听器
 setupListeners(store.dispatch)
 ```
 
@@ -48,7 +48,7 @@ setupListeners(store.dispatch)
 reducerPath: string
 ```
 
-Contains the `reducerPath` option provided to `createApi`. Use this as the root state key when adding the `reducer` function to the store so that the rest of the generated API logic can find the state correctly.
+包含提供给`createApi`的`reducerPath`选项。在将`reducer`函数添加到store时，使用此作为根状态键，以便生成的API逻辑可以正确找到状态。
 
 ## `reducer`
 
@@ -56,7 +56,7 @@ Contains the `reducerPath` option provided to `createApi`. Use this as the root 
 reducer: Reducer
 ```
 
-A standard Redux slice reducer function containing the logic for updating the cached data. Add this to the Redux store using the `reducerPath` you provided as the root state key.
+一个标准的Redux切片reducer函数，包含更新缓存数据的逻辑。使用你提供的根状态键将此添加到Redux store。
 
 ## `middleware`
 
@@ -64,4 +64,4 @@ A standard Redux slice reducer function containing the logic for updating the ca
 middleware: Middleware
 ```
 
-A custom Redux middleware that contains logic for managing caching, invalidation, subscriptions, polling, and more. Add this to the store setup after other middleware.
+一个自定义的Redux中间件，包含管理缓存，失效，订阅，轮询等逻辑。在其他中间件之后将此添加到store设置中。

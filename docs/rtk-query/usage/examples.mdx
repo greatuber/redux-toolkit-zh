@@ -8,21 +8,21 @@ description: 'RTK Query > Usage > Examples: sandboxes with runnable apps'
 
 &nbsp;
 
-# RTK Query Examples
+# RTK 查询示例
 
-## Examples Overview
+## 示例概述
 
-We have a variety of examples that demonstrate various aspects of using RTK Query.
+我们有各种示例，展示了使用 RTK Query 的各个方面。
 
-These examples are not meant to be what you base your application on, but exist to show _very specific_ behaviors that you may not actually want or need in your application. For most users, the basic examples in the [Queries](./queries) and [Mutations](./mutations) sections will cover the majority of your needs.
+这些示例并不意味着你应该以此为基础来构建你的应用程序，而是存在于展示你在应用程序中可能不需要或不想要的_非常特定_的行为。对于大多数用户来说，[查询](./queries)和[变异](./mutations)部分的基本示例将覆盖你的大部分需求。
 
 :::tip
 
-Please note that when playing with the examples in CodeSandbox that you can experience quirky behavior, especially if you fork them and start editing files. Hot reloading, CSB service workers and [`msw`](https://mswjs.io/) sometimes have trouble getting on the right page -- when that happens, just refresh in the CSB browser pane.
+请注意，当你在 CodeSandbox 中尝试示例时，可能会遇到奇怪的行为，特别是当你复制它们并开始编辑文件时。热重载、CSB 服务工作者和 [`msw`](https://mswjs.io/) 有时会有问题，无法进入正确的页面 -- 当发生这种情况时，只需在 CSB 浏览器窗格中刷新即可。
 
 :::
 
-## Kitchen Sink
+## 厨房水槽
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/kitchen-sink?fontsize=12&hidenavigation=1&theme=dark&runonclick=1"
@@ -38,12 +38,12 @@ Please note that when playing with the examples in CodeSandbox that you can expe
   sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"
 ></iframe>
 
-## React Optimistic Updates
+## React 乐观更新
 
-In the example below you'll notice a few things. There are two `Posts` list on the sidebar. The top one will only update _after_ a successful mutation and resync with the server. The _subscribed_ one will update immediately due to the optimistic update. In the event of an error, you'll see this get rolled back.
+在下面的示例中，你会注意到一些事情。侧边栏上有两个 `Posts` 列表。顶部的那个只有在成功的变异和与服务器重新同步 _之后_ 才会更新。_订阅_ 的那个由于乐观更新会立即更新。在出现错误的情况下，你会看到这个操作被回滚。
 
 :::info
-The example has some intentionally wonky behavior... when editing the name of a post, there is a decent chance you'll get a random error.
+示例中有一些故意设置的奇怪行为... 当编辑帖子的名称时，你很可能会遇到随机错误。
 :::
 
 <iframe
@@ -60,7 +60,7 @@ The example has some intentionally wonky behavior... when editing the name of a 
   sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"
 ></iframe>
 
-## React with GraphQL
+## React 与 GraphQL
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/graphql?fontsize=12&hidenavigation=1&theme=dark&module=%2Fsrc%2Fapi.js&runonclick=1"
@@ -76,13 +76,13 @@ The example has some intentionally wonky behavior... when editing the name of a 
   sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"
 ></iframe>
 
-## Authentication
+## 认证
 
-There are several ways to handle authentication with RTK Query. This is a very basic example of taking a JWT from a login mutation, then setting that in our store. We then use `prepareHeaders` to inject the authentication headers into every subsequent request.
+有多种方式可以使用 RTK Query 处理认证。这是一个非常基础的示例，从登录变异中获取 JWT，然后将其设置在我们的存储中。然后我们使用 `prepareHeaders` 将认证头注入到每个后续请求中。
 
-### Dispatching an action to set the user state
+### 分发一个动作来设置用户状态
 
-This example dispatches a `setCredentials` action to store the user and token information.
+这个示例分发一个 `setCredentials` 动作来存储用户和令牌信息。
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/authentication?fontsize=12&hidenavigation=1&module=%2Fsrc%2Ffeatures%2Fauth%2FauthSlice.tsx&theme=dark&runonclick=1"
@@ -98,9 +98,9 @@ This example dispatches a `setCredentials` action to store the user and token in
   sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"
 ></iframe>
 
-### Using `extraReducers`
+### 使用 `extraReducers`
 
-This example uses a matcher from the endpoint and `extraReducers` in the `authSlice`.
+这个示例使用了 `authSlice` 中的 `extraReducers` 和端点的匹配器。
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/authentication-with-extrareducers?fontsize=12&hidenavigation=1&module=%2Fsrc%2Ffeatures%2Fauth%2FauthSlice.tsx&theme=dark&runonclick=1"
@@ -116,9 +116,9 @@ This example uses a matcher from the endpoint and `extraReducers` in the `authSl
   sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
 ></iframe>
 
-## React Class Components
+## React 类组件
 
-Check out the `PostDetail` component for an example of Class Component usage.
+查看 `PostDetail` 组件，了解类组件的使用示例。
 
 <iframe
   src="https://codesandbox.io/embed/react-class-component-example-48hyq?fontsize=12&hidenavigation=1&theme=dark&runonclick=1"

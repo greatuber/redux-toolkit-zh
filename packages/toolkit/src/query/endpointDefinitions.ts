@@ -30,12 +30,12 @@ interface EndpointDefinitionWithQuery<
   ResultType,
 > {
   /**
-   * `query` can be a function that returns either a `string` or an `object` which is passed to your `baseQuery`. If you are using [fetchBaseQuery](./fetchBaseQuery), this can return either a `string` or an `object` of properties in `FetchArgs`. If you use your own custom [`baseQuery`](../../rtk-query/usage/customizing-queries), you can customize this behavior to your liking.
+   * `query` 可以是一个返回 `string` 或传递给你的 `baseQuery` 的 `object` 的函数。如果你使用 [fetchBaseQuery](./fetchBaseQuery)，这可以返回一个 `string` 或 `FetchArgs` 属性的 `object`。如果你使用自定义的 [`baseQuery`](../../rtk-query/usage/customizing-queries)，你可以根据自己的喜好定制这个行为。
    *
    * @example
    *
    * ```ts
-   * // codeblock-meta title="query example"
+   * // 代码块元数据 标题="query 示例"
    *
    * import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
    * interface Post {
@@ -49,18 +49,18 @@ interface EndpointDefinitionWithQuery<
    *   tagTypes: ['Post'],
    *   endpoints: (build) => ({
    *     getPosts: build.query<PostsResponse, void>({
-   *       // highlight-start
+   *       // 高亮开始
    *       query: () => 'posts',
-   *       // highlight-end
+   *       // 高亮结束
    *     }),
    *     addPost: build.mutation<Post, Partial<Post>>({
-   *      // highlight-start
+   *      // 高亮开始
    *      query: (body) => ({
    *        url: `posts`,
    *        method: 'POST',
    *        body,
    *      }),
-   *      // highlight-end
+   *      // 高亮结束
    *      invalidatesTags: [{ type: 'Post', id: 'LIST' }],
    *    }),
    *   })
@@ -70,7 +70,7 @@ interface EndpointDefinitionWithQuery<
   query(arg: QueryArg): BaseQueryArg<BaseQuery>
   queryFn?: never
   /**
-   * A function to manipulate the data returned by a query or mutation.
+   * 用于操作查询或突变返回的数据的函数。
    */
   transformResponse?(
     baseQueryReturnValue: BaseQueryResult<BaseQuery>,
@@ -78,7 +78,7 @@ interface EndpointDefinitionWithQuery<
     arg: QueryArg,
   ): ResultType | Promise<ResultType>
   /**
-   * A function to manipulate the data returned by a failed query or mutation.
+   * 用于操作失败的查询或突变返回的数据的函数。
    */
   transformErrorResponse?(
     baseQueryReturnValue: BaseQueryError<BaseQuery>,
@@ -86,14 +86,11 @@ interface EndpointDefinitionWithQuery<
     arg: QueryArg,
   ): unknown
   /**
-   * Defaults to `true`.
+   * 默认为 `true`。
    *
-   * Most apps should leave this setting on. The only time it can be a performance issue
-   * is if an API returns extremely large amounts of data (e.g. 10,000 rows per request) and
-   * you're unable to paginate it.
+   * 大多数应用应该保持此设置。只有当API返回极大量的数据（例如，每个请求10000行）并且你无法对其进行分页时，它才可能成为性能问题。
    *
-   * For details of how this works, please see the below. When it is set to `false`,
-   * every request will cause subscribed components to rerender, even when the data has not changed.
+   * 有关其工作方式的详细信息，请参见下面的链接。当它设置为 `false` 时，即使数据没有改变，每个请求也会导致订阅的组件重新渲染。
    *
    * @see https://redux-toolkit.js.org/api/other-exports#copywithstructuralsharing
    */
@@ -106,11 +103,11 @@ interface EndpointDefinitionWithQueryFn<
   ResultType,
 > {
   /**
-   * Can be used in place of `query` as an inline function that bypasses `baseQuery` completely for the endpoint.
+   * 可以用于替代 `query` 作为一个内联函数，该函数完全绕过了端点的 `baseQuery`。
    *
    * @example
    * ```ts
-   * // codeblock-meta title="Basic queryFn example"
+   * // 代码块元数据 标题="基础 queryFn 示例"
    *
    * import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
    * interface Post {
@@ -126,7 +123,7 @@ interface EndpointDefinitionWithQueryFn<
    *       query: () => 'posts',
    *     }),
    *     flipCoin: build.query<'heads' | 'tails', void>({
-   *       // highlight-start
+   *       // 高亮开始
    *       queryFn(arg, queryApi, extraOptions, baseQuery) {
    *         const randomVal = Math.random()
    *         if (randomVal < 0.45) {
@@ -137,7 +134,7 @@ interface EndpointDefinitionWithQueryFn<
    *         }
    *         return { error: { status: 500, statusText: 'Internal Server Error', data: "Coin landed on it's edge!" } }
    *       }
-   *       // highlight-end
+   *       // 高亮结束
    *     })
    *   })
    * })
@@ -270,19 +267,19 @@ export interface QueryExtraOptions<
 > {
   type: DefinitionType.query
   /**
-   * Used by `query` endpoints. Determines which 'tag' is attached to the cached data returned by the query.
-   * Expects an array of tag type strings, an array of objects of tag types with ids, or a function that returns such an array.
-   * 1.  `['Post']` - equivalent to `2`
-   * 2.  `[{ type: 'Post' }]` - equivalent to `1`
+   * 由 `query` 端点使用。确定哪个 'tag' 附加到查询返回的缓存数据上。
+   * 期望一个标签类型字符串的数组，一个带有 id 的标签类型对象的数组，或者一个返回这样的数组的函数。
+   * 1.  `['Post']` - 等同于 `2`
+   * 2.  `[{ type: 'Post' }]` - 等同于 `1`
    * 3.  `[{ type: 'Post', id: 1 }]`
-   * 4.  `(result, error, arg) => ['Post']` - equivalent to `5`
-   * 5.  `(result, error, arg) => [{ type: 'Post' }]` - equivalent to `4`
+   * 4.  `(result, error, arg) => ['Post']` - 等同于 `5`
+   * 5.  `(result, error, arg) => [{ type: 'Post' }]` - 等同于 `4`
    * 6.  `(result, error, arg) => [{ type: 'Post', id: 1 }]`
    *
    * @example
    *
    * ```ts
-   * // codeblock-meta title="providesTags example"
+   * // 代码块元数据 标题="providesTags 示例"
    *
    * import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
    * interface Post {
@@ -297,7 +294,7 @@ export interface QueryExtraOptions<
    *   endpoints: (build) => ({
    *     getPosts: build.query<PostsResponse, void>({
    *       query: () => 'posts',
-   *       // highlight-start
+   *       // 高亮开始
    *       providesTags: (result) =>
    *         result
    *           ? [
@@ -305,7 +302,7 @@ export interface QueryExtraOptions<
    *               { type: 'Posts', id: 'LIST' },
    *             ]
    *           : [{ type: 'Posts', id: 'LIST' }],
-   *       // highlight-end
+   *       // 高亮结束
    *     })
    *   })
    * })
@@ -319,22 +316,22 @@ export interface QueryExtraOptions<
     BaseQueryMeta<BaseQuery>
   >
   /**
-   * Not to be used. A query should not invalidate tags in the cache.
+   * 不要使用。查询不应使缓存中的标签无效。
    */
   invalidatesTags?: never
 
   /**
-   * Can be provided to return a custom cache key value based on the query arguments.
+   * 可以提供一个自定义的缓存键值，基于查询参数。
    *
-   * This is primarily intended for cases where a non-serializable value is passed as part of the query arg object and should be excluded from the cache key.  It may also be used for cases where an endpoint should only have a single cache entry, such as an infinite loading / pagination implementation.
+   * 这主要是为了处理非序列化值作为查询参数对象的一部分传递，并且应该从缓存键中排除的情况。它也可以用于一个端点应该只有一个缓存条目的情况，比如无限加载/分页实现。
    *
-   * Unlike the `createApi` version which can _only_ return a string, this per-endpoint option can also return an an object, number, or boolean.  If it returns a string, that value will be used as the cache key directly.  If it returns an object / number / boolean, that value will be passed to the built-in `defaultSerializeQueryArgs`.  This simplifies the use case of stripping out args you don't want included in the cache key.
+   * 与只能返回字符串的 `createApi` 版本不同，这个每个端点的选项也可以返回一个对象、数字或布尔值。如果它返回一个字符串，那么这个值将直接用作缓存键。如果它返回一个对象/数字/布尔值，那么这个值将被传递给内置的 `defaultSerializeQueryArgs`。这简化了剔除你不希望包含在缓存键中的参数的用例。
    *
    *
    * @example
    *
    * ```ts
-   * // codeblock-meta title="serializeQueryArgs : exclude value"
+   * // 代码块元数据 标题="serializeQueryArgs : 排除值"
    *
    * import { createApi, fetchBaseQuery, defaultSerializeQueryArgs } from '@reduxjs/toolkit/query/react'
    * interface Post {
@@ -349,31 +346,31 @@ export interface QueryExtraOptions<
    * createApi({
    *  baseQuery: fetchBaseQuery({ baseUrl: '/' }),
    *  endpoints: (build) => ({
-   *    // Example: an endpoint with an API client passed in as an argument,
-   *    // but only the item ID should be used as the cache key
+   *    // 示例：一个端点，API 客户端作为参数传入，
+   *    // 但只有项目 ID 应该被用作缓存键
    *    getPost: build.query<Post, { id: string; client: MyApiClient }>({
    *      queryFn: async ({ id, client }) => {
    *        const post = await client.fetchPost(id)
    *        return { data: post }
    *      },
-   *      // highlight-start
+   *      // 高亮开始
    *      serializeQueryArgs: ({ queryArgs, endpointDefinition, endpointName }) => {
    *        const { id } = queryArgs
-   *        // This can return a string, an object, a number, or a boolean.
-   *        // If it returns an object, number or boolean, that value
-   *        // will be serialized automatically via `defaultSerializeQueryArgs`
-   *        return { id } // omit `client` from the cache key
+   *        // 这可以返回一个字符串、一个对象、一个数字或一个布尔值。
+   *        // 如果它返回一个对象、数字或布尔值，那个值
+   *        // 将通过 `defaultSerializeQueryArgs` 自动序列化
+   *        return { id } // 从缓存键中省略 `client`
    *
-   *        // Alternately, you can use `defaultSerializeQueryArgs` yourself:
+   *        // 或者，你可以自己使用 `defaultSerializeQueryArgs`：
    *        // return defaultSerializeQueryArgs({
    *        //   endpointName,
    *        //   queryArgs: { id },
    *        //   endpointDefinition
    *        // })
-   *        // Or  create and return a string yourself:
+   *        // 或者创建并返回一个字符串：
    *        // return `getPost(${id})`
    *      },
-   *      // highlight-end
+   *      // 高亮结束
    *    }),
    *  }),
    *})
@@ -385,29 +382,28 @@ export interface QueryExtraOptions<
   >
 
   /**
-   * Can be provided to merge an incoming response value into the current cache data.
-   * If supplied, no automatic structural sharing will be applied - it's up to
-   * you to update the cache appropriately.
+   * 可以提供一个将传入的响应值合并到当前缓存数据的方法。
+   * 如果提供了，将不会应用自动的结构共享 - 你需要适当地更新缓存。
    *
-   * Since RTKQ normally replaces cache entries with the new response, you will usually
-   * need to use this with the `serializeQueryArgs` or `forceRefetch` options to keep
-   * an existing cache entry so that it can be updated.
+   * 由于 RTKQ 通常用新的响应替换缓存条目，你通常
+   * 需要与 `serializeQueryArgs` 或 `forceRefetch` 选项一起使用这个，
+   * 以保持现有的缓存条目，以便它可以被更新。
    *
-   * Since this is wrapped with Immer, you may either mutate the `currentCacheValue` directly,
-   * or return a new value, but _not_ both at once.
+   * 由于这是用 Immer 包装的，你可以直接修改 `currentCacheValue`，
+   * 或者返回一个新的值，但不能同时做两者。
    *
-   * Will only be called if the existing `currentCacheData` is _not_ `undefined` - on first response,
-   * the cache entry will just save the response data directly.
+   * 只有当现有的 `currentCacheData` 不是 `undefined` 时才会被调用 - 在第一次响应时，
+   * 缓存条目将直接保存响应数据。
    *
-   * Useful if you don't want a new request to completely override the current cache value,
-   * maybe because you have manually updated it from another source and don't want those
-   * updates to get lost.
+   * 如果你不希望新的请求完全覆盖当前的缓存值，
+   * 可能是因为你已经从另一个源手动更新了它，不希望这些
+   * 更新丢失，这将非常有用。
    *
    *
    * @example
    *
    * ```ts
-   * // codeblock-meta title="merge: pagination"
+   * // 代码块元数据 标题="merge: 分页"
    *
    * import { createApi, fetchBaseQuery, defaultSerializeQueryArgs } from '@reduxjs/toolkit/query/react'
    * interface Post {
@@ -420,15 +416,15 @@ export interface QueryExtraOptions<
    *  endpoints: (build) => ({
    *    listItems: build.query<string[], number>({
    *      query: (pageNumber) => `/listItems?page=${pageNumber}`,
-   *     // Only have one cache entry because the arg always maps to one string
+   *     // 因为参数总是映射到一个字符串，所以只有一个缓存条目
    *     serializeQueryArgs: ({ endpointName }) => {
    *       return endpointName
    *      },
-   *      // Always merge incoming data to the cache entry
+   *      // 总是将传入的数据合并到缓存条目
    *      merge: (currentCache, newItems) => {
    *        currentCache.push(...newItems)
    *      },
-   *      // Refetch when the page arg changes
+   *      // 当页面参数改变时重新获取
    *      forceRefetch({ currentArg, previousArg }) {
    *        return currentArg !== previousArg
    *      },
@@ -449,16 +445,16 @@ export interface QueryExtraOptions<
   ): ResultType | void
 
   /**
-   * Check to see if the endpoint should force a refetch in cases where it normally wouldn't.
-   * This is primarily useful for "infinite scroll" / pagination use cases where
-   * RTKQ is keeping a single cache entry that is added to over time, in combination
-   * with `serializeQueryArgs` returning a fixed cache key and a `merge` callback
-   * set to add incoming data to the cache entry each time.
+   * 检查在通常情况下不会强制刷新的情况下，端点是否应该强制刷新。
+   * 这主要用于 "无限滚动" / 分页的情况，其中
+   * RTKQ 保持一个随着时间增加的单一缓存条目，结合
+   * `serializeQueryArgs` 返回一个固定的缓存键和一个 `merge` 回调
+   * 每次都将传入的数据添加到缓存条目中。
    *
    * @example
    *
    * ```ts
-   * // codeblock-meta title="forceRefresh: pagination"
+   * // 代码块元数据 标题="forceRefresh: 分页"
    *
    * import { createApi, fetchBaseQuery, defaultSerializeQueryArgs } from '@reduxjs/toolkit/query/react'
    * interface Post {
@@ -471,15 +467,15 @@ export interface QueryExtraOptions<
    *  endpoints: (build) => ({
    *    listItems: build.query<string[], number>({
    *      query: (pageNumber) => `/listItems?page=${pageNumber}`,
-   *     // Only have one cache entry because the arg always maps to one string
+   *     // 因为参数总是映射到一个字符串，所以只有一个缓存条目
    *     serializeQueryArgs: ({ endpointName }) => {
    *       return endpointName
    *      },
-   *      // Always merge incoming data to the cache entry
+   *      // 总是将传入的数据合并到缓存条目
    *      merge: (currentCache, newItems) => {
    *        currentCache.push(...newItems)
    *      },
-   *      // Refetch when the page arg changes
+   *      // 当页面参数改变时重新获取
    *      forceRefetch({ currentArg, previousArg }) {
    *        return currentArg !== previousArg
    *      },
@@ -518,7 +514,7 @@ export interface MutationTypes<
   ReducerPath extends string = string,
 > extends BaseEndpointTypes<QueryArg, BaseQuery, ResultType> {
   /**
-   * The endpoint definition type. To be used with some internal generic types.
+   * 端点定义类型。用于一些内部泛型类型。
    * @example
    * ```ts
    * const useMyWrappedHook: UseMutation<typeof api.endpoints.query.Types.MutationDefinition> = ...
@@ -544,13 +540,13 @@ export interface MutationExtraOptions<
 > {
   type: DefinitionType.mutation
   /**
-   * Used by `mutation` endpoints. Determines which cached data should be either re-fetched or removed from the cache.
-   * Expects the same shapes as `providesTags`.
+   * 用于 `mutation` 端点。确定应该重新获取哪些缓存数据，或者从缓存中删除哪些数据。
+   * 期望与 `providesTags` 相同的形状。
    *
    * @example
    *
    * ```ts
-   * // codeblock-meta title="invalidatesTags example"
+   * // 代码块元数据 标题="invalidatesTags 示例"
    * import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
    * interface Post {
    *   id: number
@@ -580,9 +576,9 @@ export interface MutationExtraOptions<
    *           body,
    *         }
    *       },
-   *       // highlight-start
+   *       // 高亮开始
    *       invalidatesTags: [{ type: 'Posts', id: 'LIST' }],
-   *       // highlight-end
+   *       // 高亮结束
    *     }),
    *   })
    * })
@@ -648,25 +644,25 @@ export type EndpointBuilder<
   ReducerPath extends string,
 > = {
   /**
-   * An endpoint definition that retrieves data, and may provide tags to the cache.
+   * 一个获取数据的端点定义，并可能向缓存提供标签。
    *
    * @example
    * ```js
-   * // codeblock-meta title="Example of all query endpoint options"
+   * // 代码块元数据 标题="查询端点选项的所有示例"
    * const api = createApi({
    *  baseQuery,
    *  endpoints: (build) => ({
    *    getPost: build.query({
    *      query: (id) => ({ url: `post/${id}` }),
-   *      // Pick out data and prevent nested properties in a hook or selector
+   *      // 提取数据并防止在钩子或选择器中嵌套属性
    *      transformResponse: (response) => response.data,
-   *      // Pick out error and prevent nested properties in a hook or selector
+   *      // 提取错误并防止在钩子或选择器中嵌套属性
    *      transformErrorResponse: (response) => response.error,
-   *      // `result` is the server response
+   *      // `result` 是服务器响应
    *      providesTags: (result, error, id) => [{ type: 'Post', id }],
-   *      // trigger side effects or optimistic updates
+   *      // 触发副作用或乐观更新
    *      onQueryStarted(id, { dispatch, getState, extra, requestId, queryFulfilled, getCacheEntry, updateCachedData }) {},
-   *      // handle subscriptions etc
+   *      // 处理订阅等
    *      onCacheEntryAdded(id, { dispatch, getState, extra, requestId, cacheEntryRemoved, cacheDataLoaded, getCacheEntry, updateCachedData }) {},
    *    }),
    *  }),
@@ -680,26 +676,26 @@ export type EndpointBuilder<
     >,
   ): QueryDefinition<QueryArg, BaseQuery, TagTypes, ResultType, ReducerPath>
   /**
-   * An endpoint definition that alters data on the server or will possibly invalidate the cache.
+   * 一个改变服务器上数据或可能使缓存失效的端点定义。
    *
    * @example
    * ```js
-   * // codeblock-meta title="Example of all mutation endpoint options"
+   * // 代码块元数据 标题="所有变异端点选项的示例"
    * const api = createApi({
    *   baseQuery,
    *   endpoints: (build) => ({
    *     updatePost: build.mutation({
    *       query: ({ id, ...patch }) => ({ url: `post/${id}`, method: 'PATCH', body: patch }),
-   *       // Pick out data and prevent nested properties in a hook or selector
+   *       // 提取数据并防止在钩子或选择器中嵌套属性
    *       transformResponse: (response) => response.data,
-   *       // Pick out error and prevent nested properties in a hook or selector
+   *       // 提取错误并防止在钩子或选择器中嵌套属性
    *       transformErrorResponse: (response) => response.error,
-   *       // `result` is the server response
+   *       // `result` 是服务器响应
    *       invalidatesTags: (result, error, id) => [{ type: 'Post', id }],
-   *      // trigger side effects or optimistic updates
-   *      onQueryStarted(id, { dispatch, getState, extra, requestId, queryFulfilled, getCacheEntry }) {},
-   *      // handle subscriptions etc
-   *      onCacheEntryAdded(id, { dispatch, getState, extra, requestId, cacheEntryRemoved, cacheDataLoaded, getCacheEntry }) {},
+   *       // 触发副作用或乐观更新
+   *       onQueryStarted(id, { dispatch, getState, extra, requestId, queryFulfilled, getCacheEntry }) {},
+   *       // 处理订阅等
+   *       onCacheEntryAdded(id, { dispatch, getState, extra, requestId, cacheEntryRemoved, cacheDataLoaded, getCacheEntry }) {},
    *     }),
    *   }),
    * });

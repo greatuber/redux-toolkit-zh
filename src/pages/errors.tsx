@@ -18,30 +18,27 @@ function Errors() {
       description={siteConfig.tagline}
     >
       <main className={styles.mainFull}>
-        <h1>Production Error Codes</h1>
+        <h1>生产错误代码</h1>
         <p>
-          When Redux Toolkit is built and running in production, error text is
-          replaced by indexed error codes to save on bundle size. These errors
-          will provide a link to this page with more information about the error
-          below.
+          当Redux
+          Toolkit构建并在生产中运行时，错误文本被替换为索引错误代码以节省包大小。这些错误
+          将提供一个链接到此页面，下面有关于错误的更多信息。
         </p>
         {error && (
           <React.Fragment>
             <p>
-              <strong>
-                The full text of the error you just encountered is:
-              </strong>
+              <strong>您刚刚遇到的错误的完整文本是：</strong>
             </p>
             <code className={styles.errorDetails}>{error}</code>
           </React.Fragment>
         )}
 
-        <h2>All Error Codes</h2>
+        <h2>所有错误代码</h2>
         <table>
           <thead>
             <tr>
-              <th>Code</th>
-              <th>Message</th>
+              <th style={{ whiteSpace: "nowrap" }}>代码</th>
+              <th>消息</th>
             </tr>
           </thead>
           <tbody>

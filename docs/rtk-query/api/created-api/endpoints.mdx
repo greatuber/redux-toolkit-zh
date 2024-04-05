@@ -7,11 +7,11 @@ hide_title: true
 
 &nbsp;
 
-# API Slices: Endpoints
+# API 切片：端点
 
-The API slice object will have an `endpoints` field inside. This section maps the endpoint names you provided to `createApi` to the core Redux logic (thunks and selectors) used to trigger data fetches and read cached data for that endpoint. If you're using the React-specific version of `createApi`, each endpoint definition will also contain the auto-generated React hooks for that endpoint.
+API 切片对象将在内部有一个 `endpoints` 字段。此部分将您提供给 `createApi` 的端点名称映射到用于触发数据获取和读取该端点的缓存数据的核心 Redux 逻辑（thunks 和 selectors）。如果您正在使用 `createApi` 的 React 特定版本，每个端点定义还将包含该端点的自动生成的 React 钩子。
 
-Each endpoint structure contains the following fields:
+每个端点结构包含以下字段：
 
 ```ts no-transpile
 type EndpointLogic = {
@@ -25,7 +25,7 @@ type EndpointLogic = {
 
 ## `initiate`
 
-#### Signature
+#### 签名
 
 ```ts no-transpile
 type InitiateRequestThunk = StartQueryActionCreator | StartMutationActionCreator;
@@ -42,23 +42,23 @@ type StartMutationActionCreator<D extends MutationDefinition<any, any, any, any>
 
 type SubscriptionOptions = {
   /**
-   * How frequently to automatically re-fetch data (in milliseconds). Defaults to `0` (off).
+   * 自动重新获取数据的频率（以毫秒为单位）。默认为 `0`（关闭）。
    */
   pollingInterval?: number;
   /**
-   * Defaults to `false`. This setting allows you to control whether RTK Query will try to refetch all subscribed queries after regaining a network connection.
+   * 默认为 `false`。此设置允许您控制 RTK Query 在重新获得网络连接后是否尝试重新获取所有订阅的查询。
    *
-   * If you specify this option alongside `skip: true`, this **will not be evaluated** until `skip` is false.
+   * 如果您在 `skip: true` 旁边指定了此选项，那么在 `skip` 为 false 之前，**不会评估**此选项。
    *
-   * Note: requires `setupListeners` to have been called.
+   * 注意：需要已经调用 `setupListeners`。
    */
   refetchOnReconnect?: boolean;
   /**
-   * Defaults to `false`. This setting allows you to control whether RTK Query will try to refetch all subscribed queries after the application window regains focus.
+   * 默认为 `false`。此设置允许您控制 RTK Query 在应用程序窗口重新获得焦点后是否尝试重新获取所有订阅的查询。
    *
-   * If you specify this option alongside `skip: true`, this **will not be evaluated** until `skip` is false.
+   * 如果您在 `skip: true` 旁边指定了此选项，那么在 `skip` 为 false 之前，**不会评估**此选项。
    *
-   * Note: requires `setupListeners` to have been called.
+   * 注意：需要已经调用 `setupListeners`。
    */
   refetchOnFocus?: boolean;
 };
@@ -71,26 +71,26 @@ interface StartQueryActionCreatorOptions {
 
 interface StartMutationActionCreatorOptions {
   /**
-   * If this mutation should be tracked in the store.
-   * If you just want to manually trigger this mutation using `dispatch` and don't care about the
-   * result, state & potential errors being held in store, you can set this to false.
-   * (defaults to `true`)
+   * 如果应在存储中跟踪此突变。
+   * 如果您只想使用 `dispatch` 手动触发此突变，并且不关心
+   * 结果，状态和潜在的错误被保存在存储中，您可以将此设置为 false。
+   * （默认为 `true`）
    */
   track?: boolean;
 }
 ```
 
-#### Description
+#### 描述
 
-A Redux thunk action creator that you can dispatch to trigger data fetch queries or mutations.
+一个 Redux thunk 动作创建器，您可以分派它来触发数据获取查询或突变。
 
-React Hooks users will most likely never need to use these directly, as the hooks automatically dispatch these actions as needed.
+React Hooks 用户可能永远不需要直接使用这些，因为钩子会根据需要自动分派这些操作。
 
-:::note Usage of actions outside of React Hooks
-When dispatching an action creator, you're responsible for storing a reference to the promise it returns in the event that you want to update that specific subscription. Also, you have to manually unsubscribe once your component unmounts. To get an idea of what that entails, see the [Svelte Example](../../usage/examples.mdx#svelte) or the [React Class Components Example](../../usage/examples.mdx#react-class-components)
+:::note 在 React Hooks 外部使用操作
+当分派一个动作创建器时，您负责在需要更新特定订阅的事件中存储对它返回的 promise 的引用。此外，一旦您的组件卸载，您必须手动取消订阅。要了解这涉及到什么，可以参见 [Svelte 示例](../../usage/examples.mdx#svelte) 或 [React 类组件示例](../../usage/examples.mdx#react-class-components)
 :::
 
-#### Example
+#### 示例
 
 ```tsx no-transpile title="initiate query example"
 import { useState } from 'react'
@@ -103,10 +103,10 @@ function App() {
 
   useEffect(() => {
     // highlight-start
-    // Add a subscription
+    // 添加订阅
     const result = dispatch(api.endpoints.getPost.initiate(postId))
 
-    // Return the `unsubscribe` callback to be called in the `useEffect` cleanup step
+    // 返回 `unsubscribe` 回调，以在 `useEffect` 清理步骤中调用
     return result.unsubscribe
     // highlight-end
   }, [dispatch, postId])
@@ -130,9 +130,8 @@ function App() {
 
   function handleClick() {
     // highlight-start
-    // Trigger a mutation
-    // The `track` property can be set `false` in situations where we aren't
-    // interested in the result of the mutation
+    // 触发突变
+    // 在我们对突变的结果不感兴趣的情况下，`track` 属性可以设置为 `false`
     dispatch(api.endpoints.addPost.initiate(newPost), { track: false })
     // highlight-end
   }
@@ -148,7 +147,7 @@ function App() {
 
 ## `select`
 
-#### Signature
+#### 签名
 
 ```ts no-transpile
 type CreateCacheSelectorFactory =
@@ -169,25 +168,25 @@ type MutationResultSelectorFactory<
 type SkipToken = typeof Symbol
 ```
 
-#### Description
+#### 描述
 
-A function that accepts a cache key argument, and generates a new memoized selector for reading cached data for this endpoint using the given cache key. The generated selector is memoized using [Reselect's `createSelector`](https://redux-toolkit.js.org/api/createSelector).
+这是一个接受缓存键参数的函数，并使用给定的缓存键为此端点生成一个新的记忆化选择器，用于读取缓存数据。生成的选择器使用 [Reselect 的 `createSelector`](https://redux-toolkit.js.org/api/createSelector) 进行记忆化。
 
-When selecting mutation results rather than queries, the function accepts a request ID instead.
+当选择突变结果而不是查询时，该函数接受一个请求 ID。
 
-RTKQ defines a `Symbol` named `skipToken` internally. If `skipToken` is passed as the query argument to these selectors, the selector will return a default uninitialized state. This can be used to avoid returning a value if a given query is supposed to be disabled.
+RTKQ 内部定义了一个名为 `skipToken` 的 `Symbol`。如果 `skipToken` 作为查询参数传递给这些选择器，选择器将返回一个默认的未初始化状态。这可以用来避免返回一个值，如果一个给定的查询应该被禁用。
 
-React Hooks users will most likely never need to use these directly, as the hooks automatically use these selectors as needed.
+React Hooks 用户可能永远不需要直接使用这些，因为钩子会根据需要自动使用这些选择器。
 
 :::caution
 
-Each call to `.select(someCacheKey)` returns a _new_ selector function instance. In order for memoization to work correctly, you should create a given selector function once per cache key and reuse that selector function instance, rather than creating a new selector instance each time.
+每次调用 `.select(someCacheKey)` 都会返回一个 _新的_ 选择器函数实例。为了使记忆化正确工作，您应该为每个缓存键创建一个给定的选择器函数，并重用该选择器函数实例，而不是每次都创建一个新的选择器实例。
 
 :::
 
-#### Example
+#### 示例
 
-```tsx no-transpile title="select query example"
+```tsx no-transpile title="选择查询示例"
 import { useState, useMemo } from 'react'
 import { useAppDispatch, useAppSelector } from './store/hooks'
 import { api } from './services/api'
@@ -196,8 +195,8 @@ function App() {
   const dispatch = useAppDispatch()
   const [postId, setPostId] = useState(1)
   // highlight-start
-  // useMemo is used to only call `.select()` when required.
-  // Each call will create a new selector function instance
+  // 使用 useMemo 只在需要时调用 `.select()`。
+  // 每次调用都会创建一个新的选择器函数实例
   const selectPost = useMemo(
     () => api.endpoints.getPost.select(postId),
     [postId],
@@ -206,25 +205,25 @@ function App() {
   // highlight-end
 
   useEffect(() => {
-    // Add a subscription
+    // 添加订阅
     const result = dispatch(api.endpoints.getPost.initiate(postId))
 
-    // Return the `unsubscribe` callback to be called in the cleanup step
+    // 返回 `unsubscribe` 回调，以在清理步骤中调用
     return result.unsubscribe
   }, [dispatch, postId])
 
-  if (isLoading) return <div>Loading post...</div>
+  if (isLoading) return <div>加载帖子中...</div>
 
   return (
     <div>
-      <div>Initiate query example</div>
-      <div>Post name: {data.name}</div>
+      <div>选择查询示例</div>
+      <div>帖子名称：{data.name}</div>
     </div>
   )
 }
 ```
 
-```tsx no-transpile title="select mutation example"
+```tsx no-transpile title="选择突变示例"
 import { useState, useMemo } from 'react'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { useAppDispatch, useAppSelector } from './store/hooks'
@@ -237,8 +236,8 @@ function App() {
     skipToken,
   )
   // highlight-start
-  // useMemo is used to only call `.select(..)` when required.
-  // Each call will create a new selector function instance
+  // 使用 useMemo 只在需要时调用 `.select(..)`。
+  // 每次调用都会创建一个新的选择器函数实例
   const selectMutationResult = useMemo(
     () => api.endpoints.addPost.select(requestId),
     [requestId],
@@ -247,26 +246,26 @@ function App() {
   // highlight-end
 
   function handleClick() {
-    // Trigger a mutation
+    // 触发突变
     const result = dispatch(api.endpoints.addPost.initiate(newPost))
-    // store the requestId to select the mutation result elsewhere
+    // 存储 requestId 以在其他地方选择突变结果
     setRequestId(result.requestId)
   }
 
-  if (isLoading) return <div>Adding post...</div>
+  if (isLoading) return <div>添加帖子中...</div>
 
   return (
     <div>
-      <div>Select mutation example</div>
-      <button onClick={handleClick}>Add post</button>
+      <div>选择突变示例</div>
+      <button onClick={handleClick}>添加帖子</button>
     </div>
   )
 }
 ```
 
-## Matchers
+## 匹配器
 
-A set of [Redux Toolkit action matching utilities](https://redux-toolkit.js.org/api/matching-utilities) that match the `pending`, `fulfilled`, and `rejected` actions that will be dispatched by this thunk. These allow you to match on Redux actions for that endpoint, such as in `createSlice.extraReducers` or a custom middleware. Those are implemented as follows:
+一组 [Redux Toolkit 动作匹配实用程序](https://redux-toolkit.js.org/api/matching-utilities)，它们匹配将由此 thunk 分派的 `pending`、`fulfilled` 和 `rejected` 动作。这些允许您匹配该端点的 Redux 动作，例如在 `createSlice.extraReducers` 或自定义中间件中。它们的实现如下：
 
 ```ts no-transpile
  matchPending: isAllOf(isPending(thunk), matchesEndpoint(endpoint)),

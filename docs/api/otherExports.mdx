@@ -7,13 +7,13 @@ hide_title: true
 
 &nbsp;
 
-# Other Exports
+# 其他导出
 
-Redux Toolkit exports some of its internal utilities, and re-exports additional functions from other dependencies as well.
+Redux Toolkit 导出了一些内部工具，并从其他依赖项重新导出了额外的函数。
 
 ### `nanoid`
 
-An inlined copy of [`nanoid/nonsecure`](https://github.com/ai/nanoid). Generates a non-cryptographically-secure random ID string. `createAsyncThunk` uses this by default for request IDs. May also be useful for other cases as well.
+[`nanoid/nonsecure`](https://github.com/ai/nanoid)的内联副本。生成非加密安全的随机 ID 字符串。`createAsyncThunk` 默认使用此项作为请求 ID。在其他情况下也可能有用。
 
 ```ts
 import { nanoid } from '@reduxjs/toolkit'
@@ -24,7 +24,7 @@ console.log(nanoid())
 
 ### `miniSerializeError`
 
-The default error serialization function used by `createAsyncThunk`, based on https://github.com/sindresorhus/serialize-error. If its argument is an object (such as an `Error` instance), it returns a plain JS `SerializedError` object that copies over any of the listed fields. Otherwise, it returns a stringified form of the value: `{ message: String(value) }`.
+`createAsyncThunk` 使用的默认错误序列化函数，基于 https://github.com/sindresorhus/serialize-error。如果其参数是一个对象（如 `Error` 实例），它返回一个复制了任何列出字段的普通 JS `SerializedError` 对象。否则，它返回值的字符串形式：`{ message: String(value) }`。
 
 ```ts no-transpile
 export interface SerializedError {
@@ -39,24 +39,24 @@ export function miniSerializeError(value: any): SerializedError {}
 
 ### `copyWithStructuralSharing`
 
-A utility that will recursively merge two similar objects together, preserving existing references if the values appear to be the same. This is used internally to help ensure that re-fetched data keeps using the same references unless the new data has actually changed, to avoid unnecessary re-renders. Otherwise, every re-fetch would likely cause the entire dataset to be replaced and all consuming components to always re-render.
+一个实用工具，将两个相似的对象递归地合并在一起，如果值看起来相同，则保留现有的引用。这在内部用于确保重新获取的数据保持使用相同的引用，除非新数据实际上已经改变，以避免不必要的重新渲染。否则，每次重新获取都可能导致整个数据集被替换，所有消费组件都会重新渲染。
 
-If either of the inputs are not plain JS objects or arrays, the new value is returned.
+如果输入的任何一个不是普通的 JS 对象或数组，将返回新值。
 
 ```ts no-transpile
 export function copyWithStructuralSharing<T>(oldObj: any, newObj: T): T
 export function copyWithStructuralSharing(oldObj: any, newObj: any): any {}
 ```
 
-## Exports from Other Libraries
+## 来自其他库的导出
 
 ### `createNextState`
 
-The default immutable update function from the [`immer` library](https://immerjs.github.io/immer/), re-exported here as `createNextState` (also commonly referred to as [`produce`](https://immerjs.github.io/immer/produce))
+来自 [`immer` 库](https://immerjs.github.io/immer/)的默认不可变更新函数，重新导出为 `createNextState`（也常被称为 [`produce`](https://immerjs.github.io/immer/produce)）
 
 ### `current`
 
-[The `current` function](https://immerjs.github.io/immer/current) from the [`immer` library](https://immerjs.github.io/immer/), which takes a snapshot of the current state of a draft and finalizes it (but without freezing). Current is a great utility to print the current state during debugging, and the output of `current` can also be safely leaked outside the producer.
+来自 [`immer` 库](https://immerjs.github.io/immer/)的 [`current` 函数](https://immerjs.github.io/immer/current)，它获取草稿的当前状态并完成它（但不冻结）。Current 是在调试过程中打印当前状态的一个很好的工具，`current` 的输出也可以安全地泄露到生产者之外。
 
 ```ts
 import { createReducer, createAction, current } from '@reduxjs/toolkit'
@@ -78,33 +78,33 @@ const todosReducer = createReducer(initialState, (builder) => {
 
 ### `original`
 
-[The `original` function](https://immerjs.github.io/immer/original) from the [`immer` library](https://immerjs.github.io/immer/), which returns the original object. This is particularly useful for referential equality check in reducers.
+来自 [`immer` 库](https://immerjs.github.io/immer/)的 [`original` 函数](https://immerjs.github.io/immer/original)，它返回原始对象。这在 reducer 中进行引用等价性检查时特别有用。
 
 ### `isDraft`
 
-[The `isDraft` function](https://immerjs.github.io/immer/original) from the [`immer` library](https://immerjs.github.io/immer/), which checks to see if a given value is a Proxy-wrapped "draft" state.
+来自 [`immer` 库](https://immerjs.github.io/immer/)的 [`isDraft` 函数](https://immerjs.github.io/immer/original)，它检查给定的值是否是 Proxy 包装的 "draft" 状态。
 
 ### `freeze`
 
-[The `freeze` function](https://immerjs.github.io/immer/api) from the [`immer` library](https://immerjs.github.io/immer/), which [freezes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze) draftable objects.
+来自 [`immer` 库](https://immerjs.github.io/immer/)的 [`freeze` 函数](https://immerjs.github.io/immer/api)，它[冻结](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze)可草稿化的对象。
 
 ### `combineReducers`
 
-Redux's [`combineReducers`](https://redux.js.org/api/combinereducers), re-exported for convenience. While `configureStore` calls this internally, you may wish to call it yourself to compose multiple levels of slice reducers.
+Redux 的 [`combineReducers`](https://redux.js.org/api/combinereducers)，为了方便起见重新导出。虽然 `configureStore` 在内部调用了这个，但你可能希望自己调用它来组合多级的 slice reducers。
 
 ### `compose`
 
-Redux's [`compose`](https://redux.js.org/api/compose). It composes functions from right to left.
-This is a functional programming utility. You might want to use it to apply several store custom enhancers/ functions in a row.
+Redux 的 [`compose`](https://redux.js.org/api/compose)。它从右到左组合函数。
+这是一个函数式编程实用工具。你可能想用它来连续应用几个 store 自定义增强器/函数。
 
 ### `bindActionCreators`
 
-Redux's [`bindActionCreators`](https://redux.js.org/api/bindactioncreators). It wraps action creators with `dispatch()` so that they dispatch immediately when called.
+Redux 的 [`bindActionCreators`](https://redux.js.org/api/bindactioncreators)。它用 `dispatch()` 包装 action 创建者，以便它们在被调用时立即分派。
 
 ### `createStore`
 
-Redux's [`createStore`](https://redux.js.org/api/createstore). You should not need to use this directly.
+Redux 的 [`createStore`](https://redux.js.org/api/createstore)。你不应该直接使用这个。
 
 ### `applyMiddleware`
 
-Redux's [`applyMiddleware`](https://redux.js.org/api/applymiddleware). You should not need to use this directly.
+Redux 的 [`applyMiddleware`](https://redux.js.org/api/applymiddleware)。你不应该直接使用这个。

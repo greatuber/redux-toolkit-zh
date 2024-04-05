@@ -20,7 +20,7 @@ export interface CreateApiOptions<
   TagTypes extends string = never,
 > {
   /**
-   * The base query used by each endpoint if no `queryFn` option is specified. RTK Query exports a utility called [fetchBaseQuery](./fetchBaseQuery) as a lightweight wrapper around `fetch` for common use-cases. See [Customizing Queries](../../rtk-query/usage/customizing-queries) if `fetchBaseQuery` does not handle your requirements.
+   * 如果没有指定 `queryFn` 选项，每个端点使用的基础查询。RTK Query 导出了一个名为 [fetchBaseQuery](./fetchBaseQuery) 的实用程序，作为 `fetch` 的轻量级包装，用于常见的用例。如果 `fetchBaseQuery` 无法满足你的需求，请参阅 [自定义查询](../../rtk-query/usage/customizing-queries)。
    *
    * @example
    *
@@ -28,18 +28,18 @@ export interface CreateApiOptions<
    * import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
    *
    * const api = createApi({
-   *   // highlight-start
+   *   // 高亮开始
    *   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-   *   // highlight-end
+   *   // 高亮结束
    *   endpoints: (build) => ({
-   *     // ...endpoints
+   *     // ...端点
    *   }),
    * })
    * ```
    */
   baseQuery: BaseQuery
   /**
-   * An array of string tag type names. Specifying tag types is optional, but you should define them so that they can be used for caching and invalidation. When defining a tag type, you will be able to [provide](../../rtk-query/usage/automated-refetching#providing-tags) them with `providesTags` and [invalidate](../../rtk-query/usage/automated-refetching#invalidating-tags) them with `invalidatesTags` when configuring [endpoints](#endpoints).
+   * 字符串标签类型名称的数组。指定标签类型是可选的，但你应该定义它们，以便它们可以用于缓存和失效。定义标签类型时，你可以在配置 [endpoints](#endpoints) 时使用 `providesTags` [提供](../../rtk-query/usage/automated-refetching#providing-tags) 它们，并使用 `invalidatesTags` [使其失效](../../rtk-query/usage/automated-refetching#invalidating-tags)。
    *
    * @example
    *
@@ -48,9 +48,9 @@ export interface CreateApiOptions<
    *
    * const api = createApi({
    *   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-   *   // highlight-start
+   *   // 高亮开始
    *   tagTypes: ['Post', 'User'],
-   *   // highlight-end
+   *   // 高亮结束
    *   endpoints: (build) => ({
    *     // ...endpoints
    *   }),
@@ -59,18 +59,18 @@ export interface CreateApiOptions<
    */
   tagTypes?: readonly TagTypes[]
   /**
-   * The `reducerPath` is a _unique_ key that your service will be mounted to in your store. If you call `createApi` more than once in your application, you will need to provide a unique value each time. Defaults to `'api'`.
+   * `reducerPath` 是你的服务在存储中挂载的 _唯一_ 键。如果你在应用程序中多次调用 `createApi`，每次都需要提供一个唯一的值。默认为 `'api'`。
    *
    * @example
    *
    * ```ts
-   * // codeblock-meta title="apis.js"
+   * // 代码块元数据 标题="apis.js"
    * import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query';
    *
    * const apiOne = createApi({
-   *   // highlight-start
+   *   // 高亮开始
    *   reducerPath: 'apiOne',
-   *   // highlight-end
+   *   // 高亮结束
    *   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
    *   endpoints: (builder) => ({
    *     // ...endpoints
@@ -78,9 +78,9 @@ export interface CreateApiOptions<
    * });
    *
    * const apiTwo = createApi({
-   *   // highlight-start
+   *   // 高亮开始
    *   reducerPath: 'apiTwo',
-   *   // highlight-end
+   *   // 高亮结束
    *   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
    *   endpoints: (builder) => ({
    *     // ...endpoints
@@ -90,20 +90,20 @@ export interface CreateApiOptions<
    */
   reducerPath?: ReducerPath
   /**
-   * Accepts a custom function if you have a need to change the creation of cache keys for any reason.
+   * 如果你需要出于任何原因更改缓存键的创建，可以接受一个自定义函数。
    */
   serializeQueryArgs?: SerializeQueryArgs<BaseQueryArg<BaseQuery>>
   /**
-   * Endpoints are just a set of operations that you want to perform against your server. You define them as an object using the builder syntax. There are two basic endpoint types: [`query`](../../rtk-query/usage/queries) and [`mutation`](../../rtk-query/usage/mutations).
+   * 端点只是你想对服务器执行的一组操作。你使用构建器语法将它们定义为一个对象。有两种基本的端点类型：[`query`](../../rtk-query/usage/queries) 和 [`mutation`](../../rtk-query/usage/mutations)。
    */
   endpoints(
     build: EndpointBuilder<BaseQuery, TagTypes, ReducerPath>,
   ): Definitions
   /**
-   * Defaults to `60` _(this value is in seconds)_. This is how long RTK Query will keep your data cached for **after** the last component unsubscribes. For example, if you query an endpoint, then unmount the component, then mount another component that makes the same request within the given time frame, the most recent value will be served from the cache.
+   * 默认为 `60` _(此值以秒为单位)_。这是 RTK Query 在最后一个组件取消订阅 **之后** 保留你的数据缓存的时间。例如，如果你查询一个端点，然后卸载组件，然后在给定的时间框架内挂载另一个发出相同请求的组件，最近的值将从缓存中提供。
    *
    * ```ts
-   * // codeblock-meta title="keepUnusedDataFor example"
+   * // 代码块元数据 标题="keepUnusedDataFor 示例"
    *
    * import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
    * interface Post {
@@ -117,9 +117,9 @@ export interface CreateApiOptions<
    *   endpoints: (build) => ({
    *     getPosts: build.query<PostsResponse, void>({
    *       query: () => 'posts',
-   *       // highlight-start
+   *       // 高亮开始
    *       keepUnusedDataFor: 5
-   *       // highlight-end
+   *       // 高亮结束
    *     })
    *   })
    * })
@@ -127,53 +127,53 @@ export interface CreateApiOptions<
    */
   keepUnusedDataFor?: number
   /**
-   * Defaults to `false`. This setting allows you to control whether if a cached result is already available RTK Query will only serve a cached result, or if it should `refetch` when set to `true` or if an adequate amount of time has passed since the last successful query result.
-   * - `false` - Will not cause a query to be performed _unless_ it does not exist yet.
-   * - `true` - Will always refetch when a new subscriber to a query is added. Behaves the same as calling the `refetch` callback or passing `forceRefetch: true` in the action creator.
-   * - `number` - **Value is in seconds**. If a number is provided and there is an existing query in the cache, it will compare the current time vs the last fulfilled timestamp, and only refetch if enough time has elapsed.
+   * 默认为 `false`。此设置允许你控制如果已经有缓存结果可用，RTK Query 是否只提供缓存结果，或者如果设置为 `true` 或者自上次成功查询结果以来已经过去了足够的时间，它应该 `refetch`。
+   * - `false` - 不会导致执行查询，_除非_ 它还不存在。
+   * - `true` - 当添加一个新的查询订阅者时，总是会重新获取。行为与调用 `refetch` 回调或在动作创建器中传递 `forceRefetch: true` 相同。
+   * - `number` - **值以秒为单位**。如果提供了一个数字并且缓存中存在一个现有的查询，它将比较当前时间与最后一次满足的时间戳，并且只有在过去了足够的时间后才会重新获取。
    *
-   * If you specify this option alongside `skip: true`, this **will not be evaluated** until `skip` is false.
+   * 如果你在 `skip: true` 旁边指定了此选项，这个选项在 `skip` 为 false 之前**不会被评估**。
    */
   refetchOnMountOrArgChange?: boolean | number
   /**
-   * Defaults to `false`. This setting allows you to control whether RTK Query will try to refetch all subscribed queries after the application window regains focus.
+   * 默认为 `false`。此设置允许你控制当应用程序窗口重新获得焦点后，RTK Query 是否会尝试重新获取所有订阅的查询。
    *
-   * If you specify this option alongside `skip: true`, this **will not be evaluated** until `skip` is false.
+   * 如果你在 `skip: true` 旁边指定了此选项，这个选项在 `skip` 为 false 之前**不会被评估**。
    *
-   * Note: requires [`setupListeners`](./setupListeners) to have been called.
+   * 注意：需要调用 [`setupListeners`](./setupListeners)。
    */
   refetchOnFocus?: boolean
   /**
-   * Defaults to `false`. This setting allows you to control whether RTK Query will try to refetch all subscribed queries after regaining a network connection.
+   * 默认为 `false`。此设置允许你控制当重新获得网络连接后，RTK Query 是否会尝试重新获取所有订阅的查询。
    *
-   * If you specify this option alongside `skip: true`, this **will not be evaluated** until `skip` is false.
+   * 如果你在 `skip: true` 旁边指定了此选项，这个选项在 `skip` 为 false 之前**不会被评估**。
    *
-   * Note: requires [`setupListeners`](./setupListeners) to have been called.
+   * 注意：需要调用 [`setupListeners`](./setupListeners)。
    */
   refetchOnReconnect?: boolean
   /**
-   * Defaults to `'immediately'`. This setting allows you to control when tags are invalidated after a mutation.
+   * 默认为 `'immediately'`。此设置允许你控制在突变后何时使标签无效。
    *
-   * - `'immediately'`: Queries are invalidated instantly after the mutation finished, even if they are running.
-   *   If the query provides tags that were invalidated while it ran, it won't be re-fetched.
-   * - `'delayed'`: Invalidation only happens after all queries and mutations are settled.
-   *   This ensures that queries are always invalidated correctly and automatically "batches" invalidations of concurrent mutations.
-   *   Note that if you constantly have some queries (or mutations) running, this can delay tag invalidations indefinitely.
+   * - `'immediately'`：突变完成后，查询立即失效，即使它们正在运行。
+   *   如果查询提供了在运行时失效的标签，它将不会被重新获取。
+   * - `'delayed'`：只有在所有查询和突变都解决后，才会发生失效。
+   *   这确保了查询总是正确地失效，并自动地“批处理”并发突变的失效。
+   *   注意，如果你不断地运行一些查询（或突变），这可能会无限期地延迟标签失效。
    */
   invalidationBehavior?: 'delayed' | 'immediately'
   /**
-   * A function that is passed every dispatched action. If this returns something other than `undefined`,
-   * that return value will be used to rehydrate fulfilled & errored queries.
+   * 传递每个调度动作的函数。如果这返回了除 `undefined` 以外的东西，
+   * 那么返回值将用于重新填充已完成和错误的查询。
    *
    * @example
    *
    * ```ts
-   * // codeblock-meta title="next-redux-wrapper rehydration example"
+   * // 代码块元数据 标题="next-redux-wrapper 重新填充示例"
    * import type { Action, PayloadAction } from '@reduxjs/toolkit'
    * import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
    * import { HYDRATE } from 'next-redux-wrapper'
    *
-   * type RootState = any; // normally inferred from state
+   * type RootState = any; // 通常从状态推断
    *
    * function isHydrateAction(action: Action): action is PayloadAction<RootState> {
    *   return action.type === HYDRATE
@@ -181,15 +181,15 @@ export interface CreateApiOptions<
    *
    * export const api = createApi({
    *   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-   *   // highlight-start
+   *   // 高亮开始
    *   extractRehydrationInfo(action, { reducerPath }): any {
    *     if (isHydrateAction(action)) {
    *       return action.payload[reducerPath]
    *     }
    *   },
-   *   // highlight-end
+   *   // 高亮结束
    *   endpoints: (build) => ({
-   *     // omitted
+   *     // 省略
    *   }),
    * })
    * ```
@@ -212,7 +212,7 @@ export interface CreateApiOptions<
 
 export type CreateApi<Modules extends ModuleName> = {
   /**
-   * Creates a service to use in your application. Contains only the basic redux logic (the core module).
+   * 在你的应用程序中创建一个服务。只包含基本的 redux 逻辑（核心模块）。
    *
    * @link https://rtk-query-docs.netlify.app/api/createApi
    */
@@ -227,7 +227,7 @@ export type CreateApi<Modules extends ModuleName> = {
 }
 
 /**
- * Builds a `createApi` method based on the provided `modules`.
+ * 基于提供的 `modules` 构建一个 `createApi` 方法。
  *
  * @link https://rtk-query-docs.netlify.app/concepts/customizing-create-api
  *
@@ -246,8 +246,8 @@ export type CreateApi<Modules extends ModuleName> = {
  * );
  * ```
  *
- * @param modules - A variable number of modules that customize how the `createApi` method handles endpoints
- * @returns A `createApi` method using the provided `modules`.
+ * @param modules - 自定义 `createApi` 方法如何处理端点的一系列模块
+ * @returns 使用提供的 `modules` 的 `createApi` 方法。
  */
 export function buildCreateApi<Modules extends [Module<any>, ...Module<any>[]]>(
   ...modules: Modules

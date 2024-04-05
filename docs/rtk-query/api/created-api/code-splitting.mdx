@@ -7,17 +7,17 @@ hide_title: true
 
 &nbsp;
 
-# API Slices: Code Splitting and Generation
+# API 切片：代码拆分和生成
 
-Each API slice allows [additional endpoint definitions to be injected at runtime](../../usage/code-splitting.mdx) after the initial API slice has been defined. This can be beneficial for apps that may have _many_ endpoints.
+每个 API 切片允许在初始 API 切片定义后的运行时[注入额外的端点定义](../../usage/code-splitting.mdx)。这对于可能有_许多_端点的应用程序可能是有益的。
 
-The individual API slice endpoint definitions can also be split across multiple files. This is primarily useful for working with API slices that were [code-generated from an API schema file](../../usage/code-generation.mdx), allowing you to add additional custom behavior and configuration to a set of automatically-generated endpoint definitions.
+单个 API 切片端点定义也可以跨多个文件进行拆分。这主要用于处理从 API 架构文件[代码生成的 API 切片](../../usage/code-generation.mdx)，允许您向一组自动生成的端点定义添加额外的自定义行为和配置。
 
-Each API slice object has `injectEndpoints` and `enhanceEndpoints` functions to support these use cases.
+每个 API 切片对象都有 `injectEndpoints` 和 `enhanceEndpoints` 函数来支持这些用例。
 
 ## `injectEndpoints`
 
-#### Signature
+#### 签名
 
 ```ts no-transpile
 const injectEndpoints = (endpointOptions: InjectedEndpointOptions) =>
@@ -26,29 +26,29 @@ const injectEndpoints = (endpointOptions: InjectedEndpointOptions) =>
 interface InjectedEndpointOptions {
   endpoints: (build: EndpointBuilder) => NewEndpointDefinitions
   /**
-   * Optionally allows endpoints to be overridden if defined by multiple `injectEndpoints` calls.
+   * 可选地允许端点被多次 `injectEndpoints` 调用定义时覆盖。
    *
-   * If set to `true`, will override existing endpoints with the new definition.
-   * If set to `'throw'`, will throw an error if an endpoint is redefined with a different definition.
-   * If set to `false` (or unset), will not override existing endpoints with the new definition, and log a warning in development.
+   * 如果设置为 `true`，将用新定义覆盖现有端点。
+   * 如果设置为 `'throw'`，如果端点被不同的定义重新定义，将抛出错误。
+   * 如果设置为 `false`（或未设置），将不会用新定义覆盖现有端点，并在开发中记录警告。
    */
   overrideExisting?: boolean | 'throw'
 }
 ```
 
-#### Description
+#### 描述
 
-Accepts an options object containing the same `endpoints` builder callback you would pass to [`createApi.endpoints`](../createApi.mdx#endpoints). Any endpoint definitions defined using that builder will be merged into the existing endpoint definitions for this API slice using a shallow merge, so any new endpoint definitions will override existing endpoints with the same name.
+接受一个选项对象，其中包含您将传递给 [`createApi.endpoints`](../createApi.mdx#endpoints) 的相同 `endpoints` 构建器回调。使用该构建器定义的任何端点定义都将使用浅合并合并到此 API 切片的现有端点定义中，因此任何新的端点定义都将覆盖具有相同名称的现有端点。
 
-Returns an updated and enhanced version of the API slice object, containing the combined endpoint definitions.
+返回更新和增强的 API 切片对象版本，包含组合的端点定义。
 
-Endpoints will not be overridden unless `overrideExisting` is set to `true`. If not, a development mode warning will be shown to notify you if there is a name clash between endpoint definitions.
+除非 `overrideExisting` 设置为 `true`，否则不会覆盖端点。如果没有，将显示开发模式警告，通知您如果端点定义之间存在名称冲突。
 
-This method is primarily useful for code splitting and hot reloading.
+此方法主要用于代码拆分和热重载。
 
 ## `enhanceEndpoints`
 
-#### Signature
+#### 签名
 
 ```ts no-transpile
 const enhanceEndpoints = (endpointOptions: EnhanceEndpointsOptions) =>
@@ -60,18 +60,18 @@ interface EnhanceEndpointsOptions {
 }
 ```
 
-#### Description
+#### 描述
 
-Any provided tag types or endpoint definitions will be merged into the existing endpoint definitions for this API slice. Unlike `injectEndpoints`, the partial endpoint definitions will not _replace_ existing definitions, but are rather merged together on a per-definition basis (ie, `Object.assign(existingEndpoint, newPartialEndpoint)`).
+任何提供的标签类型或端点定义都将合并到此 API 切片的现有端点定义中。与 `injectEndpoints` 不同，部分端点定义不会_替换_现有定义，而是在每个定义基础上合并在一起（即，`Object.assign(existingEndpoint, newPartialEndpoint)`）。
 
-Returns an updated and enhanced version of the API slice object, containing the combined endpoint definitions.
+返回更新和增强的 API 切片对象版本，包含组合的端点定义。
 
-This is primarily useful for taking an API slice object that was code-generated from an API schema file like OpenAPI, and adding additional specific hand-written configuration for cache invalidation management on top of the generated endpoint definitions.
+这主要用于获取从 API 架构文件（如 OpenAPI）代码生成的 API 切片对象，并在生成的端点定义之上添加额外的特定手写配置，以进行缓存失效管理。
 
-For example, `enhanceEndpoints` can be used to modify caching behavior by changing the values of `providesTags`, `invalidatesTags`, and `keepUnusedDataFor`:
+例如，`enhanceEndpoints` 可以用来通过更改 `providesTags`、`invalidatesTags` 和 `keepUnusedDataFor` 的值来修改缓存行为：
 
 ```ts
-// file: api.ts noEmit
+// 文件：api.ts noEmit
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const api = createApi({
@@ -95,7 +95,7 @@ export const api = createApi({
   }),
 })
 
-// file: enhanceEndpoints.ts
+// 文件：enhanceEndpoints.ts
 import { api } from './api'
 
 const enhancedApi = api.enhanceEndpoints({
@@ -107,7 +107,7 @@ const enhancedApi = api.enhanceEndpoints({
     patchUserByUserId: {
       invalidatesTags: ['User'],
     },
-    // alternatively, define a function which is called with the endpoint definition as an argument
+    // 或者，定义一个函数，该函数以端点定义为参数调用
     getUsers(endpoint) {
       endpoint.providesTags = ['User']
       endpoint.keepUnusedDataFor = 120

@@ -8,46 +8,46 @@ description: 'RTK Query > TypeScript: Instructions on how to use RTK Query with 
 
 &nbsp;
 
-# Usage With TypeScript
+# 与 TypeScript 一起使用
 
-:::tip What You'll Learn
+:::tip 你将学到什么
 
-- Details on how to use various RTK Query APIs with TypeScript
+- 如何使用各种 RTK Query APIs 与 TypeScript
 
 :::
 
-## Introduction
+## 简介
 
-As with the rest of the Redux Toolkit package, RTK Query is written in TypeScript, and its API is designed for seamless use in TypeScript applications.
+与 Redux Toolkit 包的其余部分一样，RTK Query 是用 TypeScript 编写的，其 API 旨在在 TypeScript 应用程序中无缝使用。
 
-This page provides details for using APIs included in RTK Query with TypeScript and how to type them correctly.
+此页面提供了使用 RTK Query 中包含的 APIs 与 TypeScript 以及如何正确地对它们进行类型化的详细信息。
 
 :::info
 
-**We strongly recommend using TypeScript 4.1+ with RTK Query for best results.**
+**我们强烈建议使用 TypeScript 4.1+ 与 RTK Query 以获得最佳结果。**
 
-If you encounter any problems with the types that are not described on this page, please [open an issue](https://github.com/reduxjs/redux-toolkit/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) for discussion.
+如果你遇到任何在此页面上未描述的类型问题，请[开启一个问题](https://github.com/reduxjs/redux-toolkit/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc)进行讨论。
 
 :::
 
 ## `createApi`
 
-### Using auto-generated React Hooks
+### 使用自动生成的 React 钩子
 
-The React-specific entry point for RTK Query exports a version of [`createApi`](./api/createApi.mdx) which automatically generates React hooks for each of the defined query & mutation [`endpoints`](./api/createApi.mdx#endpoints).
+RTK Query 的 React 特定入口点导出了一个版本的 [`createApi`](./api/createApi.mdx)，它会自动为定义的查询和突变 [`endpoints`](./api/createApi.mdx#endpoints) 生成 React 钩子。
 
-To use the auto-generated React Hooks as a TypeScript user, **you'll need to use TS4.1+**.
+要作为 TypeScript 用户使用自动生成的 React 钩子，**你需要使用 TS4.1+**。
 
 ```ts
-// file: src/services/types.ts noEmit
+// 文件: src/services/types.ts noEmit
 export type Pokemon = {}
 
-// file: src/services/pokemon.ts
-// Need to use the React-specific entry point to allow generating React hooks
+// 文件: src/services/pokemon.ts
+// 需要使用 React 特定的入口点以允许生成 React 钩子
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Pokemon } from './types'
 
-// Define a service using a base URL and expected endpoints
+// 使用基础 URL 和预期的端点定义服务
 export const pokemonApi = createApi({
   reducerPath: 'pokemonApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://pokeapi.co/api/v2/' }),
@@ -59,19 +59,19 @@ export const pokemonApi = createApi({
 })
 
 // highlight-start
-// Export hooks for usage in function components, which are
-// auto-generated based on the defined endpoints
+// 导出用于在函数组件中使用的钩子，这些钩子是
+// 根据定义的端点自动生成的
 export const { useGetPokemonByNameQuery } = pokemonApi
 // highlight-end
 ```
 
-For older versions of TS, you can use `api.endpoints.[endpointName].useQuery/useMutation` to access the same hooks.
+对于旧版本的 TS，你可以使用 `api.endpoints.[endpointName].useQuery/useMutation` 来访问相同的钩子。
 
-```ts title="Accessing api hooks directly"
-// file: src/services/types.ts noEmit
+```ts title="直接访问 api 钩子"
+// 文件: src/services/types.ts noEmit
 export type Pokemon = {}
 
-// file: src/services/pokemon.ts noEmit
+// 文件: src/services/pokemon.ts noEmit
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Pokemon } from './types'
 
@@ -87,17 +87,17 @@ export const pokemonApi = createApi({
 
 export const { useGetPokemonByNameQuery } = pokemonApi
 
-// file: src/services/manual-query.ts
+// 文件: src/services/manual-query.ts
 import { pokemonApi } from './pokemon'
 
 const useGetPokemonByNameQuery = pokemonApi.endpoints.getPokemonByName.useQuery
 ```
 
-### Typing a `baseQuery`
+### 对 `baseQuery` 进行类型化
 
-Typing a custom [`baseQuery`](./api/createApi.mdx#basequery) can be done using the `BaseQueryFn` type exported by RTK Query.
+可以使用 RTK Query 导出的 `BaseQueryFn` 类型对自定义 [`baseQuery`](./api/createApi.mdx#basequery) 进行类型化。
 
-```ts title="Base Query signature" no-transpile
+```ts title="Base Query 签名" no-transpile
 export type BaseQueryFn<
   Args = any,
   Result = unknown,
@@ -129,21 +129,21 @@ export type QueryReturnValue<T = unknown, E = unknown, M = unknown> =
     }
 ```
 
-The `BaseQueryFn` type accepts the following generics:
+`BaseQueryFn` 类型接受以下泛型：
 
-- `Args` - The type for the first parameter of the function. The result returned by a [`query`](./api/createApi.mdx#query) property on an endpoint will be passed here.
-- `Result` - The type to be returned in the `data` property for the success case. Unless you expect all queries and mutations to return the same type, it is recommended to keep this typed as `unknown`, and specify the types individually as shown [below](#typing-query-and-mutation-endpoints).
-- `Error` - The type to be returned for the `error` property in the error case. This type also applies to all [`queryFn`](#typing-a-queryfn) functions used in endpoints throughout the API definition.
-- `DefinitionExtraOptions` - The type for the third parameter of the function. The value provided to the [`extraOptions`](./api/createApi.mdx#extraoptions) property on an endpoint will be passed here.
-- `Meta` - the type of the `meta` property that may be returned from calling the `baseQuery`. The `meta` property is accessible as the second argument to [`transformResponse`](./api/createApi.mdx#transformresponse) and [`transformErrorResponse`](./api/createApi.mdx#transformerrorresponse).
+- `Args` - 函数的第一个参数的类型。端点上的 [`query`](./api/createApi.mdx#query) 属性返回的结果将在此处传递。
+- `Result` - 成功情况下 `data` 属性要返回的类型。除非你期望所有查询和突变都返回相同的类型，否则建议将此类型保持为 `unknown`，并如下所示单独指定类型。
+- `Error` - 错误情况下 `error` 属性要返回的类型。此类型也适用于 API 定义中所有端点使用的 [`queryFn`](#typing-a-queryfn) 函数。
+- `DefinitionExtraOptions` - 函数的第三个参数的类型。在端点上提供给 [`extraOptions`](./api/createApi.mdx#extraoptions) 属性的值将在此处传递。
+- `Meta` - 可能从调用 `baseQuery` 返回的 `meta` 属性的类型。`meta` 属性可以作为 [`transformResponse`](./api/createApi.mdx#transformresponse) 和 [`transformErrorResponse`](./api/createApi.mdx#transformerrorresponse) 的第二个参数访问。
 
 :::note
 
-The `meta` property returned from a `baseQuery` will always be considered as potentially undefined, as a `throw` in the error case may result in it not being provided. When accessing values from the `meta` property, this should be accounted for, e.g. using [optional chaining](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining)
+从 `baseQuery` 返回的 `meta` 属性总是被视为可能未定义的，因为在错误情况下可能会导致它未被提供。在访问 `meta` 属性的值时，应考虑到这一点，例如使用[可选链](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining)。
 
 :::
 
-```ts title="Simple baseQuery TypeScript example"
+```ts title="简单的 baseQuery TypeScript 示例"
 import { createApi } from '@reduxjs/toolkit/query'
 import type { BaseQueryFn } from '@reduxjs/toolkit/query'
 
@@ -154,9 +154,9 @@ const simpleBaseQuery: BaseQueryFn<
   { shout?: boolean }, // DefinitionExtraOptions
   { timestamp: number } // Meta
 > = (arg, api, extraOptions) => {
-  // `arg` has the type `string`
-  // `api` has the type `BaseQueryApi` (not configurable)
-  // `extraOptions` has the type `{ shout?: boolean }
+  // `arg` 的类型为 `string`
+  // `api` 的类型为 `BaseQueryApi`（不可配置）
+  // `extraOptions` 的类型为 `{ shout?: boolean }
 
   const meta = { timestamp: Date.now() }
 
@@ -189,24 +189,24 @@ const api = createApi({
 })
 ```
 
-### Typing query and mutation `endpoints`
+### 为查询和变异 `endpoints` 添加类型
 
-`endpoints` for an api are defined as an object using the builder syntax. Both `query` and `mutation` endpoints can be typed by providing types to the generics in `<ResultType, QueryArg>` format.
+使用构建器语法，`endpoints` 被定义为一个对象。通过向 `<ResultType, QueryArg>` 格式的泛型提供类型，可以为 `query` 和 `mutation` endpoints 添加类型。
 
-- `ResultType` - The type of the final data returned by the query, factoring an optional [`transformResponse`](./api/createApi.mdx#transformresponse).
-  - If `transformResponse` is not provided, then it is treated as though a successful query will return this type instead.
-  - If `transformResponse` _is_ provided, the input type for `transformResponse` must also be specified, to indicate the type that the initial query returns. The return type for `transformResponse` must match `ResultType`.
-  - If `queryFn` is used rather than `query`, then it must return the following shape for the success case:
+- `ResultType` - 查询返回的最终数据的类型，考虑到可选的 [`transformResponse`](./api/createApi.mdx#transformresponse)。
+  - 如果没有提供 `transformResponse`，那么就会被视为成功的查询将返回这种类型。
+  - 如果提供了 `transformResponse`，那么 `transformResponse` 的输入类型也必须指定，以指示初始查询返回的类型。`transformResponse` 的返回类型必须与 `ResultType` 匹配。
+  - 如果使用 `queryFn` 而不是 `query`，那么它必须返回以下形状的成功案例：
     ```ts no-transpile
     {
       data: ResultType
     }
     ```
-- `QueryArg` - The type of the input that will be passed as the only parameter to the `query` property of the endpoint, or the first parameter of a `queryFn` property if used instead.
-  - If `query` doesn't have a parameter, then `void` type has to be provided explicitly.
-  - If `query` has an optional parameter, then a union type with the type of parameter, and `void` has to be provided, e.g. `number | void`.
+- `QueryArg` - 将作为唯一参数传递给 endpoint 的 `query` 属性，或者如果使用 `queryFn` 属性，则作为第一个参数。
+  - 如果 `query` 没有参数，那么必须明确提供 `void` 类型。
+  - 如果 `query` 有一个可选参数，那么必须提供参数类型和 `void` 的联合类型，例如 `number | void`。
 
-```ts title="Defining endpoints with TypeScript"
+```ts title="使用 TypeScript 定义 endpoints"
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 interface Post {
   id: number
@@ -216,44 +216,43 @@ interface Post {
 const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: (build) => ({
-    // highlight-start
+    // 高亮开始
     //              ResultType  QueryArg
     //                    v       v
     getPost: build.query<Post, number>({
-      // inferred as `number` from the `QueryArg` type
+      // 从 `QueryArg` 类型推断出 `number`
       //       v
       query: (id) => `post/${id}`,
-      // An explicit type must be provided to the raw result that the query returns
-      // when using `transformResponse`
+      // 当使用 `transformResponse` 时，必须为查询返回的原始结果提供明确的类型
       //                             v
       transformResponse: (rawResult: { result: { post: Post } }, meta) => {
         //                                                        ^
-        // The optional `meta` property is available based on the type for the `baseQuery` used
+        // 基于用于 `baseQuery` 的类型，可选的 `meta` 属性可用
 
-        // The return value for `transformResponse` must match `ResultType`
+        // `transformResponse` 的返回值必须与 `ResultType` 匹配
         return rawResult.result.post
       },
     }),
-    // highlight-end
+    // 高亮结束
   }),
 })
 ```
 
 :::note
 
-`queries` and `mutations` can also have their return type defined by a [`baseQuery`](#typing-a-basequery) rather than the method shown above, however, unless you expect all of your queries and mutations to return the same type, it is recommended to leave the return type of the `baseQuery` as `unknown`.
+`queries` 和 `mutations` 的返回类型也可以由 [`baseQuery`](#typing-a-basequery) 定义，而不是上面显示的方法，但是，除非你期望所有的查询和变异都返回相同的类型，否则建议将 `baseQuery` 的返回类型保留为 `unknown`。
 
 :::
 
-### Typing a `queryFn`
+### 为 `queryFn` 添加类型
 
-As mentioned in [Typing query and mutation endpoints](#typing-query-and-mutation-endpoints), a `queryFn` will receive its result & arg types from the generics provided to the corresponding built endpoint.
+如在 [为查询和变异 endpoints 添加类型](#typing-query-and-mutation-endpoints) 中提到的，`queryFn` 将从提供给相应构建 endpoint 的泛型中接收其结果和参数类型。
 
 ```ts
-// file: randomData.ts noEmit
+// 文件: randomData.ts noEmit
 export declare const getRandomName: () => string
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { getRandomName } from './randomData'
 
@@ -265,46 +264,46 @@ interface Post {
 const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: (build) => ({
-    // highlight-start
+    // 高亮开始
     //              ResultType  QueryArg
     //                    v       v
     getPost: build.query<Post, number>({
-      // inferred as `number` from the `QueryArg` type
+      // 从 `QueryArg` 类型推断出 `number`
       //         v
       queryFn: (arg, queryApi, extraOptions, baseQuery) => {
         const post: Post = {
           id: arg,
           name: getRandomName(),
         }
-        // For the success case, the return type for the `data` property
-        // must match `ResultType`
+        // 对于成功的情况，`data` 属性的返回类型
+        // 必须与 `ResultType` 匹配
         //              v
         return { data: post }
       },
     }),
-    // highlight-end
+    // 高亮结束
   }),
 })
 ```
 
-The error type that a `queryFn` must return is determined by the [`baseQuery`](#typing-a-basequery) provided to `createApi`.
+`queryFn` 必须返回的错误类型由提供给 `createApi` 的 [`baseQuery`](#typing-a-basequery) 确定。
 
-With [`fetchBaseQuery`](./api/fetchBaseQuery.mdx), the error type is like so:
+对于 [`fetchBaseQuery`](./api/fetchBaseQuery.mdx)，错误类型如下：
 
-```ts title="fetchBaseQuery error shape" no-transpile
+```ts title="fetchBaseQuery 错误形状" no-transpile
 {
   status: number
   data: any
 }
 ```
 
-An error case for the example above using `queryFn` and the error type from `fetchBaseQuery` could look like:
+对于上面使用 `queryFn` 和来自 `fetchBaseQuery` 的错误类型的例子，错误情况可能如下：
 
-```ts title="queryFn error example with error type from fetchBaseQuery"
-// file: randomData.ts noEmit
+```ts title="queryFn 错误示例，错误类型来自 fetchBaseQuery"
+// 文件: randomData.ts noEmit
 export declare const getRandomName: () => string
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { getRandomName } from './randomData'
 
@@ -316,10 +315,10 @@ interface Post {
 const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: (build) => ({
-    // highlight-start
+    // 高亮开始
     getPost: build.query<Post, number>({
       queryFn: (arg, queryApi, extraOptions, baseQuery) => {
-        // highlight-start
+        // 高亮开始
         if (arg <= 0) {
           return {
             error: {
@@ -329,7 +328,7 @@ const api = createApi({
             },
           }
         }
-        // highlight-end
+        // 高亮结束
         const post: Post = {
           id: arg,
           name: getRandomName(),
@@ -341,24 +340,24 @@ const api = createApi({
 })
 ```
 
-For users who wish to _only_ use `queryFn` for each endpoint and not include a `baseQuery` at all, RTK Query provides a `fakeBaseQuery` function that can be used to easily specify the error type each `queryFn` should return.
+对于希望 _只_ 为每个 endpoint 使用 `queryFn` 并且完全不包含 `baseQuery` 的用户，RTK Query 提供了一个 `fakeBaseQuery` 函数，可以用来轻松指定每个 `queryFn` 应返回的错误类型。
 
-```ts title="Excluding baseQuery for all endpoints"
+```ts title="排除所有 endpoints 的 baseQuery"
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query'
 
-// highlight-start
+// 高亮开始
 type CustomErrorType = { reason: 'too cold' | 'too hot' }
-// highlight-end
+// 高亮结束
 
 const api = createApi({
-  // highlight-start
-  // This type will be used as the error type for all `queryFn` functions provided
+  // 高亮开始
+  // 这种类型将被用作所有 `queryFn` 函数提供的错误类型
   //                              v
   baseQuery: fakeBaseQuery<CustomErrorType>(),
-  // highlight-end
+  // 高亮结束
   endpoints: (build) => ({
     eatPorridge: build.query<'just right', 1 | 2 | 3>({
-      // highlight-start
+      // 高亮开始
       queryFn(seat) {
         if (seat === 1) {
           return { error: { reason: 'too cold' } }
@@ -370,10 +369,10 @@ const api = createApi({
 
         return { data: 'just right' }
       },
-      // highlight-end
+      // 高亮结束
     }),
     microwaveHotPocket: build.query<'delicious!', number>({
-      // highlight-start
+      // 高亮开始
       queryFn(duration) {
         if (duration < 110) {
           return { error: { reason: 'too cold' } }
@@ -384,19 +383,19 @@ const api = createApi({
 
         return { data: 'delicious!' }
       },
-      // highlight-end
+      // 高亮结束
     }),
   }),
 })
 ```
 
-### Typing `dispatch` and `getState`
+### 为 `dispatch` 和 `getState` 类型化
 
-`createApi` exposes the standard Redux `dispatch` and `getState` methods in several places, such as the `lifecycleApi` argument in lifecycle methods, or the `baseQueryApi` argument passed to `queryFn` methods and base query functions.
+`createApi` 在多个地方暴露了标准的 Redux `dispatch` 和 `getState` 方法，例如在生命周期方法中的 `lifecycleApi` 参数，或者传递给 `queryFn` 方法和基础查询函数的 `baseQueryApi` 参数。
 
-Normally, [your application infers `RootState` and `AppDispatch` types from the store setup](../tutorials/typescript.md#define-root-state-and-dispatch-types). Since `createApi` has to be called prior to creating the Redux store and is used as part of the store setup sequence, it can't directly know or use those types - it would cause a circular type inference error.
+通常，[你的应用程序会从存储设置中推断出 `RootState` 和 `AppDispatch` 类型](../tutorials/typescript.md#define-root-state-and-dispatch-types)。由于 `createApi` 必须在创建 Redux 存储之前被调用，并且被用作存储设置序列的一部分，因此它不能直接知道或使用这些类型 - 这将导致循环类型推断错误。
 
-By default, `dispatch` usages inside of `createApi` will be typed as `ThunkDispatch`, and `getState` usages are typed as `() => unknown`. You will need to assert the type when needed - `getState() as RootState`. You may also include an explicit return type for the function as well, in order to break the circular type inference cycle:
+默认情况下，`createApi` 内部的 `dispatch` 使用将被类型化为 `ThunkDispatch`，`getState` 的使用被类型化为 `() => unknown`。你需要在需要的时候断言类型 - `getState() as RootState`。你也可以为函数包含一个明确的返回类型，以打破循环类型推断周期：
 
 ```ts no-transpile
 const api = createApi({
@@ -405,7 +404,7 @@ const api = createApi({
     getTodos: build.query<Todo[], void>({
       async queryFn() {
         // highlight-start
-        // Cast state as `RootState`
+        // 将状态转换为 `RootState`
         const state = getState() as RootState
         // highlight-end
         const text = state.todoTexts[queryFnCalls]
@@ -416,21 +415,21 @@ const api = createApi({
 })
 ```
 
-### Typing `providesTags`/`invalidatesTags`
+### 为 `providesTags`/`invalidatesTags` 类型化
 
-RTK Query utilizes a cache tag invalidation system in order to provide [automated re-fetching](./usage/automated-refetching.mdx) of stale data.
+RTK Query 使用缓存标签失效系统，以提供[自动重新获取](./usage/automated-refetching.mdx)过期数据的功能。
 
-When using the function notation, both the `providesTags` and `invalidatesTags` properties on endpoints are called with the following arguments:
+当使用函数表示法时，端点上的 `providesTags` 和 `invalidatesTags` 属性都会被以下参数调用：
 
-- result: `ResultType` | `undefined` - The result returned by a successful query. The type corresponds with `ResultType` as [supplied to the built endpoint](#typing-query-and-mutation-endpoints). In the error case for a query, this will be `undefined`.
-- error: `ErrorType` | `undefined` - The error returned by an errored query. The type corresponds with `Error` as [supplied to the `baseQuery` for the api](#typing-a-basequery). In the success case for a query, this will be `undefined`.
-- arg: `QueryArg` - The argument supplied to the `query` property when the query itself is called. The type corresponds with `QueryArg` as [supplied to the built endpoint](#typing-query-and-mutation-endpoints).
+- result: `ResultType` | `undefined` - 成功查询返回的结果。类型与[提供给构建端点的 `ResultType` 对应](#typing-query-and-mutation-endpoints)。对于查询的错误情况，这将是 `undefined`。
+- error: `ErrorType` | `undefined` - 错误查询返回的错误。类型与[提供给 api 的 `baseQuery` 的 `Error` 对应](#typing-a-basequery)。对于查询的成功情况，这将是 `undefined`。
+- arg: `QueryArg` - 当查询本身被调用时，提供给 `query` 属性的参数。类型与[提供给构建端点的 `QueryArg` 对应](#typing-query-and-mutation-endpoints)。
 
-A recommended use-case with `providesTags` when a query returns a list of items is to provide a tag for each item in the list using the entity ID, as well as a 'LIST' ID tag (see [Advanced Invalidation with abstract tag IDs](./usage/automated-refetching.mdx#advanced-invalidation-with-abstract-tag-ids)).
+当查询返回一个项目列表时，使用 `providesTags` 的推荐用例是为列表中的每个项目提供一个标签，使用实体 ID，以及一个 'LIST' ID 标签（参见[使用抽象标签 ID 的高级失效](./usage/automated-refetching.mdx#advanced-invalidation-with-abstract-tag-ids)）。
 
-This is often written by spreading the result of mapping the received data into an array, as well as an additional item in the array for the `'LIST'` ID tag. When spreading the mapped array, by default, TypeScript will broaden the `type` property to `string`. As the tag `type` must correspond to one of the string literals provided to the [`tagTypes`](./api/createApi.mdx#tagtypes) property of the api, the broad `string` type will not satisfy TypeScript. In order to alleviate this, the tag `type` can be cast `as const` to prevent the type being broadened to `string`.
+这通常通过将接收到的数据映射到数组的结果扩展，以及数组中的额外项用于 `'LIST'` ID 标签来编写。当扩展映射数组时，默认情况下，TypeScript 将 `type` 属性扩展为 `string`。由于标签 `type` 必须对应到提供给 api 的 [`tagTypes`](./api/createApi.mdx#tagtypes) 属性的一个字符串字面量，所以广泛的 `string` 类型将不会满足 TypeScript。为了缓解这个问题，可以将标签 `type` 转换为 `as const`，以防止类型被扩展为 `string`。
 
-```ts title="providesTags TypeScript example"
+```ts title="providesTags TypeScript 示例"
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 interface Post {
   id: number
@@ -458,31 +457,27 @@ const api = createApi({
 })
 ```
 
-<!-- when mapping, needs the tag `type` cast `as const` to prevent being broadened to `string` -->
+## 使用 `skipToken` 在 TypeScript 中跳过查询
 
-## Skipping queries with TypeScript using `skipToken`
+RTK Query 提供了使用 `skip` 参数作为查询钩子选项的部分，以有条件地跳过自动运行的查询的能力（参见[条件获取](./usage/conditional-fetching.mdx)）。
 
-<!-- good for scenarios where you never want to send the query for a nullish value (skipping the query), but want the param itself to be typed correctly. Passing `skipToken` as the param will prevents the query from firing, with the same effect as `{ skip: true }`  -->
+TypeScript 用户可能会发现，当查询参数被类型化为不是 `undefined`，并且他们试图在参数无效时 `skip` 查询时，他们会遇到无效的类型场景。
 
-RTK Query provides the ability to conditionally skip queries from automatically running using the `skip` parameter as part of query hook options (see [Conditional Fetching](./usage/conditional-fetching.mdx)).
-
-TypeScript users may find that they encounter invalid type scenarios when a query argument is typed to not be `undefined`, and they attempt to `skip` the query when an argument would not be valid.
-
-```ts title="API definition"
-// file: types.ts noEmit
+```ts title="API 定义"
+// 文件: types.ts noEmit
 export interface Post {
   id: number
   name: string
 }
 
-// file: api.ts
+// 文件: api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Post } from './types'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: (build) => ({
-    // Query argument is required to be `number`, and can't be `undefined`
+    // 查询参数必须是 `number`，不能是 `undefined`
     //                            V
     getPost: build.query<Post, number>({
       query: (id) => `post/${id}`,
@@ -493,55 +488,50 @@ export const api = createApi({
 export const { useGetPostQuery } = api
 ```
 
-```tsx no-transpile title="Using skip in a component"
+```tsx no-transpile title="在组件中使用 skip"
 import { useGetPostQuery } from './api'
 
 function MaybePost({ id }: { id?: number }) {
-  // This will produce a typescript error:
-  // Argument of type 'number | undefined' is not assignable to parameter of type 'number | unique symbol'.
-  // Type 'undefined' is not assignable to type 'number | unique symbol'.
+  // 这将产生一个 TypeScript 错误：
+  // 类型 'number | undefined' 的参数不能赋值给类型 'number | unique symbol' 的参数。
+  // 类型 'undefined' 不能赋值给类型 'number | unique symbol'。
 
-  // @ts-expect-error id passed must be a number, but we don't call it when it isn't a number
+  // @ts-expect-error 传递的 id 必须是一个数字，但是我们在它不是数字时不调用它
   const { data } = useGetPostQuery(id, { skip: !id })
 
   return <div>...</div>
 }
 ```
 
-While you might be able to convince yourself that the query won't be called unless the `id` arg is a `number` at the time, TypeScript won't be convinced so easily.
+虽然你可能能够说服自己，除非 `id` 参数在那时是一个 `number`，否则查询不会被调用，但 TypeScript 不会那么容易被说服。
 
-RTK Query provides a `skipToken` export which can be used as an alternative to the `skip` option in order to skip queries, while remaining type-safe. When `skipToken` is passed as the query argument to `useQuery`, `useQueryState` or `useQuerySubscription`, it provides the same effect as setting `skip: true` in the query options, while also being a valid argument in scenarios where the `arg` might be undefined otherwise.
+RTK Query 提供了一个 `skipToken` 导出，它可以作为跳过查询的替代方法，同时保持类型安全。当 `skipToken` 作为查询参数传递给 `useQuery`，`useQueryState` 或 `useQuerySubscription` 时，它提供了与在查询选项中设置 `skip: true` 相同的效果，同时在 `arg` 可能否则未定义的情况下也是一个有效的参数。
 
-```tsx no-transpile title="Using skipToken in a component"
+```tsx no-transpile title="在组件中使用 skipToken"
 import { skipToken } from '@reduxjs/toolkit/query/react'
 import { useGetPostQuery } from './api'
 
 function MaybePost({ id }: { id?: number }) {
-  // When `id` is nullish, we will still skip the query.
-  // TypeScript is also happy that the query will only ever be called with a `number` now
+  // 当 `id` 是 nullish，我们仍然会跳过查询。
+  // TypeScript 也很高兴现在查询只会被一个 `number` 调用
   const { data } = useGetPostQuery(id ?? skipToken)
 
   return <div>...</div>
 }
 ```
 
-## Type safe error handling
+## 类型安全的错误处理
 
-When an error is gracefully provided from a [`base query`](./api/createApi.mdx#baseQuery), RTK query will provide the error
-directly. If an unexpected error is thrown by user code rather than a handled error,
-that error will be transformed into a `SerializedError` shape. Users should make sure that they are checking which kind of error they are dealing with before attempting to access its properties. This can be done in a type safe manner either
-by using a type guard, e.g. by checking for [discriminated properties](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#the-in-operator-narrowing),
-or using a [type predicate](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates).
+当一个错误从 [`base query`](./api/createApi.mdx#baseQuery) 中优雅地提供时，RTK 查询将直接提供错误。如果用户代码抛出了一个意外的错误，而不是一个处理过的错误，那么这个错误将被转换为 `SerializedError` 形状。用户应确保在尝试访问其属性之前，检查他们正在处理哪种类型的错误。这可以通过使用类型保护，例如，通过检查[鉴别属性](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#the-in-operator-narrowing)，或者使用[类型谓词](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates)来以类型安全的方式完成。
 
-When using [`fetchBaseQuery`](./api/fetchBaseQuery.mdx), as your base query,
-errors will be of type `FetchBaseQueryError | SerializedError`. The specific shapes of those types can be seen below.
+当使用 [`fetchBaseQuery`](./api/fetchBaseQuery.mdx) 作为你的基础查询时，错误将是 `FetchBaseQueryError | SerializedError` 类型。这些类型的具体形状可以在下面看到。
 
-```ts title="FetchBaseQueryError type"
+```ts title="FetchBaseQueryError 类型"
 export type FetchBaseQueryError =
   | {
       /**
        * * `number`:
-       *   HTTP status code
+       *   HTTP 状态码
        */
       status: number
       data: unknown
@@ -549,7 +539,7 @@ export type FetchBaseQueryError =
   | {
       /**
        * * `"FETCH_ERROR"`:
-       *   An error that occurred during execution of `fetch` or the `fetchFn` callback option
+       *   在执行 `fetch` 或 `fetchFn` 回调选项期间发生的错误
        **/
       status: 'FETCH_ERROR'
       data?: undefined
@@ -558,9 +548,9 @@ export type FetchBaseQueryError =
   | {
       /**
        * * `"PARSING_ERROR"`:
-       *   An error happened during parsing.
-       *   Most likely a non-JSON-response was returned with the default `responseHandler` "JSON",
-       *   or an error occurred while executing a custom `responseHandler`.
+       *   在解析过程中发生的错误。
+       *   最有可能的是返回了一个非 JSON 响应，使用默认的 `responseHandler` "JSON"，
+       *   或者在执行自定义 `responseHandler` 时发生了错误。
        **/
       status: 'PARSING_ERROR'
       originalStatus: number
@@ -570,7 +560,7 @@ export type FetchBaseQueryError =
   | {
       /**
        * * `"CUSTOM_ERROR"`:
-       *   A custom error type that you can return from your `queryFn` where another error might not make sense.
+       *   你可以从你的 `queryFn` 返回的自定义错误类型，其中其他错误可能没有意义。
        **/
       status: 'CUSTOM_ERROR'
       data?: unknown
@@ -578,7 +568,7 @@ export type FetchBaseQueryError =
     }
 ```
 
-```ts title="SerializedError type"
+```ts title="SerializedError 类型"
 export interface SerializedError {
   name?: string
   message?: string
@@ -587,10 +577,9 @@ export interface SerializedError {
 }
 ```
 
-### Error result example
+### 错误结果示例
 
-When using `fetchBaseQuery`, the `error` property returned from a hook will have the type `FetchBaseQueryError | SerializedError | undefined`.
-If an error is present, you can access error properties after narrowing the type to either `FetchBaseQueryError` or `SerializedError`.
+当使用 `fetchBaseQuery` 时，从钩子返回的 `error` 属性将具有 `FetchBaseQueryError | SerializedError | undefined` 类型。如果存在错误，你可以在将类型缩小到 `FetchBaseQueryError` 或 `SerializedError` 后访问错误属性。
 
 ```tsx no-transpile
 import { api } from './services/api'
@@ -599,22 +588,22 @@ function PostDetail() {
   const { data, error, isLoading } = usePostsQuery()
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <div>加载中...</div>
   }
 
   if (error) {
     if ('status' in error) {
-      // you can access all properties of `FetchBaseQueryError` here
+      // 你可以在这里访问 `FetchBaseQueryError` 的所有属性
       const errMsg = 'error' in error ? error.error : JSON.stringify(error.data)
 
       return (
         <div>
-          <div>An error has occurred:</div>
+          <div>发生了一个错误：</div>
           <div>{errMsg}</div>
         </div>
       )
     } else {
-      // you can access all properties of `SerializedError` here
+      // 你可以在这里访问 `SerializedError` 的所有属性
       return <div>{error.message}</div>
     }
   }
@@ -623,7 +612,7 @@ function PostDetail() {
     return (
       <div>
         {data.map((post) => (
-          <div key={post.id}>Name: {post.name}</div>
+          <div key={post.id}>名称: {post.name}</div>
         ))}
       </div>
     )
@@ -633,20 +622,15 @@ function PostDetail() {
 }
 ```
 
-### Inline error handling example
+### 内联错误处理示例
 
-When handling errors inline after [`unwrapping`](../api/createAsyncThunk.mdx#unwrapping-result-actions) a mutation call,
-a thrown error will have a type of `any` for typescript versions below 4.4,
-or [`unknown` for versions 4.4+](https://devblogs.microsoft.com/typescript/announcing-typescript-4-4/#use-unknown-catch-variables).
-In order to safely access properties of the error, you must first narrow the type to a known type.
-This can be done using a [type predicate](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates)
-as shown below.
+当在 [`unwrapping`](../api/createAsyncThunk.mdx#unwrapping-result-actions) 一个 mutation 调用后内联处理错误时，抛出的错误将对于 TypeScript 版本低于 4.4 的类型为 `any`，或者对于 [4.4+ 版本为 `unknown`](https://devblogs.microsoft.com/typescript/announcing-typescript-4-4/#use-unknown-catch-variables)。为了安全地访问错误的属性，你必须首先将类型缩小到已知类型。这可以使用下面显示的 [类型谓词](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates) 来完成。
 
 ```tsx no-transpile title="services/helpers.ts"
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query'
 
 /**
- * Type predicate to narrow an unknown error to `FetchBaseQueryError`
+ * 类型谓词，用于将未知错误缩小为 `FetchBaseQueryError`
  */
 export function isFetchBaseQueryError(
   error: unknown,
@@ -655,7 +639,7 @@ export function isFetchBaseQueryError(
 }
 
 /**
- * Type predicate to narrow an unknown error to an object with a string 'message' property
+ * 类型谓词，用于将未知错误缩小为具有字符串 'message' 属性的对象
  */
 export function isErrorWithMessage(
   error: unknown,
@@ -686,11 +670,11 @@ function AddPost() {
       setName('')
     } catch (err) {
       if (isFetchBaseQueryError(err)) {
-        // you can access all properties of `FetchBaseQueryError` here
+        // 你可以在这里访问 `FetchBaseQueryError` 的所有属性
         const errMsg = 'error' in err ? err.error : JSON.stringify(err.data)
         enqueueSnackbar(errMsg, { variant: 'error' })
       } else if (isErrorWithMessage(err)) {
-        // you can access a string 'message' property here
+        // 你可以在这里访问字符串 'message' 属性
         enqueueSnackbar(err.message, { variant: 'error' })
       }
     }
@@ -699,7 +683,7 @@ function AddPost() {
   return (
     <div>
       <input value={name} onChange={(e) => setName(e.target.value)} />
-      <button>Add post</button>
+      <button>添加帖子</button>
     </div>
   )
 }
