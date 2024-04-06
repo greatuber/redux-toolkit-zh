@@ -112,7 +112,7 @@ We now export an `UnknownAction` type, which treats all fields other than `actio
 
 `AnyAction` still exists for compatibility, but has been marked as deprecated.
 
-Note that [Redux Toolkit's action creators have a `.match()` method](https://redux-toolkit.js.org/api/createAction#actioncreatormatch) that acts as a useful type guard:
+Note that [Redux Toolkit's action creators have a `.match()` method](https://ouweiya.github.io/redux-toolkit-zh/api/createAction#actioncreatormatch) that acts as a useful type guard:
 
 ```ts
 if (todoAdded.match(someUnknownAction)) {

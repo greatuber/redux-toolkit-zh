@@ -7,7 +7,7 @@
  */
 export function formatProdErrorMessage(code: number) {
   return (
-    `Minified Redux Toolkit error #${code}; visit https://redux-toolkit.js.org/Errors?code=${code} for the full message or ` +
+    `Minified Redux Toolkit error #${code}; visit https://ouweiya.github.io/redux-toolkit-zh/Errors?code=${code} for the full message or ` +
     'use the non-minified dev environment for full errors. '
   )
 }

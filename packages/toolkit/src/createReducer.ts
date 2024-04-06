@@ -136,7 +136,7 @@ export function createReducer<S extends NotFunction<any>>(
   if (process.env.NODE_ENV !== 'production') {
     if (typeof mapOrBuilderCallback === 'object') {
       throw new Error(
-        "The object notation for `createReducer` has been removed. Please use the 'builder callback' notation instead: https://redux-toolkit.js.org/api/createReducer",
+        "The object notation for `createReducer` has been removed. Please use the 'builder callback' notation instead: https://ouweiya.github.io/redux-toolkit-zh/api/createReducer",
       )
     }
   }

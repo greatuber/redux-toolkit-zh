@@ -44,7 +44,7 @@ The package includes a precompiled ESM build that can be used as a [`<script typ
 
 ## Documentation
 
-The Redux Toolkit docs are available at **https://redux-toolkit.js.org**, including API references and usage guides for all of the APIs included in Redux Toolkit.
+The Redux Toolkit docs are available at **https://ouweiya.github.io/redux-toolkit-zh**, including API references and usage guides for all of the APIs included in Redux Toolkit.
 
 The Redux core docs at https://redux.js.org includes the full Redux tutorials, as well usage guides on general Redux patterns.
 
@@ -76,7 +76,7 @@ Redux Toolkit includes these APIs:
 - `createEntityAdapter()`: generates a set of reusable reducers and selectors to manage normalized data in the store
 - The `createSelector()` utility from the [Reselect](https://github.com/reduxjs/reselect) library, re-exported for ease of use.
 
-For details, see [the Redux Toolkit API Reference section in the docs](https://redux-toolkit.js.org/api/configureStore).
+For details, see [the Redux Toolkit API Reference section in the docs](https://ouweiya.github.io/redux-toolkit-zh/api/configureStore).
 
 ## RTK Query
 
@@ -103,7 +103,7 @@ RTK Query includes these APIs:
 - `<ApiProvider />`: Can be used as a Provider if you do not already have a Redux store.
 - `setupListeners()`: A utility used to enable refetchOnMount and refetchOnReconnect behaviors.
 
-See the [**RTK Query Overview**](https://redux-toolkit.js.org/rtk-query/overview) page for more details on what RTK Query is, what problems it solves, and how to use it.
+See the [**RTK Query Overview**](https://ouweiya.github.io/redux-toolkit-zh/rtk-query/overview) page for more details on what RTK Query is, what problems it solves, and how to use it.
 
 ## Contributing
 

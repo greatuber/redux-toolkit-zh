@@ -237,10 +237,10 @@ import type { Post } from './types'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-  // 高亮开始
+  // highlight-start
   // api 的全局配置
   refetchOnFocus: true,
-  // 高亮结束
+  // highlight-end
   endpoints: (builder) => ({
     getPosts: builder.query<Post[], number>({
       query: () => `posts`,
@@ -262,10 +262,10 @@ import type { Post } from './types'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-  // 高亮开始
+  // highlight-start
   // api 的全局配置
   refetchOnFocus: true,
-  // 高亮结束
+  // highlight-end
   endpoints: (builder) => ({
     getPosts: builder.query<Post[], number>({
       query: () => `posts`,
@@ -285,10 +285,10 @@ export const store = configureStore({
   middleware: (gDM) => gDM().concat(api.middleware),
 })
 
-// 高亮开始
+// highlight-start
 // 为 store 启用监听器行为
 setupListeners(store.dispatch)
-// 高亮结束
+// highlight-end
 
 export type RootState = ReturnType<typeof store.getState>
 ```
@@ -316,10 +316,10 @@ import type { Post } from './types'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-  // 高亮开始
+  // highlight-start
   // api 的全局配置
   refetchOnReconnect: true,
-  // 高亮结束
+  // highlight-end
   endpoints: (builder) => ({
     getPosts: builder.query<Post[], number>({
       query: () => `posts`,
@@ -341,10 +341,10 @@ import type { Post } from './types'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-  // 高亮开始
+  // highlight-start
   // api 的全局配置
   refetchOnReconnect: true,
-  // 高亮结束
+  // highlight-end
   endpoints: (builder) => ({
     getPosts: builder.query<Post[], number>({
       query: () => `posts`,
@@ -364,10 +364,10 @@ export const store = configureStore({
   middleware: (gDM) => gDM().concat(api.middleware),
 })
 
-// 高亮开始
+// highlight-start
 // 为 store 启用监听器行为
 setupListeners(store.dispatch)
-// 高亮结束
+// highlight-end
 
 export type RootState = ReturnType<typeof store.getState>
 ```

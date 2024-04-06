@@ -7,15 +7,15 @@ description: 'Introduction > Why RTK is Redux Today: details on how RTK replaces
 
 ## 什么是 Redux Toolkit？
 
-[**Redux Toolkit**](https://redux-toolkit.js.org)（也被简称为 **"RTK"**）是我们官方推荐的编写 Redux 逻辑的方法。`@reduxjs/toolkit` 包装了核心的 `redux` 包，并包含我们认为构建 Redux 应用所必需的 API 方法和常见依赖。Redux Toolkit 内置了我们建议的最佳实践，简化了大多数 Redux 任务，防止了常见错误，使编写 Redux 应用更加容易。
+[**Redux Toolkit**](https://ouweiya.github.io/redux-toolkit-zh)（也被简称为 **"RTK"**）是我们官方推荐的编写 Redux 逻辑的方法。`@reduxjs/toolkit` 包装了核心的 `redux` 包，并包含我们认为构建 Redux 应用所必需的 API 方法和常见依赖。Redux Toolkit 内置了我们建议的最佳实践，简化了大多数 Redux 任务，防止了常见错误，使编写 Redux 应用更加容易。
 
 **如果你今天正在编写任何 Redux 逻辑，你应该使用 Redux Toolkit 来编写那些代码！**
 
-RTK 包含了帮助简化许多常见用例的实用工具，包括[设置 store](https://redux-toolkit.js.org/api/configureStore)，
-[创建 reducers 和编写不可变的更新逻辑](https://redux-toolkit.js.org/api/createreducer)，
-甚至[一次性创建整个 "slices" 的状态](https://redux-toolkit.js.org/api/createslice)。
+RTK 包含了帮助简化许多常见用例的实用工具，包括[设置 store](https://ouweiya.github.io/redux-toolkit-zh/api/configureStore)，
+[创建 reducers 和编写不可变的更新逻辑](https://ouweiya.github.io/redux-toolkit-zh/api/createreducer)，
+甚至[一次性创建整个 "slices" 的状态](https://ouweiya.github.io/redux-toolkit-zh/api/createslice)。
 
-无论你是刚开始使用 Redux 的新用户，还是想要简化现有应用的经验丰富的用户，**[Redux Toolkit](https://redux-toolkit.js.org/)** 都可以帮助你改进你的 Redux 代码。
+无论你是刚开始使用 Redux 的新用户，还是想要简化现有应用的经验丰富的用户，**[Redux Toolkit](https://ouweiya.github.io/redux-toolkit-zh/)** 都可以帮助你改进你的 Redux 代码。
 
 :::tip
 

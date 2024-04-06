@@ -13,8 +13,8 @@ Code Generator
 
 ### Introduction
 
-This is a utility library meant to be used with [RTK Query](https://redux-toolkit.js.org/rtk-query/overview) that will generate a typed API client from an OpenAPI schema.
+This is a utility library meant to be used with [RTK Query](https://ouweiya.github.io/redux-toolkit-zh/rtk-query/overview) that will generate a typed API client from an OpenAPI schema.
 
 ### Documentation
 
-[View the RTK Query Code Generation docs](https://redux-toolkit.js.org/rtk-query/usage/code-generation)
+[View the RTK Query Code Generation docs](https://ouweiya.github.io/redux-toolkit-zh/rtk-query/usage/code-generation)

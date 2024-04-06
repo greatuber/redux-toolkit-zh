@@ -216,7 +216,7 @@ interface Post {
 const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: (build) => ({
-    // 高亮开始
+    // highlight-start
     //              ResultType  QueryArg
     //                    v       v
     getPost: build.query<Post, number>({
@@ -233,7 +233,7 @@ const api = createApi({
         return rawResult.result.post
       },
     }),
-    // 高亮结束
+    // highlight-end
   }),
 })
 ```
@@ -264,7 +264,7 @@ interface Post {
 const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: (build) => ({
-    // 高亮开始
+    // highlight-start
     //              ResultType  QueryArg
     //                    v       v
     getPost: build.query<Post, number>({
@@ -281,7 +281,7 @@ const api = createApi({
         return { data: post }
       },
     }),
-    // 高亮结束
+    // highlight-end
   }),
 })
 ```
@@ -315,10 +315,10 @@ interface Post {
 const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: (build) => ({
-    // 高亮开始
+    // highlight-start
     getPost: build.query<Post, number>({
       queryFn: (arg, queryApi, extraOptions, baseQuery) => {
-        // 高亮开始
+        // highlight-start
         if (arg <= 0) {
           return {
             error: {
@@ -328,7 +328,7 @@ const api = createApi({
             },
           }
         }
-        // 高亮结束
+        // highlight-end
         const post: Post = {
           id: arg,
           name: getRandomName(),
@@ -345,19 +345,19 @@ const api = createApi({
 ```ts title="排除所有 endpoints 的 baseQuery"
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query'
 
-// 高亮开始
+// highlight-start
 type CustomErrorType = { reason: 'too cold' | 'too hot' }
-// 高亮结束
+// highlight-end
 
 const api = createApi({
-  // 高亮开始
+  // highlight-start
   // 这种类型将被用作所有 `queryFn` 函数提供的错误类型
   //                              v
   baseQuery: fakeBaseQuery<CustomErrorType>(),
-  // 高亮结束
+  // highlight-end
   endpoints: (build) => ({
     eatPorridge: build.query<'just right', 1 | 2 | 3>({
-      // 高亮开始
+      // highlight-start
       queryFn(seat) {
         if (seat === 1) {
           return { error: { reason: 'too cold' } }
@@ -369,10 +369,10 @@ const api = createApi({
 
         return { data: 'just right' }
       },
-      // 高亮结束
+      // highlight-end
     }),
     microwaveHotPocket: build.query<'delicious!', number>({
-      // 高亮开始
+      // highlight-start
       queryFn(duration) {
         if (duration < 110) {
           return { error: { reason: 'too cold' } }
@@ -383,7 +383,7 @@ const api = createApi({
 
         return { data: 'delicious!' }
       },
-      // 高亮结束
+      // highlight-end
     }),
   }),
 })

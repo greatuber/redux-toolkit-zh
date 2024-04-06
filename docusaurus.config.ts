@@ -63,6 +63,11 @@ const config: Config = {
 
   themeConfig: {
     image: "img/redux-logo-landscape.png",
+    docs: {
+      sidebar: {
+        // hideable: true,
+      },
+    },
     navbar: {
       title: "Redux Toolkit 中文文档",
       logo: {

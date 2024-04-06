@@ -59,7 +59,7 @@ export interface CommonOptions {
   /**
    * defaults to false
    * `true` will result in all generated endpoints having `providesTags`/`invalidatesTags` declarations for the `tags` of their respective operation definition
-   * @see https://redux-toolkit.js.org/rtk-query/usage/code-generation for more information
+   * @see https://ouweiya.github.io/redux-toolkit-zh/rtk-query/usage/code-generation for more information
    */
   tag?: boolean;
   /**

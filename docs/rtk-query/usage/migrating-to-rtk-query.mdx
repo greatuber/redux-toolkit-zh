@@ -132,12 +132,12 @@ export const pokemonSlice = createSlice({
 ```ts title="src/services/pokemonSlice.ts - selectors" no-transpile
 // 省略了导入，thunk action创建器和切片
 
-// 高亮开始
+// highlight-start
 export const selectStatusByName = (state: RootState, name: string) =>
   state.pokemon.statusByName[name]
 export const selectDataByName = (state: RootState, name: string) =>
   state.pokemon.dataByName[name]
-// 高亮结束
+// highlight-end
 ```
 
 ### 存储
@@ -158,9 +158,9 @@ import { pokemonSlice } from './services/pokemonSlice'
 
 export const store = configureStore({
   reducer: {
-    // 高亮开始
+    // highlight-start
     pokemon: pokemonSlice.reducer,
-    // 高亮结束
+    // highlight-end
   },
 })
 
@@ -171,22 +171,22 @@ export type RootState = ReturnType<typeof store.getState>
 
 ```tsx no-transpile title="src/index.ts"
 import { render } from 'react-dom'
-// 高亮开始
+// highlight-start
 import { Provider } from 'react-redux'
-// 高亮结束
+// highlight-end
 
 import App from './App'
-// 高亮开始
+// highlight-start
 import { store } from './store'
-// 高亮结束
+// highlight-end
 
 const rootElement = document.getElementById('root')
 render(
-  // 高亮开始
+  // highlight-start
   <Provider store={store}>
     <App />
   </Provider>,
-  // 高亮结束
+  // highlight-end
   rootElement,
 )
 ```
@@ -238,7 +238,7 @@ import {
   selectDataByName,
 } from './services/pokemonSlice'
 
-// 高亮开始
+// highlight-start
 export function useGetPokemonByNameQuery(name: string) {
   const dispatch = useAppDispatch()
   // 从store状态中选择提供的名称的当前状态
@@ -264,7 +264,7 @@ export function useGetPokemonByNameQuery(name: string) {
   // 返回重要的数据，供钩子的调用者使用
   return { data, isUninitialized, isLoading, isError, isSuccess }
 }
-// 高亮结束
+// highlight-end
 ```
 
 ### 使用自定义钩子
@@ -278,14 +278,14 @@ export function useGetPokemonByNameQuery(name: string) {
 
 ```tsx no-transpile title="src/App.tsx"
 import * as React from 'react'
-// 高亮开始
+// highlight-start
 import { useGetPokemonByNameQuery } from './hooks'
-// 高亮结束
+// highlight-end
 
 export default function App() {
-  // 高亮开始
+  // highlight-start
   const { data, isError, isLoading } = useGetPokemonByNameQuery('bulbasaur')
-  // 高亮结束
+  // highlight-end
 
   return (
     <div className="App">

@@ -170,7 +170,7 @@ type SkipToken = typeof Symbol
 
 #### 描述
 
-这是一个接受缓存键参数的函数，并使用给定的缓存键为此端点生成一个新的记忆化选择器，用于读取缓存数据。生成的选择器使用 [Reselect 的 `createSelector`](https://redux-toolkit.js.org/api/createSelector) 进行记忆化。
+这是一个接受缓存键参数的函数，并使用给定的缓存键为此端点生成一个新的记忆化选择器，用于读取缓存数据。生成的选择器使用 [Reselect 的 `createSelector`](https://ouweiya.github.io/redux-toolkit-zh/api/createSelector) 进行记忆化。
 
 当选择突变结果而不是查询时，该函数接受一个请求 ID。
 
@@ -265,7 +265,7 @@ function App() {
 
 ## 匹配器
 
-一组 [Redux Toolkit 动作匹配实用程序](https://redux-toolkit.js.org/api/matching-utilities)，它们匹配将由此 thunk 分派的 `pending`、`fulfilled` 和 `rejected` 动作。这些允许您匹配该端点的 Redux 动作，例如在 `createSlice.extraReducers` 或自定义中间件中。它们的实现如下：
+一组 [Redux Toolkit 动作匹配实用程序](https://ouweiya.github.io/redux-toolkit-zh/api/matching-utilities)，它们匹配将由此 thunk 分派的 `pending`、`fulfilled` 和 `rejected` 动作。这些允许您匹配该端点的 Redux 动作，例如在 `createSlice.extraReducers` 或自定义中间件中。它们的实现如下：
 
 ```ts no-transpile
  matchPending: isAllOf(isPending(thunk), matchesEndpoint(endpoint)),

@@ -75,7 +75,7 @@ export const api = createApi({
   endpoints: (build) => ({
     getMessages: build.query<Message[], Channel>({
       query: (channel) => `messages/${channel}`,
-      // 高亮开始
+      // highlight-start
       async onCacheEntryAdded(
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
@@ -108,7 +108,7 @@ export const api = createApi({
         // 一旦 `cacheEntryRemoved` 承诺解析，执行清理步骤
         ws.close()
       },
-      // 高亮结束
+      // highlight-end
     }),
   }),
 })
@@ -151,24 +151,24 @@ export interface Message {
   text: string
 }
 
-// 高亮开始
+// highlight-start
 const messagesAdapter = createEntityAdapter<Message>()
-// 高亮结束
+// highlight-end
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: (build) => ({
-    // 高亮开始
+    // highlight-start
     getMessages: build.query<EntityState<Message, number>, Channel>({
-      // 高亮结束
+      // highlight-end
       query: (channel) => `messages/${channel}`,
-      // 高亮开始
+      // highlight-start
       transformResponse(response: Message[]) {
         return messagesAdapter.addMany(
           messagesAdapter.getInitialState(),
           response,
         )
       },
-      // 高亮结束
+      // highlight-end
       async onCacheEntryAdded(
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
@@ -182,9 +182,9 @@ export const api = createApi({
             if (!isMessage(data) || data.channel !== arg) return
 
             updateCachedData((draft) => {
-              // 高亮开始
+              // highlight-start
               messagesAdapter.upsertOne(draft, data)
-              // 高亮结束
+              // highlight-end
             })
           }
 

@@ -702,7 +702,7 @@ export function buildCreateSlice({ creators }: BuildCreateSliceConfig = {}) {
       if (process.env.NODE_ENV !== 'production') {
         if (typeof options.extraReducers === 'object') {
           throw new Error(
-            "The object notation for `createSlice.extraReducers` has been removed. Please use the 'builder callback' notation instead: https://redux-toolkit.js.org/api/createSlice",
+            "The object notation for `createSlice.extraReducers` has been removed. Please use the 'builder callback' notation instead: https://ouweiya.github.io/redux-toolkit-zh/api/createSlice",
           )
         }
       }

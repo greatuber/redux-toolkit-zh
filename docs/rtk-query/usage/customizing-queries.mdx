@@ -416,7 +416,7 @@ const api = createApi({
 import { createApi } from '@reduxjs/toolkit/query'
 import { request, gql, ClientError } from 'graphql-request'
 
-// 高亮开始
+// highlight-start
 const graphqlBaseQuery =
   ({ baseUrl }: { baseUrl: string }) =>
   async ({ body }: { body: string }) => {
@@ -430,14 +430,14 @@ const graphqlBaseQuery =
       return { error: { status: 500, data: error } }
     }
   }
-// 高亮结束
+// highlight-end
 
 export const api = createApi({
-  // 高亮开始
+  // highlight-start
   baseQuery: graphqlBaseQuery({
     baseUrl: 'https://graphqlzero.almansi.me/api',
   }),
-  // 高亮结束
+  // highlight-end
   endpoints: (builder) => ({
     getPosts: builder.query({
       query: () => ({
@@ -531,14 +531,14 @@ import type {
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query'
 import { tokenReceived, loggedOut } from './authSlice'
-// 高亮开始
+// highlight-start
 import { Mutex } from 'async-mutex'
-// 高亮结束
+// highlight-end
 
 // 创建一个新的互斥锁
-// 高亮开始
+// highlight-start
 const mutex = new Mutex()
-// 高亮结束
+// highlight-end
 const baseQuery = fetchBaseQuery({ baseUrl: '/' })
 const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
@@ -546,16 +546,16 @@ const baseQueryWithReauth: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
   // 等待互斥锁可用，但不锁定它
-  // 高亮开始
+  // highlight-start
   await mutex.waitForUnlock()
-  // 高亮结束
+  // highlight-end
   let result = await baseQuery(args, api, extraOptions)
   if (result.error && result.error.status === 401) {
     // 检查互斥锁是否被锁定
-    // 高亮开始
+    // highlight-start
     if (!mutex.isLocked()) {
       const release = await mutex.acquire()
-      // 高亮结束
+      // highlight-end
       try {
         const refreshResult = await baseQuery(
           '/refreshToken',
@@ -571,15 +571,15 @@ const baseQueryWithReauth: BaseQueryFn<
         }
       } finally {
         // 一旦互斥锁应该再次被释放，必须调用release。
-        // 高亮开始
+        // highlight-start
         release()
-        // 高亮结束
+        // highlight-end
       }
     } else {
       // 等待互斥锁可用，但不锁定它
-      // 高亮开始
+      // highlight-start
       await mutex.waitForUnlock()
-      // 高亮结束
+      // highlight-end
       result = await baseQuery(args, api, extraOptions)
     }
   }
@@ -868,10 +868,10 @@ export const api = createApi({
           }
         `,
       }),
-      // 高亮开始
+      // highlight-start
       transformResponse: (response: { posts: { data: Post[] } }) =>
         response.posts.data,
-      // 高亮结束
+      // highlight-end
     }),
   }),
 })
@@ -915,22 +915,22 @@ export interface Post {
   name: string
 }
 
-// 高亮开始
+// highlight-start
 const postsAdapter = createEntityAdapter<Post>({
   sortComparer: (a, b) => a.name.localeCompare(b.name),
 })
-// 高亮结束
+// highlight-end
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: (build) => ({
     getPosts: build.query<EntityState<Post, number>, void>({
       query: () => `posts`,
-      // 高亮开始
+      // highlight-start
       transformResponse(response: Post[]) {
         return postsAdapter.addMany(postsAdapter.getInitialState(), response)
       },
-      // 高亮结束
+      // highlight-end
     }),
   }),
 })
@@ -1003,7 +1003,7 @@ const api = createApi({
       providesTags: ['User'],
     }),
 
-    // 高亮开始
+    // highlight-start
     refetchPostsAndUsers: build.mutation<null, void>({
       // 这里的查询不相关，所以使用了一个返回 `null` 的 `queryFn`
       queryFn: () => ({ data: null }),
@@ -1012,7 +1012,7 @@ const api = createApi({
       // 当前订阅了缓存的数据
       invalidatesTags: ['Post', 'User'],
     }),
-    // 高亮结束
+    // highlight-end
   }),
 })
 ```
@@ -1040,7 +1040,7 @@ const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   tagTypes: ['Message'],
   endpoints: (build) => ({
-    // 高亮开始
+    // highlight-start
     streamMessages: build.query<Message[], void>({
       // 这里的查询不相关，因为数据将通过流式更新提供。
       // 使用返回空数组的 queryFn，内容将通过
@@ -1058,7 +1058,7 @@ const api = createApi({
         ws.close()
       },
     }),
-    // 高亮结束
+    // highlight-end
   }),
 })
 ```

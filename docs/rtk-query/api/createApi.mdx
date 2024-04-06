@@ -29,7 +29,7 @@ export type Pokemon = {}
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { Pokemon } from './types'
 
-// 高亮开始
+// highlight-start
 // 使用基础 URL 和预期的端点定义服务
 export const pokemonApi = createApi({
   reducerPath: 'pokemonApi',
@@ -44,13 +44,13 @@ Query({ baseUrl: 'https://pokeapi.co/api/v2/' }),
     }),
   }),
 })
-// 高亮结束
+// highlight-end
 
-// 高亮开始
+// highlight-start
 // 导出用于函数组件的钩子，这些钩子是
 // 基于定义的端点自动生成的
 export const { useGetPokemonByNameQuery } = pokemonApi
-// 高亮结束
+// highlight-end
 ```
 
 ## 参数

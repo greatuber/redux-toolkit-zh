@@ -283,3 +283,7 @@ body {
     sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
     "Noto Color Emoji", "Microsoft YaHei"; */
 }
+
+nav.menu {
+  padding-bottom: 24px;
+}

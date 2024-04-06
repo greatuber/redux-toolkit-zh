@@ -149,7 +149,7 @@ declare module '../apiTypes' {
          * Can be used to await a specific query triggered in any way,
          * including via hook calls or manually dispatching `initiate` actions.
          *
-         * See https://redux-toolkit.js.org/rtk-query/usage/server-side-rendering for details.
+         * See https://ouweiya.github.io/redux-toolkit-zh/rtk-query/usage/server-side-rendering for details.
          */
         getRunningQueryThunk<EndpointName extends QueryKeys<Definitions>>(
           endpointName: EndpointName,
@@ -169,7 +169,7 @@ declare module '../apiTypes' {
          * Can be used to await a specific mutation triggered in any way,
          * including via hook trigger functions or manually dispatching `initiate` actions.
          *
-         * See https://redux-toolkit.js.org/rtk-query/usage/server-side-rendering for details.
+         * See https://ouweiya.github.io/redux-toolkit-zh/rtk-query/usage/server-side-rendering for details.
          */
         getRunningMutationThunk<EndpointName extends MutationKeys<Definitions>>(
           endpointName: EndpointName,
@@ -187,7 +187,7 @@ declare module '../apiTypes' {
          * Useful for SSR scenarios to await all running queries triggered in any way,
          * including via hook calls or manually dispatching `initiate` actions.
          *
-         * See https://redux-toolkit.js.org/rtk-query/usage/server-side-rendering for details.
+         * See https://ouweiya.github.io/redux-toolkit-zh/rtk-query/usage/server-side-rendering for details.
          */
         getRunningQueriesThunk(): ThunkWithReturnValue<
           Array<QueryActionCreatorResult<any>>
@@ -199,7 +199,7 @@ declare module '../apiTypes' {
          * Useful for SSR scenarios to await all running mutations triggered in any way,
          * including via hook calls or manually dispatching `initiate` actions.
          *
-         * See https://redux-toolkit.js.org/rtk-query/usage/server-side-rendering for details.
+         * See https://ouweiya.github.io/redux-toolkit-zh/rtk-query/usage/server-side-rendering for details.
          */
         getRunningMutationsThunk(): ThunkWithReturnValue<
           Array<MutationActionCreatorResult<any>>

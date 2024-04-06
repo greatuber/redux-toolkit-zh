@@ -137,12 +137,12 @@ export type AppDispatch = AppStore['dispatch']
 import { useDispatch, useSelector, useStore } from 'react-redux'
 import type { RootState, AppDispatch, AppStore } from './store'
 
-// 高亮开始
+// highlight-start
 // 在你的应用中使用，而不是普通的 `useDispatch` 和 `useSelector`
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
 export const useAppSelector = useSelector.withTypes<RootState>()
 export const useAppStore = useStore.withTypes<AppStore>()
-// 高亮结束
+// highlight-end
 ```
 
 ### 提供存储
@@ -171,22 +171,22 @@ export type AppDispatch = AppStore['dispatch']
 'use client'
 import { useRef } from 'react'
 import { Provider } from 'react-redux'
-// 高亮开始
+// highlight-start
 import { makeStore, AppStore } from '../lib/store'
-// 高亮结束
+// highlight-end
 
 export default function StoreProvider({
   children,
 }: {
   children: React.ReactNode
 }) {
-  // 高亮开始
+  // highlight-start
   const storeRef = useRef<AppStore>()
   if (!storeRef.current) {
     // 第一次渲染时创建存储实例
     storeRef.current = makeStore()
   }
-  // 高亮结束
+  // highlight-end
 
   return <Provider store={storeRef.current}>{children}</Provider>
 }
@@ -251,9 +251,9 @@ export type AppDispatch = AppStore['dispatch']
 import { useRef } from 'react'
 import { Provider } from 'react-redux'
 import { makeStore, AppStore } from '../lib/store'
-// 高亮开始
+// highlight-start
 import { initializeCount } from '../lib/features/counter/counterSlice'
-// 高亮结束
+// highlight-end
 
 export default function StoreProvider({
   count,
@@ -265,9 +265,9 @@ export default function StoreProvider({
   const storeRef = useRef<AppStore | null>(null)
   if (!storeRef.current) {
     storeRef.current = makeStore()
-    // 高亮开始
+    // highlight-start
     storeRef.current.dispatch(initializeCount(count))
-    // 高亮结束
+    // highlight-end
   }
 
   return <Provider store={storeRef.current}>{children}</Provider>
@@ -390,7 +390,7 @@ export const dynamic = 'force-dynamic'
 
 我们建议仅在**客户端**使用 RTK 查询进行数据获取。服务器上的数据获取应使用 `async` RSCs 的 `fetch` 请求。
 
-你可以在 [Redux Toolkit Query 教程](https://redux-toolkit.js.org/tutorials/rtk-query)中了解更多关于 Redux Toolkit Query 的信息。
+你可以在 [Redux Toolkit Query 教程](https://ouweiya.github.io/redux-toolkit-zh/tutorials/rtk-query)中了解更多关于 Redux Toolkit Query 的信息。
 
 :::note
 

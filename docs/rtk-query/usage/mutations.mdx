@@ -45,7 +45,7 @@ const api = createApi({
   endpoints: (build) => ({
     // 变更接受一个 `Partial<Post>` 参数，并返回一个 `Post`
     updatePost: build.mutation<Post, Partial<Post> & Pick<Post, 'id'>>({
-      // 高亮开始
+      // highlight-start
       // 注意：可选的 `queryFn` 可以代替 `query` 使用
       query: ({ id, ...patch }) => ({
         url: `post/${id}`,
@@ -80,7 +80,7 @@ const api = createApi({
           getCacheEntry,
         },
       ) {},
-      // 高亮结束
+      // highlight-end
     }),
   }),
 })

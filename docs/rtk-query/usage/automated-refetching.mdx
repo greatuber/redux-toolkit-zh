@@ -76,9 +76,9 @@ const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: '/',
   }),
-  // 高亮开始
+  // highlight-start
   tagTypes: ['Post', 'User'],
-  // 高亮结束
+  // highlight-end
   endpoints: (build) => ({
     getPosts: build.query<Post[], void>({
       query: () => '/posts',
@@ -144,15 +144,15 @@ const api = createApi({
   endpoints: (build) => ({
     getPosts: build.query<Post[], void>({
       query: () => '/posts',
-      // 高亮开始
+      // highlight-start
       providesTags: ['Post'],
-      // 高亮结束
+      // highlight-end
     }),
     getUsers: build.query<User[], void>({
       query: () => '/users',
-      // 高亮开始
+      // highlight-start
       providesTags: ['User'],
-      // 高亮结束
+      // highlight-end
     }),
     addPost: build.mutation<Post, Omit<Post, 'id'>>({
       query: (body) => ({
@@ -200,12 +200,12 @@ const api = createApi({
   endpoints: (build) => ({
     getPosts: build.query<Post[], void>({
       query: () => '/posts',
-      // 高亮开始
+      // highlight-start
       providesTags: (result, error, arg) =>
         result
           ? [...result.map(({ id }) => ({ type: 'Post' as const, id })), 'Post']
           : ['Post'],
-      // 高亮结束
+      // highlight-end
     }),
     getUsers: build.query<User[], void>({
       query: () => '/users',
@@ -282,9 +282,9 @@ const api = createApi({
         method: 'POST',
         body,
       }),
-      // 高亮开始
+      // highlight-start
       invalidatesTags: ['Post'],
-      // 高亮结束
+      // highlight-end
     }),
     editPost: build.mutation<Post, Partial<Post> & Pick<Post, 'id'>>({
       query: (body) => ({
@@ -292,9 +292,9 @@ const api = createApi({
         method: 'POST',
         body,
       }),
-      // 高亮开始
+      // highlight-start
       invalidatesTags: ['Post'],
-      // 高亮结束
+      // highlight-end
     }),
   }),
 })
@@ -370,9 +370,9 @@ const api = createApi({
         method: 'POST',
         body,
       }),
-      // 高亮开始
+      // highlight-start
       invalidatesTags: (result, error, arg) => [{ type: 'Post', id: arg.id }],
-      // 高亮结束
+      // highlight-end
     }),
   }),
 })
@@ -865,7 +865,7 @@ const api = createApi({
   endpoints: (build) => ({
     getPosts: build.query<Post[], void>({
       query: () => `posts`,
-      // 高亮开始
+      // highlight-start
       providesTags: (result) =>
         result
           ? [
@@ -873,11 +873,11 @@ const api = createApi({
               ...result.map(({ id }) => ({ type: 'Post' as const, id })),
             ]
           : [{ type: 'Post', id: 'LIST' }],
-      // 高亮结束
+      // highlight-end
     }),
     getUsers: build.query<User[], void>({
       query: () => `users`,
-      // 高亮开始
+      // highlight-start
       providesTags: (result) =>
         result
           ? [
@@ -885,7 +885,7 @@ const api = createApi({
               ...result.map(({ id }) => ({ type: 'User' as const, id })),
             ]
           : [{ type: 'User', id: 'LIST' }],
-      // 高亮结束
+      // highlight-end
     }),
   }),
 })
@@ -909,7 +909,7 @@ export interface User {
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import type { Post, User } from './types'
 
-// 高亮开始
+// highlight-start
 function providesList<R extends { id: string | number }[], T extends string>(
   resultsWithIds: R | undefined,
   tagType: T,
@@ -921,7 +921,7 @@ function providesList<R extends { id: string | number }[], T extends string>(
       ]
     : [{ type: tagType, id: 'LIST' }]
 }
-// 高亮结束
+// highlight-end
 
 const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: 'https://example.com' }),
@@ -929,15 +929,15 @@ const api = createApi({
   endpoints: (build) => ({
     getPosts: build.query({
       query: () => `posts`,
-      // 高亮开始
+      // highlight-start
       providesTags: (result) => providesList(result, 'Post'),
-      // 高亮结束
+      // highlight-end
     }),
     getUsers: build.query({
       query: () => `users`,
-      // 高亮开始
+      // highlight-start
       providesTags: (result) => providesList(result, 'User'),
-      // 高亮结束
+      // highlight-end
     }),
   }),
 })

@@ -91,7 +91,7 @@ const api = createApi({
         method: 'PATCH',
         body: patch,
       }),
-      // 高亮开始
+      // highlight-start
       async onQueryStarted({ id, ...patch }, { dispatch, queryFulfilled }) {
         const patchResult = dispatch(
           api.util.updateQueryData('getPost', id, (draft) => {
@@ -110,7 +110,7 @@ const api = createApi({
            */
         }
       },
-      // 高亮结束
+      // highlight-end
     }),
   }),
 })
@@ -177,7 +177,7 @@ const api = createApi({
         method: 'PATCH',
         body: patch,
       }),
-      // 高亮开始
+      // highlight-start
       async onQueryStarted({ id, ...patch }, { dispatch, queryFulfilled }) {
         try {
           const { data: updatedPost } = await queryFulfilled
@@ -188,7 +188,7 @@ const api = createApi({
           )
         } catch {}
       },
-      // 高亮结束
+      // highlight-end
     }),
     createPost: build.mutation<Post, Pick<Post, 'id'> & Partial<Post>>({
       query: ({ id, ...body }) => ({
@@ -196,7 +196,7 @@ const api = createApi({
         method: 'POST',
         body,
       }),
-      // 高亮开始
+      // highlight-start
       async onQueryStarted({ id }, { dispatch, queryFulfilled }) {
         try {
           const { data: createdPost } = await queryFulfilled
@@ -205,7 +205,7 @@ const api = createApi({
           )
         } catch {}
       },
-      // 高亮结束
+      // highlight-end
     }),
   }),
 })

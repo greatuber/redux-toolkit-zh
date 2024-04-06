@@ -49,18 +49,18 @@ interface EndpointDefinitionWithQuery<
    *   tagTypes: ['Post'],
    *   endpoints: (build) => ({
    *     getPosts: build.query<PostsResponse, void>({
-   *       // 高亮开始
+   *       // highlight-start
    *       query: () => 'posts',
-   *       // 高亮结束
+   *       // highlight-end
    *     }),
    *     addPost: build.mutation<Post, Partial<Post>>({
-   *      // 高亮开始
+   *      // highlight-start
    *      query: (body) => ({
    *        url: `posts`,
    *        method: 'POST',
    *        body,
    *      }),
-   *      // 高亮结束
+   *      // highlight-end
    *      invalidatesTags: [{ type: 'Post', id: 'LIST' }],
    *    }),
    *   })
@@ -92,7 +92,7 @@ interface EndpointDefinitionWithQuery<
    *
    * 有关其工作方式的详细信息，请参见下面的链接。当它设置为 `false` 时，即使数据没有改变，每个请求也会导致订阅的组件重新渲染。
    *
-   * @see https://redux-toolkit.js.org/api/other-exports#copywithstructuralsharing
+   * @see https://ouweiya.github.io/redux-toolkit-zh/api/other-exports#copywithstructuralsharing
    */
   structuralSharing?: boolean
 }
@@ -123,7 +123,7 @@ interface EndpointDefinitionWithQueryFn<
    *       query: () => 'posts',
    *     }),
    *     flipCoin: build.query<'heads' | 'tails', void>({
-   *       // 高亮开始
+   *       // highlight-start
    *       queryFn(arg, queryApi, extraOptions, baseQuery) {
    *         const randomVal = Math.random()
    *         if (randomVal < 0.45) {
@@ -134,7 +134,7 @@ interface EndpointDefinitionWithQueryFn<
    *         }
    *         return { error: { status: 500, statusText: 'Internal Server Error', data: "Coin landed on it's edge!" } }
    *       }
-   *       // 高亮结束
+   *       // highlight-end
    *     })
    *   })
    * })
@@ -165,7 +165,7 @@ interface EndpointDefinitionWithQueryFn<
    * For details of how this works, please see the below. When it is set to `false`,
    * every request will cause subscribed components to rerender, even when the data has not changed.
    *
-   * @see https://redux-toolkit.js.org/api/other-exports#copywithstructuralsharing
+   * @see https://ouweiya.github.io/redux-toolkit-zh/api/other-exports#copywithstructuralsharing
    */
   structuralSharing?: boolean
 }
@@ -294,7 +294,7 @@ export interface QueryExtraOptions<
    *   endpoints: (build) => ({
    *     getPosts: build.query<PostsResponse, void>({
    *       query: () => 'posts',
-   *       // 高亮开始
+   *       // highlight-start
    *       providesTags: (result) =>
    *         result
    *           ? [
@@ -302,7 +302,7 @@ export interface QueryExtraOptions<
    *               { type: 'Posts', id: 'LIST' },
    *             ]
    *           : [{ type: 'Posts', id: 'LIST' }],
-   *       // 高亮结束
+   *       // highlight-end
    *     })
    *   })
    * })
@@ -353,7 +353,7 @@ export interface QueryExtraOptions<
    *        const post = await client.fetchPost(id)
    *        return { data: post }
    *      },
-   *      // 高亮开始
+   *      // highlight-start
    *      serializeQueryArgs: ({ queryArgs, endpointDefinition, endpointName }) => {
    *        const { id } = queryArgs
    *        // 这可以返回一个字符串、一个对象、一个数字或一个布尔值。
@@ -370,7 +370,7 @@ export interface QueryExtraOptions<
    *        // 或者创建并返回一个字符串：
    *        // return `getPost(${id})`
    *      },
-   *      // 高亮结束
+   *      // highlight-end
    *    }),
    *  }),
    *})
@@ -576,9 +576,9 @@ export interface MutationExtraOptions<
    *           body,
    *         }
    *       },
-   *       // 高亮开始
+   *       // highlight-start
    *       invalidatesTags: [{ type: 'Posts', id: 'LIST' }],
-   *       // 高亮结束
+   *       // highlight-end
    *     }),
    *   })
    * })

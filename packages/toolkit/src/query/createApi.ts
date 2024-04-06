@@ -28,9 +28,9 @@ export interface CreateApiOptions<
    * import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
    *
    * const api = createApi({
-   *   // 高亮开始
+   *   // highlight-start
    *   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-   *   // 高亮结束
+   *   // highlight-end
    *   endpoints: (build) => ({
    *     // ...端点
    *   }),
@@ -48,9 +48,9 @@ export interface CreateApiOptions<
    *
    * const api = createApi({
    *   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-   *   // 高亮开始
+   *   // highlight-start
    *   tagTypes: ['Post', 'User'],
-   *   // 高亮结束
+   *   // highlight-end
    *   endpoints: (build) => ({
    *     // ...endpoints
    *   }),
@@ -68,9 +68,9 @@ export interface CreateApiOptions<
    * import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query';
    *
    * const apiOne = createApi({
-   *   // 高亮开始
+   *   // highlight-start
    *   reducerPath: 'apiOne',
-   *   // 高亮结束
+   *   // highlight-end
    *   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
    *   endpoints: (builder) => ({
    *     // ...endpoints
@@ -78,9 +78,9 @@ export interface CreateApiOptions<
    * });
    *
    * const apiTwo = createApi({
-   *   // 高亮开始
+   *   // highlight-start
    *   reducerPath: 'apiTwo',
-   *   // 高亮结束
+   *   // highlight-end
    *   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
    *   endpoints: (builder) => ({
    *     // ...endpoints
@@ -117,9 +117,9 @@ export interface CreateApiOptions<
    *   endpoints: (build) => ({
    *     getPosts: build.query<PostsResponse, void>({
    *       query: () => 'posts',
-   *       // 高亮开始
+   *       // highlight-start
    *       keepUnusedDataFor: 5
-   *       // 高亮结束
+   *       // highlight-end
    *     })
    *   })
    * })
@@ -181,13 +181,13 @@ export interface CreateApiOptions<
    *
    * export const api = createApi({
    *   baseQuery: fetchBaseQuery({ baseUrl: '/' }),
-   *   // 高亮开始
+   *   // highlight-start
    *   extractRehydrationInfo(action, { reducerPath }): any {
    *     if (isHydrateAction(action)) {
    *       return action.payload[reducerPath]
    *     }
    *   },
-   *   // 高亮结束
+   *   // highlight-end
    *   endpoints: (build) => ({
    *     // 省略
    *   }),
