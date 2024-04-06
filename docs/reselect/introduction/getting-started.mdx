@@ -83,9 +83,9 @@ const selectCompletedTodos = (state: RootState) => {
   return state.todos.filter(todo => todo.completed === true)
 }
 
-selectCompletedTodos(state) // selector ran
-selectCompletedTodos(state) // selector ran
-selectCompletedTodos(state) // selector ran
+selectCompletedTodos(state) // 选择器运行
+selectCompletedTodos(state) // 选择器运行
+selectCompletedTodos(state) // 选择器运行
 
 const memoizedSelectCompletedTodos = createSelector(
   [(state: RootState) => state.todos],
@@ -95,7 +95,7 @@ const memoizedSelectCompletedTodos = createSelector(
   }
 )
 
-memoizedSelectCompletedTodos(state) // memoized selector ran
+memoizedSelectCompletedTodos(state) // 运行了记忆化的选择器
 memoizedSelectCompletedTodos(state)
 memoizedSelectCompletedTodos(state)
 
@@ -128,9 +128,9 @@ const selectCompletedTodos = state => {
   return state.todos.filter(todo => todo.completed === true)
 }
 
-selectCompletedTodos(state) // selector ran
-selectCompletedTodos(state) // selector ran
-selectCompletedTodos(state) // selector ran
+selectCompletedTodos(state) // 选择器运行
+selectCompletedTodos(state) // 选择器运行
+selectCompletedTodos(state) // 选择器运行
 
 const memoizedSelectCompletedTodos = createSelector(
   [state => state.todos],
@@ -140,7 +140,7 @@ const memoizedSelectCompletedTodos = createSelector(
   }
 )
 
-memoizedSelectCompletedTodos(state) // memoized selector ran
+memoizedSelectCompletedTodos(state) // 运行了记忆化的选择器
 memoizedSelectCompletedTodos(state)
 memoizedSelectCompletedTodos(state)
 

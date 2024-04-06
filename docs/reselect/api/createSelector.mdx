@@ -13,69 +13,69 @@ import { InternalLinks } from '@site/src/components/InternalLinks'
 
 # `createSelector`
 
-Accepts one or more "<InternalLinks.InputSelectors />" (either as separate arguments or a single array),
-a single "<InternalLinks.ResultFunction />", and an optional options object, and
-generates a memoized selector function.
+接受一个或多个"<InternalLinks.InputSelectors />"（作为单独的参数或单个数组），
+一个"<InternalLinks.ResultFunction />"，以及一个可选的选项对象，
+并生成一个备忘录选择器函数。
 
-The **Redux docs usage page on [Deriving Data with Selectors](https://redux.js.org/usage/deriving-data-selectors)** covers the purpose and motivation for selectors, why memoized selectors are useful, and typical Reselect usage patterns.
+**Redux 文档的 [使用选择器派生数据](https://redux.js.org/usage/deriving-data-selectors)** 页面介绍了选择器的目的和动机，为什么备忘录选择器有用，以及典型的 Reselect 使用模式。
 
 ```ts no-emit
 const selectTodosByCategory = createSelector(
   [
-    // Pass input selectors with typed arguments
+    // 传递带有类型参数的输入选择器
     (state: RootState) => state.todos,
     (state: RootState, category: string) => category
   ],
-  // Extracted values are passed to the result function for recalculation
+  // 提取的值被传递给结果函数进行重新计算
   (todos, category) => {
     return todos.filter(t => t.category === category)
   }
 )
 ```
 
-## Parameters
+## 参数
 
-| Name                     | Description                                                                                      |
+| 名称                     | 描述                                                                                      |
 | :----------------------- | :----------------------------------------------------------------------------------------------- |
-| `inputSelectors`         | An array of <InternalLinks.InputSelectors />, can also be passed as separate arguments.          |
-| `resultFunc`             | A function that takes the results of the <InternalLinks.InputSelectors /> as separate arguments. |
-| `createSelectorOptions?` | An optional options object that allows for further customization per selector.                   |
+| `inputSelectors`         | 一个 <InternalLinks.InputSelectors /> 数组，也可以作为单独的参数传递。          |
+| `resultFunc`             | 一个函数，它接受 <InternalLinks.InputSelectors /> 的结果作为单独的参数。 |
+| `createSelectorOptions?` | 一个可选的选项对象，允许进一步自定义每个选择器。                   |
 
-## Returns
+## 返回
 
-A memoized <InternalLinks.OutputSelector />.
+一个备忘录的 <InternalLinks.OutputSelector />。
 
-### Output Selector Fields
+### 输出选择器字段
 
-The output selectors created by `createSelector` have several additional properties attached to them:
+由 `createSelector` 创建的输出选择器附加了几个额外的属性：
 
-| Name                            | Description                                                                                                                                                                                                                                                                |
+| 名称                            | 描述                                                                                                                                                                                                                                                                |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `resultFunc`                    | The final function passed to <InternalLinks.CreateSelector />.                                                                                                                                                                                                             |
-| `memoizedResultFunc`            | The memoized version of `resultFunc`.                                                                                                                                                                                                                                      |
-| `lastResult`                    | Returns the last result calculated by `memoizedResultFunc`.                                                                                                                                                                                                                |
-| `dependencies`                  | The array of the input selectors used by <InternalLinks.CreateSelector /> to compose `resultFunc`.                                                                                                                                                                         |
-| `recomputations`                | Counts the number of times `memoizedResultFunc` has been recalculated.                                                                                                                                                                                                     |
-| `resetRecomputations`           | Resets the count of `recomputations` count to 0.                                                                                                                                                                                                                           |
-| `dependencyRecomputations`      | Counts the number of times the <InternalLinks.InputSelectors /> (<InternalLinks.Dependencies text={<code>dependencies</code>} />) have been recalculated. This is distinct from `recomputations`, which tracks the recalculations of the <InternalLinks.ResultFunction />. |
-| `resetDependencyRecomputations` | Resets the `dependencyRecomputations` count to 0.                                                                                                                                                                                                                          |
-| `memoize`                       | Function used to memoize the `resultFunc`.                                                                                                                                                                                                                                 |
-| `argsMemoize`                   | Function used to memoize the arguments passed into the <InternalLinks.OutputSelector />.                                                                                                                                                                                   |
+| `resultFunc`                    | 传递给 <InternalLinks.CreateSelector /> 的最终函数。                                                                                                                                                                                                             |
+| `memoizedResultFunc`            | `resultFunc` 的记忆版本。                                                                                                                                                                                                                                      |
+| `lastResult`                    | 返回 `memoizedResultFunc` 计算的最后结果。                                                                                                                                                                                                                |
+| `dependencies`                  | <InternalLinks.CreateSelector /> 用来组成 `resultFunc` 的输入选择器数组。                                                                                                                                                                         |
+| `recomputations`                | 计算 `memoizedResultFunc` 重新计算的次数。                                                                                                                                                                                                     |
+| `resetRecomputations`           | 将 `recomputations` 的计数重置为 0。                                                                                                                                                                                                                           |
+| `dependencyRecomputations`      | 计算 <InternalLinks.InputSelectors /> (<InternalLinks.Dependencies text={<code>dependencies</code>} />) 重新计算的次数。这与 `recomputations` 不同，后者跟踪的是 <InternalLinks.ResultFunction /> 的重新计算次数。 |
+| `resetDependencyRecomputations` | 将 `dependencyRecomputations` 的计数重置为 0。                                                                                                                                                                                                                          |
+| `memoize`                       | 用于记忆 `resultFunc` 的函数。                                                                                                                                                                                                                                 |
+| `argsMemoize`                   | 用于记忆传入 <InternalLinks.OutputSelector /> 的参数的函数。                                                                                                                                                                                   |
 
-## Type Parameters
+## 类型参数
 
-| Name                          | Description                                                                                                                                                                                                          |
+| 名称                          | 描述                                                                                                                                                                                                          |
 | :---------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `InputSelectors`              | The type of the <InternalLinks.InputSelectors /> array.                                                                                                                                                              |
-| `Result`                      | The return type of the <InternalLinks.ResultFunction /> as well as the <InternalLinks.OutputSelector />.                                                                                                             |
-| `OverrideMemoizeFunction`     | The type of the optional `memoize` function that could be passed into the options object to override the original `memoize` function that was initially passed into <InternalLinks.CreateSelectorCreator />.         |
-| `OverrideArgsMemoizeFunction` | The type of the optional `argsMemoize` function that could be passed into the options object to override the original `argsMemoize` function that was initially passed into <InternalLinks.CreateSelectorCreator />. |
+| `InputSelectors`              | <InternalLinks.InputSelectors /> 数组的类型。                                                                                                                                                              |
+| `Result`                      | <InternalLinks.ResultFunction /> 以及 <InternalLinks.OutputSelector /> 的返回类型。                                                                                                             |
+| `OverrideMemoizeFunction`     | 可以传入选项对象的可选 `memoize` 函数的类型，以覆盖最初传入 <InternalLinks.CreateSelectorCreator /> 的原始 `memoize` 函数。         |
+| `OverrideArgsMemoizeFunction` | 可以传入选项对象的可选 `argsMemoize` 函数的类型，以覆盖最初传入 <InternalLinks.CreateSelectorCreator /> 的原始 `argsMemoize` 函数。 |
 
-## Defining a Pre-Typed <InternalLinks.CreateSelector>`createSelector`</InternalLinks.CreateSelector>
+## 定义预设类型的 <InternalLinks.CreateSelector>`createSelector`</InternalLinks.CreateSelector>
 
-As of Reselect 5.1.0, you can create a "pre-typed" version of <InternalLinks.CreateSelector /> where the `state` type is predefined. This allows you to set the `state` type once, eliminating the need to specify it with every <InternalLinks.CreateSelector /> call.
+从 Reselect 5.1.0 开始，你可以创建一个预设 `state` 类型的 <InternalLinks.CreateSelector /> 版本。这允许你一次设置 `state` 类型，从而无需在每次调用 <InternalLinks.CreateSelector /> 时指定它。
 
-To do this, you can call `createSelector.withTypes<StateType>()`:
+要做到这一点，你可以调用 `createSelector.withTypes<StateType>()`：
 
 {/* START: createSelector/withTypes.ts */}
 
@@ -100,7 +100,7 @@ export const createAppSelector = createSelector.withTypes<RootState>()
 
 const selectTodoIds = createAppSelector(
   [
-    // Type of `state` is set to `RootState`, no need to manually set the type
+    // `state`的类型被设置为`RootState`，无需手动设置类型
     // highlight-start
     state => state.todos
     // highlight-end
@@ -119,7 +119,7 @@ export const createAppSelector = createSelector.withTypes()
 
 const selectTodoIds = createAppSelector(
   [
-    // Type of `state` is set to `RootState`, no need to manually set the type
+    // `state`的类型被设置为`RootState`，无需手动设置类型
     // highlight-start
     state => state.todos
     // highlight-end
@@ -133,17 +133,17 @@ const selectTodoIds = createAppSelector(
 
 {/* END: createSelector/withTypes.ts */}
 
-Import and use the pre-typed `createAppSelector` instead of the original, and the type for state will be used automatically.
+导入并使用预定义的 `createAppSelector` 替代原始的，状态的类型将会自动使用。
 
-:::danger Known Limitations
+:::danger 已知的限制
 
-Currently this approach only works if input selectors are provided as a single array.
+目前这种方法只有在输入选择器作为单一数组提供时才有效。
 
-If you pass the input selectors as separate inline arguments, the parameter types of the result function will not be inferred.
-As a workaround you can either
+如果你将输入选择器作为单独的内联参数传递，结果函数的参数类型将不会被推断。
+作为解决方案，你可以：
 
-1. Wrap your input selectors in a single array
-2. You can annotate the parameter types of the result function:
+1. 将你的输入选择器包装在一个单一数组中
+2. 你可以注解结果函数的参数类型：
 
 {/* START: createSelector/annotateResultFunction.ts */}
 
@@ -177,10 +177,10 @@ export interface RootState {
 export const createAppSelector = createSelector.withTypes<RootState>()
 
 const selectTodoIds = createAppSelector(
-  // Type of `state` is set to `RootState`, no need to manually set the type
+  // `state`的类型被设置为`RootState`，无需手动设置类型
   state => state.todos,
-  // ❌ Known limitation: Parameter types are not inferred in this scenario
-  // so you will have to manually annotate them.
+  // ❌ 已知的限制：在这种情况下，参数类型不会被推断，
+  // 因此你需要手动注解它们。
   // highlight-start
   (todos: Todo[]) => todos.map(({ id }) => id)
   // highlight-end
@@ -196,10 +196,10 @@ import { createSelector } from 'reselect'
 export const createAppSelector = createSelector.withTypes()
 
 const selectTodoIds = createAppSelector(
-  // Type of `state` is set to `RootState`, no need to manually set the type
+  // `state`的类型被设置为`RootState`，无需手动设置类型
   state => state.todos,
-  // ❌ Known limitation: Parameter types are not inferred in this scenario
-  // so you will have to manually annotate them.
+  // ❌ 已知的限制：在这种情况下，参数类型不会被推断，
+  // 因此你需要手动注解它们。
   // highlight-start
   todos => todos.map(({ id }) => id)
   // highlight-end
@@ -215,7 +215,7 @@ const selectTodoIds = createAppSelector(
 
 :::tip
 
-You can also use this API with <InternalLinks.CreateSelectorCreator /> to create a pre-typed custom selector creator:
+你也可以使用这个API与<InternalLinks.CreateSelectorCreator />来创建一个预定义类型的自定义选择器创建器：
 
 {/* START: createSelector/createAppSelector.ts */}
 
@@ -258,7 +258,7 @@ export const createAppSelector = createSelectorCreator({
 
 const selectReadAlerts = createAppSelector(
   [
-    // Type of `state` is set to `RootState`, no need to manually set the type
+    // `state`的类型被设置为`RootState`，无需手动设置类型
     // highlight-start
     state => state.alerts
     // highlight-end
@@ -295,7 +295,7 @@ export const createAppSelector = createSelectorCreator({
 
 const selectReadAlerts = createAppSelector(
   [
-    // Type of `state` is set to `RootState`, no need to manually set the type
+    // `state`的类型被设置为`RootState`，无需手动设置类型
     // highlight-start
     state => state.alerts
     // highlight-end

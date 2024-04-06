@@ -11,63 +11,63 @@ import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 import { InternalLinks } from '@site/src/components/InternalLinks'
 
-# Development-Only Stability Checks
+# 仅在开发环境进行稳定性检查
 
-Reselect includes extra checks in development mode to help catch and warn about mistakes in selector behavior.
+Reselect在开发模式中包含额外的检查，以帮助捕获并警告有关选择器行为的错误。
 
 ## `inputStabilityCheck`
 
-Due to how <InternalLinks.CascadingMemoization /> works in Reselect, it is crucial that your <InternalLinks.InputSelectors /> do not return a new reference on each run. If an <InternalLinks.InputSelectors text='input selector' /> always returns a new reference, like
+由于<InternalLinks.CascadingMemoization />在Reselect中的工作方式，您的<InternalLinks.InputSelectors />不应在每次运行时返回新的引用。如果一个<InternalLinks.InputSelectors text='输入选择器' />总是返回一个新的引用，比如
 
 ```ts
 state => ({ a: state.a, b: state.b })
 ```
 
-or
+或者
 
 ```ts
 state => state.todos.map(todo => todo.id)
 ```
 
-that will cause the selector to never memoize properly.
-Since this is a common mistake, we've added a development mode check to catch this. By default, <InternalLinks.CreateSelector /> will now run the <InternalLinks.InputSelectors /> twice during the first call to the selector. If the result appears to be different for the same call, it will log a warning with the arguments and the two different sets of extracted input values.
+那将导致选择器永远无法正确地进行记忆化。
+由于这是一个常见的错误，我们添加了一个开发模式检查来捕获这个问题。默认情况下，<InternalLinks.CreateSelector />现在会在选择器第一次被调用时运行两次<InternalLinks.InputSelectors />。如果对相同的调用结果看起来不同，它将记录警告，包括参数和两个不同的提取输入值集。
 
 ```ts
 type DevModeCheckFrequency = 'always' | 'once' | 'never'
 ```
 
-| Possible Values | Description                                     |
+| 可能的值 | 描述 |
 | :-------------- | :---------------------------------------------- |
-| `once`          | Run only the first time the selector is called. |
-| `always`        | Run every time the selector is called.          |
-| `never`         | Never run the input stability check.            |
+| `once` | 只在选择器第一次被调用时运行。 |
+| `always` | 每次选择器被调用时都运行。 |
+| `never` | 从不运行输入稳定性检查。 |
 
 :::info
 
-The input stability check is automatically disabled in production environments.
+输入稳定性检查在生产环境中自动禁用。
 
 :::
 
-You can configure this behavior in two ways:
+您可以通过两种方式配置此行为：
 
-### 1. Globally through `setGlobalDevModeChecks`:
+### 1. 通过`setGlobalDevModeChecks`全局设置：
 
-A `setGlobalDevModeChecks` function is exported from Reselect, which should be called with the desired setting.
+`setGlobalDevModeChecks`函数从Reselect导出，应该用所需的设置调用它。
 
 ```ts
 import { setGlobalDevModeChecks } from 'reselect'
 
-// Run only the first time the selector is called. (default)
+// 只在选择器第一次被调用时运行。 (默认)
 setGlobalDevModeChecks({ inputStabilityCheck: 'once' })
 
-// Run every time the selector is called.
+// 每次选择器被调用时都运行。
 setGlobalDevModeChecks({ inputStabilityCheck: 'always' })
 
-// Never run the input stability check.
+// 从不运行输入稳定性检查。
 setGlobalDevModeChecks({ inputStabilityCheck: 'never' })
 ```
 
-### 2. Per selector by passing an `inputStabilityCheck` option directly to <InternalLinks.CreateSelector>`createSelector`</InternalLinks.CreateSelector>:
+### 2. 通过直接向<InternalLinks.CreateSelector>`createSelector`</InternalLinks.CreateSelector>传递`inputStabilityCheck`选项，对每个选择器进行设置：
 
 {/* START: development-only-stability-checks/inputStabilityCheck.ts */}
 
@@ -88,16 +88,16 @@ interface RootState {
   alerts: { id: number; read: boolean }[]
 }
 
-// Create a selector that double-checks the results of input selectors every time it runs.
+// 创建一个选择器，每次运行时都会对输入选择器的结果进行双重检查。
 const selectCompletedTodosLength = createSelector(
   [
-    // ❌ Incorrect Use Case: This input selector will not be
-    // memoized properly since it always returns a new reference.
+    // ❌ 错误的使用案例：此输入选择器将无法
+    // 正确地进行记忆化，因为它总是返回一个新的引用。
     (state: RootState) =>
       state.todos.filter(({ completed }) => completed === true)
   ],
   completedTodos => completedTodos.length,
-  // Will override the global setting.
+  // 将覆盖全局设置。
   { devModeChecks: { inputStabilityCheck: 'always' } }
 )
 ```
@@ -108,15 +108,15 @@ const selectCompletedTodosLength = createSelector(
 ```js title="development-only-stability-checks/inputStabilityCheck.js"
 import { createSelector } from 'reselect'
 
-// Create a selector that double-checks the results of input selectors every time it runs.
+// 创建一个选择器，每次运行时都会对输入选择器的结果进行双重检查。
 const selectCompletedTodosLength = createSelector(
   [
-    // ❌ Incorrect Use Case: This input selector will not be
-    // memoized properly since it always returns a new reference.
+    // ❌ 错误的使用案例：此输入选择器将无法
+    // 正确地进行记忆化，因为它总是返回一个新的引用。
     state => state.todos.filter(({ completed }) => completed === true)
   ],
   completedTodos => completedTodos.length,
-  // Will override the global setting.
+  // 将覆盖全局设置。
   { devModeChecks: { inputStabilityCheck: 'always' } }
 )
 ```
@@ -128,28 +128,28 @@ const selectCompletedTodosLength = createSelector(
 
 :::warning
 
-This will override the global input stability check set by calling `setGlobalDevModeChecks`.
+这将覆盖通过调用`setGlobalDevModeChecks`设置的全局输入稳定性检查。
 
 :::
 
 ## `identityFunctionCheck`
 
-When working with Reselect, it's crucial to adhere to a fundamental philosophy regarding the separation of concerns between extraction and transformation logic.
+在使用 Reselect 时，坚持关于提取逻辑和转换逻辑之间关注点分离的基本哲学是至关重要的。
 
-- **Extraction Logic**: This refers to operations like `state => state.todos`, which should be placed in [input selectors]. Extraction logic is responsible for retrieving or 'selecting' data from a broader state or dataset.
+- **提取逻辑**：这指的是像 `state => state.todos` 这样的操作，应该放在 [输入选择器] 中。提取逻辑负责从更广泛的状态或数据集中检索或'选择'数据。
 
-- **Transformation Logic**: In contrast, transformation logic, such as `todos => todos.map(({ id }) => id)`, belongs in the [result function]. This is where you manipulate, format, or transform the data extracted by the input selectors.
+- **转换逻辑**：相反，转换逻辑，如 `todos => todos.map(({ id }) => id)`，应该放在 [结果函数] 中。这是你操作、格式化或转换输入选择器提取的数据的地方。
 
-Most importantly, effective memoization in Reselect hinges on following these guidelines. Memoization, only functions correctly when extraction and transformation logic are properly segregated. By keeping extraction logic in input selectors and transformation logic in the result function, Reselect can efficiently determine when to reuse cached results and when to recompute them. This not only enhances performance but also ensures the consistency and predictability of your selectors.
+最重要的是，Reselect 中有效的记忆化依赖于遵循这些指导原则。只有当提取和转换逻辑正确地分离时，记忆化才能正确地工作。通过将提取逻辑保留在输入选择器中，将转换逻辑保留在结果函数中，Reselect 可以有效地确定何时重用缓存结果，何时重新计算它们。这不仅提高了性能，而且确保了你的选择器的一致性和可预测性。
 
-For memoization to work as intended, it's imperative to follow both guidelines. If either is disregarded, memoization will not function properly. Consider the following example for clarity:
+为了使记忆化按预期工作，必须遵循这两个指导原则。如果任何一个被忽视，记忆化将无法正常工作。考虑以下例子以便清晰理解：
 
 ```ts
-// ❌ Incorrect Use Case: This will not memoize correctly, and does nothing useful!
+// ❌ 错误的使用案例：这将无法正确地记忆化，而且没有任何用处！
 const brokenSelector = createSelector(
-  // ✔️ GOOD: Contains extraction logic.
+  // ✔️ 好的：包含提取逻辑。
   [(state: RootState) => state.todos],
-  // ❌ BAD: Does not contain transformation logic.
+  // ❌ 坏的：不包含转换逻辑。
   todos => todos
 )
 ```
@@ -158,49 +158,38 @@ const brokenSelector = createSelector(
 type DevModeCheckFrequency = 'always' | 'once' | 'never'
 ```
 
-| Possible Values | Description                                     |
+| 可能的值 | 描述 |
 | :-------------- | :---------------------------------------------- |
-| `once`          | Run only the first time the selector is called. |
-| `always`        | Run every time the selector is called.          |
-| `never`         | Never run the identity function check.          |
+| `once` | 只在第一次调用选择器时运行。 |
+| `always` | 每次调用选择器时都运行。 |
+| `never` | 从不运行身份函数检查。 |
 
 :::info
 
-The identity function check is automatically disabled in production environments.
+身份函数检查在生产环境中会自动禁用。
 
 :::
 
-You can configure this behavior in two ways:
+你可以通过两种方式配置这种行为：
 
-### 1. Globally through `setGlobalDevModeChecks`:
+### 1. 通过 `setGlobalDevModeChecks` 全局配置：
 
 ```ts
 import { setGlobalDevModeChecks } from 'reselect'
 
-// Run only the first time the selector is called. (default)
+// 只在第一次调用选择器时运行。 (默认)
 setGlobalDevModeChecks({ identityFunctionCheck: 'once' })
 
-// Run every time the selector is called.
+// 每次调用选择器时都运行。
 setGlobalDevModeChecks({ identityFunctionCheck: 'always' })
 
-// Never run the identity function check.
+// 从不运行身份函数检查。
 setGlobalDevModeChecks({ identityFunctionCheck: 'never' })
 ```
 
-### 2. Per selector by passing an `identityFunctionCheck` option directly to <InternalLinks.CreateSelector>`createSelector`</InternalLinks.CreateSelector>:
+### 2. 通过直接向 <InternalLinks.CreateSelector>`createSelector`</InternalLinks.CreateSelector> 传递 `identityFunctionCheck` 选项来对每个选择器进行配置：
 
-{/* START: development-only-stability-checks/identityFunctionCheck.ts */}
-
-<Tabs
-  groupId='language'
-  defaultValue='ts'
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'},
-  ]}>
-  <TabItem value='ts'>
-
-```ts title="development-only-stability-checks/identityFunctionCheck.ts"
+```ts
 import { createSelector } from 'reselect'
 
 interface RootState {
@@ -208,41 +197,19 @@ interface RootState {
   alerts: { id: number; read: boolean }[]
 }
 
-// Create a selector that checks to see if the result function is an identity function.
+// 创建一个选择器，检查结果函数是否是一个身份函数。
 const selectTodos = createSelector(
-  // ✔️ GOOD: Contains extraction logic.
+  // ✔️ 好的：包含提取逻辑。
   [(state: RootState) => state.todos],
-  // ❌ BAD: Does not contain transformation logic.
+  // ❌ 坏的：不包含转换逻辑。
   todos => todos,
-  // Will override the global setting.
+  // 将覆盖全局设置。
   { devModeChecks: { identityFunctionCheck: 'always' } }
 )
 ```
-
-  </TabItem>
-  <TabItem value='js'>
-
-```js title="development-only-stability-checks/identityFunctionCheck.js"
-import { createSelector } from 'reselect'
-
-// Create a selector that checks to see if the result function is an identity function.
-const selectTodos = createSelector(
-  // ✔️ GOOD: Contains extraction logic.
-  [state => state.todos],
-  // ❌ BAD: Does not contain transformation logic.
-  todos => todos,
-  // Will override the global setting.
-  { devModeChecks: { identityFunctionCheck: 'always' } }
-)
-```
-
-  </TabItem>
-</Tabs>
-
-{/* END: development-only-stability-checks/identityFunctionCheck.ts */}
 
 :::warning
 
-This will override the global identity function check set by calling `setGlobalDevModeChecks`.
+这将覆盖通过调用 `setGlobalDevModeChecks` 设置的全局身份函数检查。
 
 :::

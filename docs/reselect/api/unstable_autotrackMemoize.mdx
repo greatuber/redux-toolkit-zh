@@ -12,55 +12,55 @@ import { InternalLinks } from '@site/src/components/InternalLinks'
 
 # `unstable_autotrackMemoize`
 
-Uses an "auto-tracking" approach inspired by the work of the Ember Glimmer team. It uses a Proxy to wrap arguments and track accesses to nested fields in your selector on first read. Later, when the selector is called with new arguments, it identifies which accessed fields have changed and only recalculates the result if one or more of those accessed fields have changed. This allows it to be more precise than the shallow equality checks in `lruMemoize`.
+使用由Ember Glimmer团队启发的"自动跟踪"方法。它使用一个代理来包装参数，并在首次读取时跟踪对选择器中嵌套字段的访问。后来，当选择器被新的参数调用时，它会识别哪些访问的字段已经改变，并且只有当一个或多个被访问的字段改变时，才重新计算结果。这使得它比`lruMemoize`中的浅等式检查更精确。
 
 :::danger
 
-This API is still experimental and undergoing testing.
+这个API仍然是实验性的，正在进行测试。
 
 :::
 
-## Design Tradeoffs
+## 设计权衡
 
-- Pros:
+- 优点：
 
-  - It is likely to avoid excess calculations and recalculate fewer times than `lruMemoize` will, which may also result in fewer component re-renders.
+  - 它可能避免过多的计算，并且比`lruMemoize`重新计算的次数少，这也可能导致组件重新渲染的次数减少。
 
-- Cons:
+- 缺点：
 
-  - It only has a cache size of 1.
-  - It is slower than `lruMemoize`, because it has to do more work. (How much slower is dependent on the number of accessed fields in a selector, number of calls, frequency of input changes, etc)
-  - It can have some unexpected behavior. Because it tracks nested field accesses, cases where you don't access a field will not recalculate properly. For example, a badly-written selector like:
+  - 它只有一个缓存大小。
+  - 它比`lruMemoize`慢，因为它需要做更多的工作。（有多慢取决于选择器中访问的字段数量，调用次数，输入变化的频率等）
+  - 它可能有一些意外的行为。因为它跟踪嵌套字段的访问，所以在你不访问一个字段的情况下，它将无法正确地重新计算。例如，一个写得不好的选择器像：
 
   ```ts
   createSelector([state => state.todos], todos => todos)
   ```
 
-  that just immediately returns the extracted value will never update, because it doesn't see any field accesses to check.
+  那只是立即返回提取的值，将永远不会更新，因为它看不到任何字段访问来检查。
 
-## Use Cases
+## 使用场景
 
-- It is likely best used for cases where you need to access specific nested fields in data, and avoid recalculating if other fields in the same data objects are immutably updated.
+- 它可能最适用于你需要访问数据中特定嵌套字段的情况，并且如果同一数据对象中的其他字段不可变地更新，避免重新计算。
 
-## Parameters
+## 参数
 
-| Name   | Description                  |
+| 名称   | 描述                  |
 | :----- | :--------------------------- |
-| `func` | The function to be memoized. |
+| `func` | 要被记忆的函数。 |
 
-## Returns
+## 返回
 
-A memoized function with a `.clearCache()` method attached.
+一个带有 `.clearCache()` 方法的记忆函数。
 
-## Type Parameters
+## 类型参数
 
-| Name   | Description                                |
+| 名称   | 描述                                |
 | :----- | :----------------------------------------- |
-| `Func` | The type of the function that is memoized. |
+| `Func` | 被记忆的函数的类型。 |
 
-## Examples
+## 示例
 
-### Using `unstable_autotrackMemoize` with `createSelector`
+### 使用 `unstable_autotrackMemoize` 与 `createSelector`
 
 {/* START: unstable_autotrackMemoize/usingWithCreateSelector.ts */}
 
@@ -106,7 +106,7 @@ const selectTodoIds = createSelector(
 
 {/* END: unstable_autotrackMemoize/usingWithCreateSelector.ts */}
 
-### Using `unstable_autotrackMemoize` with `createSelectorCreator`
+### 使用 `unstable_autotrackMemoize` 与 `createSelectorCreator`
 
 {/* START: unstable_autotrackMemoize/usingWithCreateSelectorCreator.ts */}
 

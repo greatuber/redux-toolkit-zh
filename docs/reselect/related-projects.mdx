@@ -10,32 +10,32 @@ import { InternalLinks } from '@site/src/components/InternalLinks'
 import { ExternalLinks } from '@site/src/components/ExternalLinks'
 import Link from '@docusaurus/Link'
 
-# Related Projects
+# 相关项目
 
 ## <ExternalLinks.ReReselect>Re-reselect</ExternalLinks.ReReselect>
 
-Enhances Reselect selectors by wrapping <InternalLinks.CreateSelector /> and returning a memoized collection of selectors indexed with the cache key returned by a custom resolver function.
+通过包装 <InternalLinks.CreateSelector /> 并返回由自定义解析器函数返回的缓存键索引的选择器的记忆集合来增强 Reselect 选择器。
 
-Useful to reduce selectors recalculation when the same selector is repeatedly called with one/few different arguments.
+当同一个选择器被反复调用一次/几次不同的参数时，这对减少选择器的重新计算很有用。
 
 ## <Link to='https://github.com/skortchmark9/reselect-tools'>reselect-tools</Link>
 
-- Measure selector recomputations across the app and identify performance bottlenecks
-- Check selector dependencies, inputs, outputs, and recomputations at any time with the chrome extension
-- Statically export a JSON representation of your selector graph for further analysis
+- 测量应用程序中选择器的重新计算，并识别性能瓶颈
+- 使用 chrome 扩展随时检查选择器的依赖项、输入、输出和重新计算
+- 静态导出选择器图的 JSON 表示以进行进一步分析
 
 ## <Link to='https://github.com/vlanemcev/reselect-debugger-flipper'>reselect-debugger</Link>
 
 <!-- prettier-ignore -->
-<Link to="https://github.com/vlanemcev/flipper-plugin-reselect-debugger">Flipper plugin</Link> and
-<Link to="https://github.com/vlanemcev/reselect-debugger-flipper">the connect app</Link> for debugging selectors in **React Native Apps**.
+<Link to="https://github.com/vlanemcev/flipper-plugin-reselect-debugger">Flipper 插件</Link> 和
+<Link to="https://github.com/vlanemcev/reselect-debugger-flipper">连接应用</Link> 用于在 **React Native Apps** 中调试选择器。
 
-Inspired by Reselect Tools, so it also has all functionality from this library and more, but only for React Native and Flipper.
+受 Reselect Tools 的启发，因此它也具有来自这个库的所有功能，以及更多，但只适用于 React Native 和 Flipper。
 
-- Selectors Recomputations count in live time across the App for identify performance bottlenecks
-- Highlight most recomputed selectors
-- Dependency Graph
-- Search by Selectors Graph
-- Selectors Inputs
-- Selectors Output (In case if selector not dependent from external arguments)
-- Shows "Not Memoized (NM)" selectors
+- 在应用程序中实时计算选择器的重新计算次数，以识别性能瓶颈
+- 高亮显示最多重新计算的选择器
+- 依赖关系图
+- 通过选择器图搜索
+- 选择器输入
+- 选择器输出（如果选择器不依赖于外部参数的情况下）
+- 显示 "未记忆化 (NM)" 的选择器

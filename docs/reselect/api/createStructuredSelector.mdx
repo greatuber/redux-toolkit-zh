@@ -12,30 +12,30 @@ import { InternalLinks } from '@site/src/components/InternalLinks'
 
 # `createStructuredSelector`
 
-A convenience function that simplifies returning an object made up of selector results.
+这是一个方便的函数，简化了返回由选择器结果组成的对象的过程。
 
-## Parameters
+## 参数
 
-| Name                   | Description                                                                          |
+| 名称                   | 描述                                                                          |
 | :--------------------- | :----------------------------------------------------------------------------------- |
-| `inputSelectorsObject` | A key value pair consisting of input selectors.                                      |
-| `selectorCreator?`     | A custom selector creator function. It defaults to <InternalLinks.CreateSelector />. |
+| `inputSelectorsObject` | 由输入选择器组成的键值对。                                      |
+| `selectorCreator?`     | 自定义的选择器创建函数。默认为 <InternalLinks.CreateSelector />。 |
 
-## Returns
+## 返回值
 
-A memoized structured selector.
+一个被记忆化的结构化选择器。
 
-## Type Parameters
+## 类型参数
 
-| Name                   | Description                                                                                                                                               |
+| 名称                   | 描述                                                                                                                                               |
 | :--------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `InputSelectorsObject` | The shape of the <InternalLinks.InputSelectors /> object.                                                                                                 |
-| `MemoizeFunction`      | The type of the memoize function that is used to create the structured selector. It defaults to `lruMemoize`.                                             |
-| `ArgsMemoizeFunction`  | The type of the of the memoize function that is used to memoize the arguments passed into the generated structured selector. It defaults to `lruMemoize`. |
+| `InputSelectorsObject` | <InternalLinks.InputSelectors /> 对象的形状。                                                                                                 |
+| `MemoizeFunction`      | 用于创建结构化选择器的记忆化函数的类型。默认为 `lruMemoize`。                                             |
+| `ArgsMemoizeFunction`  | 用于记忆化传入生成的结构化选择器的参数的记忆化函数的类型。默认为 `lruMemoize`。 |
 
-## Examples
+## 示例
 
-### Modern Use Case
+### 现代用例
 
 {/* START: createStructuredSelector/modernUseCase.ts */}
 
@@ -61,7 +61,7 @@ export interface RootState {
   alerts: { id: number; read: boolean }[]
 }
 
-// This:
+// 这个：
 export const structuredSelector = createStructuredSelector(
   {
     todos: (state: RootState) => state.todos,
@@ -71,7 +71,7 @@ export const structuredSelector = createStructuredSelector(
   createSelector
 )
 
-// Is essentially the same as this:
+// 本质上与这个相同：
 export const selector = createSelector(
   [
     (state: RootState) => state.todos,
@@ -94,7 +94,7 @@ export const selector = createSelector(
 ```js title="createStructuredSelector/modernUseCase.js"
 import { createSelector, createStructuredSelector } from 'reselect'
 
-// This:
+// 这个：
 export const structuredSelector = createStructuredSelector(
   {
     todos: state => state.todos,
@@ -104,7 +104,7 @@ export const structuredSelector = createStructuredSelector(
   createSelector
 )
 
-// Is essentially the same as this:
+// 本质上与这个相同：
 export const selector = createSelector(
   [state => state.todos, state => state.alerts, (state, id) => state.todos[id]],
   (todos, alerts, todoById) => {
@@ -122,7 +122,7 @@ export const selector = createSelector(
 
 {/* END: createStructuredSelector/modernUseCase.ts */}
 
-In your component:
+在你的组件中：
 
 {/* START: createStructuredSelector/MyComponent.tsx */}
 
@@ -152,11 +152,11 @@ const MyComponent: FC<Props> = ({ id }) => {
 
   return (
     <div>
-      Next to do is:
+      下一个待办事项是：
       <h2>{todoById.title}</h2>
-      <p>Description: {todoById.description}</p>
+      <p>描述：{todoById.description}</p>
       <ul>
-        <h3>All other to dos:</h3>
+        <h3>所有其他待办事项：</h3>
         {todos.map(todo => (
           <li key={todo.id}>{todo.title}</li>
         ))}
@@ -180,11 +180,11 @@ const MyComponent = ({ id }) => {
 
   return (
     <div>
-      Next to do is:
+      下一步要做的是：
       <h2>{todoById.title}</h2>
-      <p>Description: {todoById.description}</p>
+      <p>描述：{todoById.description}</p>
       <ul>
-        <h3>All other to dos:</h3>
+        <h3>所有其他待办事项：</h3>
         {todos.map(todo => (
           <li key={todo.id}>{todo.title}</li>
         ))}
@@ -205,17 +205,17 @@ const MyComponent = ({ id }) => {
 const selectA = state => state.a
 const selectB = state => state.b
 
-// The result function in the following selector
-// is simply building an object from the input selectors
+// 下面选择器中的结果函数
+// 只是从输入选择器构建一个对象
 const structuredSelector = createSelector(selectA, selectB, (a, b) => ({
   a,
   b
 }))
 
-const result = structuredSelector({ a: 1, b: 2 }) // will produce { x: 1, y: 2 }
+const result = structuredSelector({ a: 1, b: 2 }) // 将产生 { x: 1, y: 2 }
 ```
 
-`createStructuredSelector` takes an object whose properties are input selectors and returns a structured selector. The structured selector returns an object with the same keys as the `inputSelectorsObject` argument, but with the selectors replaced with their values.
+`createStructuredSelector`接受一个对象，该对象的属性是输入选择器，并返回一个结构化选择器。结构化选择器返回一个对象，该对象具有与`inputSelectorsObject`参数相同的键，但是选择器被其值替换。
 
 ```ts
 const selectA = state => state.a
@@ -226,10 +226,10 @@ const structuredSelector = createStructuredSelector({
   y: selectB
 })
 
-const result = structuredSelector({ a: 1, b: 2 }) // will produce { x: 1, y: 2 }
+const result = structuredSelector({ a: 1, b: 2 }) // 将产生 { x: 1, y: 2 }
 ```
 
-Structured selectors can be nested:
+结构化选择器可以嵌套：
 
 ```ts
 const nestedSelector = createStructuredSelector({
@@ -244,11 +244,11 @@ const nestedSelector = createStructuredSelector({
 })
 ```
 
-## Defining a Pre-Typed <InternalLinks.CreateStructuredSelector>`createStructuredSelector`</InternalLinks.CreateStructuredSelector>
+## 定义预设类型的 <InternalLinks.CreateStructuredSelector>`createStructuredSelector`</InternalLinks.CreateStructuredSelector>
 
-As of Reselect 5.1.0, you can create a "pre-typed" version of <InternalLinks.CreateStructuredSelector /> where the `state` type is predefined. This allows you to set the `state` type once, eliminating the need to specify it with every <InternalLinks.CreateStructuredSelector /> call.
+从 Reselect 5.1.0 开始，你可以创建一个预设 `state` 类型的 <InternalLinks.CreateStructuredSelector />。这允许你一次性设置 `state` 类型，从而无需在每次调用 <InternalLinks.CreateStructuredSelector /> 时指定它。
 
-To do this, you can call `createStructuredSelector.withTypes<StateType>()`:
+要做到这一点，你可以调用 `createStructuredSelector.withTypes<StateType>()`：
 
 {/* START: createStructuredSelector/withTypes.ts */}
 
@@ -273,7 +273,7 @@ export const createStructuredAppSelector =
   createStructuredSelector.withTypes<RootState>()
 
 const structuredAppSelector = createStructuredAppSelector({
-  // Type of `state` is set to `RootState`, no need to manually set the type
+  // `state` 的类型被设置为 `RootState`，无需手动设置类型
   // highlight-start
   todos: state => state.todos,
   // highlight-end
@@ -291,7 +291,7 @@ import { createStructuredSelector } from 'reselect'
 export const createStructuredAppSelector = createStructuredSelector.withTypes()
 
 const structuredAppSelector = createStructuredAppSelector({
-  // Type of `state` is set to `RootState`, no need to manually set the type
+  // `state` 的类型被设置为 `RootState`，无需手动设置类型
   // highlight-start
   todos: state => state.todos,
   // highlight-end

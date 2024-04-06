@@ -13,33 +13,28 @@ import { ExternalLinks } from '@site/src/components/ExternalLinks'
 
 # `weakMapMemoize`
 
-<InternalLinks.LruMemoize /> has to be explicitly configured to have a cache
-size larger than 1, and uses an LRU cache internally.
+<InternalLinks.LruMemoize /> 需要明确配置缓存大小大于1，并在内部使用LRU缓存。
 
-`weakMapMemoize` creates a tree of <ExternalLinks.WeakMap />-based cache nodes based on the identity of the arguments it's been called with (in this case, the extracted values from your input selectors). **This allows `weakMapMemoize` to have an effectively infinite cache size**. Cache results will be kept in memory as long as references to the arguments still exist, and then cleared out as the arguments are garbage-collected.
+`weakMapMemoize` 根据其被调用的参数（在这种情况下，是从你的输入选择器中提取的值）的身份，创建了一个基于 <ExternalLinks.WeakMap /> 的缓存节点树。**这使得 `weakMapMemoize` 具有实际上无限的缓存大小**。只要对参数的引用仍然存在，缓存结果将被保留在内存中，然后在参数被垃圾收集时清除。
 
-## Design Tradeoffs
+## 设计权衡
 
-- Pros:
+- 优点：
 
-  - It has an effectively infinite cache size, but you have no control over
-    how long values are kept in cache as it's based on garbage collection and <ExternalLinks.WeakMap />s.
+  - 它具有实际上无限的缓存大小，但你无法控制值在缓存中保留多长时间，因为它基于垃圾收集和 <ExternalLinks.WeakMap />。
 
-- Cons:
-  - There's currently no way to alter the argument comparisons. They're based on <ExternalLinks.ReferenceEqualityCheck text='strict reference equality' />.
+- 缺点：
+  - 目前无法更改参数比较。它们基于 <ExternalLinks.ReferenceEqualityCheck text='严格的引用等同性' />。
 
-## Use Cases
+## 使用案例
 
-- This memoizer is likely best used for cases where you need to call the
-  same selector instance with many different arguments, such as a single
-  selector instance that is used in a list item component and called with
-  item IDs like:
+- 这个记忆器可能最适合需要用许多不同的参数调用同一个选择器实例的情况，例如在列表项组件中使用的单个选择器实例，并用像这样的项目ID调用：
 
 ```ts
 useSelector(state => selectSomeData(state, id))
 ```
 
-Prior to `weakMapMemoize`, you had this problem:
+在使用 `weakMapMemoize` 之前，你遇到了这样的问题：
 
 {/* START: weakMapMemoize/cacheSizeProblem.ts */}
 
@@ -76,10 +71,10 @@ const selectItemsByCategory = createSelector(
   (items, category) => items.filter(item => item.category === category)
 )
 
-selectItemsByCategory(state, 'Electronics') // Selector runs
+selectItemsByCategory(state, 'Electronics') // 选择器运行
 selectItemsByCategory(state, 'Electronics')
-selectItemsByCategory(state, 'Stationery') // Selector runs
-selectItemsByCategory(state, 'Electronics') // Selector runs again!
+selectItemsByCategory(state, 'Stationery') // 选择器运行
+selectItemsByCategory(state, 'Electronics') // 选择器再次运行！
 ```
 
   </TabItem>
@@ -102,10 +97,10 @@ const selectItemsByCategory = createSelector(
   (items, category) => items.filter(item => item.category === category)
 )
 
-selectItemsByCategory(state, 'Electronics') // Selector runs
+selectItemsByCategory(state, 'Electronics') // 选择器运行
 selectItemsByCategory(state, 'Electronics')
-selectItemsByCategory(state, 'Stationery') // Selector runs
-selectItemsByCategory(state, 'Electronics') // Selector runs again!
+selectItemsByCategory(state, 'Stationery') // 选择器运行
+selectItemsByCategory(state, 'Electronics') // 选择器再次运行！
 ```
 
   </TabItem>
@@ -113,9 +108,9 @@ selectItemsByCategory(state, 'Electronics') // Selector runs again!
 
 {/* END: weakMapMemoize/cacheSizeProblem.ts */}
 
-Before you could solve this in a number of different ways:
+在此之前，你可以通过多种不同的方式来解决这个问题：
 
-1. Set the `maxSize` with <InternalLinks.LruMemoize />:
+1. 使用 <InternalLinks.LruMemoize /> 设置 `maxSize`：
 
 {/* START: weakMapMemoize/setMaxSize.ts */}
 
@@ -170,9 +165,9 @@ const selectItemsByCategory = createSelector(
 
 {/* END: weakMapMemoize/setMaxSize.ts */}
 
-But this required having to know the cache size ahead of time.
+但这需要提前知道缓存大小。
 
-2. Create unique selector instances using <ExternalLinks.UseMemo />.
+2. 使用 <ExternalLinks.UseMemo /> 创建唯一的选择器实例。
 
 {/* START: weakMapMemoize/withUseMemo.tsx */}
 
@@ -255,7 +250,7 @@ const MyComponent = ({ category }) => {
 
 {/* END: weakMapMemoize/withUseMemo.tsx */}
 
-3. Use <ExternalLinks.ReReselect />:
+3. 使用 <ExternalLinks.ReReselect />：
 
 ```ts
 import { createCachedSelector } from 're-reselect'
@@ -269,7 +264,7 @@ const selectItemsByCategory = createCachedSelector(
 )((state: RootState, category: string) => category)
 ```
 
-Starting in 5.0.0, you can eliminate this problem using `weakMapMemoize`.
+从5.0.0版本开始，你可以使用 `weakMapMemoize` 来消除这个问题。
 
 {/* START: weakMapMemoize/cacheSizeSolution.ts */}
 
@@ -307,10 +302,10 @@ const selectItemsByCategory = createSelector(
   }
 )
 
-selectItemsByCategory(state, 'Electronics') // Selector runs
-selectItemsByCategory(state, 'Electronics') // Cached
-selectItemsByCategory(state, 'Stationery') // Selector runs
-selectItemsByCategory(state, 'Electronics') // Still cached!
+selectItemsByCategory(state, 'Electronics') // 选择器运行
+selectItemsByCategory(state, 'Electronics') // 缓存
+selectItemsByCategory(state, 'Stationery') // 选择器运行
+selectItemsByCategory(state, 'Electronics') // 仍然缓存！
 ```
 
   </TabItem>
@@ -337,10 +332,10 @@ const selectItemsByCategory = createSelector(
   }
 )
 
-selectItemsByCategory(state, 'Electronics') // Selector runs
-selectItemsByCategory(state, 'Electronics') // Cached
-selectItemsByCategory(state, 'Stationery') // Selector runs
-selectItemsByCategory(state, 'Electronics') // Still cached!
+selectItemsByCategory(state, 'Electronics') // 选择器运行
+selectItemsByCategory(state, 'Electronics') // 缓存
+selectItemsByCategory(state, 'Stationery') // 选择器运行
+selectItemsByCategory(state, 'Electronics') // 仍然缓存！
 ```
 
   </TabItem>
@@ -348,27 +343,27 @@ selectItemsByCategory(state, 'Electronics') // Still cached!
 
 {/* END: weakMapMemoize/cacheSizeSolution.ts */}
 
-This solves the problem of having to know and set the cache size prior to creating a memoized selector. Because `weakMapMemoize` essentially provides a dynamic cache size out of the box.
+这解决了在创建记忆选择器之前需要知道和设置缓存大小的问题。因为 `weakMapMemoize` 本质上提供了一个开箱即用的动态缓存大小。
 
-## Parameters
+## 参数
 
-| Name   | Description                  |
+| 名称   | 描述                  |
 | :----- | :--------------------------- |
-| `func` | The function to be memoized. |
+| `func` | 需要被记忆的函数。 |
 
-## Returns
+## 返回
 
-A memoized function with a `.clearCache()` method attached.
+一个带有 `.clearCache()` 方法的记忆函数。
 
-## Type Parameters
+## 类型参数
 
-| Name   | Description                                |
+| 名称   | 描述                                |
 | :----- | :----------------------------------------- |
-| `Func` | The type of the function that is memoized. |
+| `Func` | 被记忆的函数的类型。 |
 
-## Examples
+## 示例
 
-### Using `weakMapMemoize` with `createSelector`
+### 使用 `weakMapMemoize` 与 `createSelector`
 
 {/* START: weakMapMemoize/usingWithCreateSelector.ts */}
 
@@ -406,9 +401,9 @@ const selectItemsByCategory = createSelector(
   }
 )
 
-selectItemsByCategory(state, 'Electronics') // Selector runs
+selectItemsByCategory(state, 'Electronics') // 选择器运行
 selectItemsByCategory(state, 'Electronics')
-selectItemsByCategory(state, 'Stationery') // Selector runs
+selectItemsByCategory(state, 'Stationery') // 选择器运行
 selectItemsByCategory(state, 'Electronics')
 ```
 
@@ -436,9 +431,9 @@ const selectItemsByCategory = createSelector(
   }
 )
 
-selectItemsByCategory(state, 'Electronics') // Selector runs
+selectItemsByCategory(state, 'Electronics') // 选择器运行
 selectItemsByCategory(state, 'Electronics')
-selectItemsByCategory(state, 'Stationery') // Selector runs
+selectItemsByCategory(state, 'Stationery') // 选择器运行
 selectItemsByCategory(state, 'Electronics')
 ```
 
@@ -447,7 +442,7 @@ selectItemsByCategory(state, 'Electronics')
 
 {/* END: weakMapMemoize/usingWithCreateSelector.ts */}
 
-### Using `weakMapMemoize` with `createSelectorCreator`
+### 使用 `weakMapMemoize` 与 `createSelectorCreator`
 
 {/* START: weakMapMemoize/usingWithCreateSelectorCreator.ts */}
 
@@ -486,9 +481,9 @@ const selectItemsByCategory = createSelectorWeakMap(
   (items, category) => items.filter(item => item.category === category)
 )
 
-selectItemsByCategory(state, 'Electronics') // Selector runs
+selectItemsByCategory(state, 'Electronics') // 选择器运行
 selectItemsByCategory(state, 'Electronics')
-selectItemsByCategory(state, 'Stationery') // Selector runs
+selectItemsByCategory(state, 'Stationery') // 选择器运行
 selectItemsByCategory(state, 'Electronics')
 ```
 
@@ -517,9 +512,9 @@ const selectItemsByCategory = createSelectorWeakMap(
   (items, category) => items.filter(item => item.category === category)
 )
 
-selectItemsByCategory(state, 'Electronics') // Selector runs
+selectItemsByCategory(state, 'Electronics') // 选择器运行
 selectItemsByCategory(state, 'Electronics')
-selectItemsByCategory(state, 'Stationery') // Selector runs
+selectItemsByCategory(state, 'Stationery') // 选择器运行
 selectItemsByCategory(state, 'Electronics')
 ```
 

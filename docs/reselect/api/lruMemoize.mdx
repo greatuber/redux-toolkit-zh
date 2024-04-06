@@ -13,11 +13,11 @@ import { ExternalLinks } from '@site/src/components/ExternalLinks'
 
 # `lruMemoize`
 
-A memoization function that uses a provided equality check function to compare its inputs. This was originally known as `defaultMemoize`, and was the default inside of <InternalLinks.CreateSelector /> up through version 4.x.
+这是一个使用提供的等价性检查函数来比较其输入的记忆化函数。这最初被称为 `defaultMemoize`，并且在4.x版本之前是<InternalLinks.CreateSelector />的默认设置。
 
-It has a default cache size of 1. This means it always recalculates when the value of an argument changes. However, this can be customized as needed with a specific max cache size (since 4.1.0).
+它的默认缓存大小为1。这意味着当参数的值发生变化时，它总是会重新计算。然而，可以根据需要使用特定的最大缓存大小进行自定义（自4.1.0版本以来）。
 
-It determines if an argument has changed by calling the `equalityCheck` function. As `lruMemoize` is designed to be used with immutable data, the default `equalityCheck` function checks for changes using <ExternalLinks.ReferenceEqualityCheck text="reference equality" />:
+它通过调用 `equalityCheck` 函数来判断参数是否发生了变化。由于 `lruMemoize` 设计用于处理不可变数据，因此默认的 `equalityCheck` 函数使用<ExternalLinks.ReferenceEqualityCheck text="引用等价性" />来检查变化：
 
 {/* START: lruMemoize/referenceEqualityCheck.ts */}
 
@@ -50,14 +50,14 @@ const referenceEqualityCheck = (previousValue, currentValue) => {
 
 {/* END: lruMemoize/referenceEqualityCheck.ts */}
 
-## Parameters
+## 参数
 
-| Name                     | Description                                               |
+| 名称                     | 描述                                               |
 | :----------------------- | :-------------------------------------------------------- |
-| `func`                   | The function to be memoized.                              |
-| `equalityCheckOrOptions` | Either an equality check function or an `options` object. |
+| `func`                   | 需要被记忆化的函数。                              |
+| `equalityCheckOrOptions` | 一个等式检查函数或者一个`options`对象。 |
 
-Since 4.1.0, `lruMemoize` also accepts an options object as its first argument instead of an `equalityCheck` function. The `options` object may contain:
+从4.1.0版本开始，`lruMemoize`也接受一个选项对象作为其第一个参数，而不是一个`equalityCheck`函数。`options`对象可能包含：
 
 ```ts
 type EqualityFn<T = any> = (a: T, b: T) => boolean
@@ -69,31 +69,31 @@ interface LruMemoizeOptions<Result = any> {
 }
 ```
 
-| Name                  | Description                                                                                                                                                                                                                                                                                                                                                                         |
+| 名称                  | 描述                                                                                                                                                                                                                                                                                                                                                                         |
 | :-------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `equalityCheck`       | Used to compare the individual arguments of the provided calculation function. <br /> **`Default`** = `defaultEqualityCheck`                                                                                                                                                                                                                                                        |
-| `resultEqualityCheck` | If provided, used to compare a newly generated output value against previous values in the cache. If a match is found, the old value is returned. This addresses the common <code>todos.map(todo => todo.id)</code> use case, where an update to another field in the original data causes a recalculation due to changed references, but the output is still effectively the same. |
-| `maxSize`             | The cache size for the selector. If greater than 1, the selector will use an LRU cache internally. <br /> **`Default`** = 1                                                                                                                                                                                                                                                         |
+| `equalityCheck`       | 用于比较提供的计算函数的各个参数。<br /> **`默认值`** = `defaultEqualityCheck`                                                                                                                                                                                                                                                        |
+| `resultEqualityCheck` | 如果提供，用于将新生成的输出值与缓存中的旧值进行比较。如果找到匹配，将返回旧值。这解决了常见的<code>todos.map(todo => todo.id)</code>用例，其中原始数据中的其他字段的更新由于引用的改变而导致重新计算，但输出仍然有效地相同。 |
+| `maxSize`             | 选择器的缓存大小。如果大于1，选择器将内部使用LRU缓存。<br /> **`默认值`** = 1                                                                                                                                                                                                                                                         |
 
 :::warning
 
-If `resultEqualityCheck` is used inside `argsMemoizeOptions` it has no effect.
+如果在`argsMemoizeOptions`中使用`resultEqualityCheck`，它将不起作用。
 
 :::
 
-## Returns
+## 返回值
 
-A memoized function with a `.clearCache()` method attached.
+一个带有`.clearCache()`方法的记忆化函数。
 
-## Type Parameters
+## 类型参数
 
-| Name   | Description                                |
+| 名称   | 描述                                |
 | :----- | :----------------------------------------- |
-| `Func` | The type of the function that is memoized. |
+| `Func` | 被记忆化函数的类型。 |
 
-## Examples
+## 示例
 
-### Using `lruMemoize` with `createSelector`
+### 使用`lruMemoize`与`createSelector`
 
 {/* START: lruMemoize/usingWithCreateSelector.ts */}
 
@@ -172,7 +172,7 @@ const selectTodoIds = createSelector(
 
 {/* END: lruMemoize/usingWithCreateSelector.ts */}
 
-### Using `lruMemoize` with `createSelectorCreator`
+### 使用 `lruMemoize` 和 `createSelectorCreator`
 
 {/* START: lruMemoize/usingWithCreateSelectorCreator.ts */}
 

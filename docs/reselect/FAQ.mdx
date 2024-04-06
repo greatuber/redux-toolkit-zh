@@ -12,19 +12,19 @@ import { InternalLinks } from '@site/src/components/InternalLinks'
 import { ExternalLinks } from '@site/src/components/ExternalLinks'
 import Link from '@docusaurus/Link'
 
-# FAQ
+# 常见问题解答
 
-## Why isn’t my selector recomputing when the input state changes?
+## 为什么当输入状态改变时，我的选择器没有重新计算？
 
-Check that your memoization function is compatible with your state update function (i.e. the reducer if you are using <ExternalLinks.Redux />). For example, a selector created with <InternalLinks.CreateSelector /> will not work with a state update function that mutates an existing object instead of creating a new one each time. <InternalLinks.CreateSelector /> uses an identity check (`===`) to detect that an input has changed, so mutating an existing object will not trigger the selector to recompute because mutating an object does not change its identity. Note that if you are using <ExternalLinks.Redux />, mutating the state object is <Link to='http://redux.js.org/docs/Troubleshooting.html'>almost certainly a mistake</Link>.
+请检查你的记忆化函数是否与你的状态更新函数（例如，如果你正在使用 <ExternalLinks.Redux />，那就是减速器）兼容。例如，使用 <InternalLinks.CreateSelector /> 创建的选择器将无法与一个状态更新函数一起工作，该函数会改变现有对象，而不是每次都创建一个新的对象。<InternalLinks.CreateSelector /> 使用身份检查（`===`）来检测输入是否已经改变，所以改变一个现有的对象不会触发选择器重新计算，因为改变一个对象并不会改变它的身份。请注意，如果你正在使用 <ExternalLinks.Redux />，改变状态对象几乎肯定是一个错误，详情请参考 <Link to='http://redux.js.org/docs/Troubleshooting.html'>这里</Link>。
 
-## Why is my selector recomputing when the input state stays the same?
+## 为什么当输入状态保持不变时，我的选择器正在重新计算？
 
-To address unexpected recomputations in your selector, first ensure that `inputStabilityCheck` is set to either `'always'` or `'once'`. This setting aids in debugging by monitoring the stability of your inputs. Additionally, utilize <InternalLinks.OutputSelectorFields /> such as `recomputations`, `resetRecomputations`, `dependencyRecomputations`, and `resetDependencyRecomputations`. These tools help identify the source of the issue.
+要解决你的选择器中意外的重新计算问题，首先确保 `inputStabilityCheck` 被设置为 `'always'` 或 `'once'`。这个设置有助于通过监视输入的稳定性来进行调试。此外，利用 <InternalLinks.OutputSelectorFields />，如 `recomputations`、`resetRecomputations`、`dependencyRecomputations` 和 `resetDependencyRecomputations`。这些工具有助于识别问题的来源。
 
-Keep an eye on the `dependencyRecomputations` count. If it increases while `recomputations` remains the same, it suggests that your arguments are changing references but your <InternalLinks.InputSelectors /> are stable which is typically the desired behavior.
+请关注 `dependencyRecomputations` 的计数。如果它在 `recomputations` 保持不变的情况下增加，这表明你的参数正在改变引用，但你的 <InternalLinks.InputSelectors /> 是稳定的，这通常是期望的行为。
 
-To delve deeper, you can determine which arguments are changing references too frequently by using the `argsMemoizeOptions` and `equalityCheck`. Consider the following example:
+要深入了解，你可以通过使用 `argsMemoizeOptions` 和 `equalityCheck` 来确定哪些参数的引用变化过于频繁。考虑以下示例：
 
 {/* START: FAQ/selectorRecomputing.ts */}
 
@@ -54,7 +54,7 @@ const selectAlertsByType = createSelector(
   {
     argsMemoize: lruMemoize,
     argsMemoizeOptions: {
-      // This will check the arguments passed to the output selector.
+      // 这将检查传递给输出选择器的参数。
       equalityCheck: (a, b) => {
         if (a !== b) {
           console.log('Changed argument:', a, 'to', b)
@@ -78,7 +78,7 @@ const selectAlertsByType = createSelector(
   {
     argsMemoize: lruMemoize,
     argsMemoizeOptions: {
-      // This will check the arguments passed to the output selector.
+      // 这将检查传递给输出选择器的参数。
       equalityCheck: (a, b) => {
         if (a !== b) {
           console.log('Changed argument:', a, 'to', b)
@@ -95,30 +95,30 @@ const selectAlertsByType = createSelector(
 
 {/* END: FAQ/selectorRecomputing.ts */}
 
-## Can I use Reselect without <ExternalLinks.Redux>Redux</ExternalLinks.Redux>?
+## 我可以在没有<ExternalLinks.Redux>Redux</ExternalLinks.Redux>的情况下使用Reselect吗？
 
-Yes. Reselect has no dependencies on any other package, so although it was designed to be used with <ExternalLinks.Redux /> it can be used independently. It can be used with any plain JS data, such as typical <ExternalLinks.React /> state values, as long as that data is being updated immutably.
+可以。Reselect没有依赖任何其他包，所以虽然它是设计用来和<ExternalLinks.Redux />一起使用的，但它也可以独立使用。只要数据是以不可变的方式更新的，它就可以用于任何普通的JS数据，比如典型的<ExternalLinks.React />状态值。
 
-## How do I create a selector that takes an argument?
+## 如何创建一个接受参数的选择器？
 
-Each of the <InternalLinks.InputSelectors /> you provide will be called with all of the selector's arguments. You can add additional input selectors to extract arguments and forward them to the <InternalLinks.ResultFunction />, like this:
+你提供的每一个<InternalLinks.InputSelectors />都会被调用，并传入所有的选择器参数。你可以添加额外的输入选择器来提取参数，并将它们转发给<InternalLinks.ResultFunction />，像这样：
 
 ```ts
 const selectTodosByCategory = createSelector(
   (state: RootState) => state.todos,
-  // Extract the second argument to pass it on
+  // 提取第二个参数以便传递
   (state: RootState, category: string) => category,
   (todos, category) => todos.filter(t => t.category === category)
 )
 ```
 
-When creating a selector that accepts arguments in Reselect, it's important to structure your input and <InternalLinks.OutputSelector text='output selectors' /> appropriately. Here are key points to consider:
+在Reselect中创建一个接受参数的选择器时，重要的是要正确地构造你的输入和<InternalLinks.OutputSelector text='输出选择器' />。以下是需要考虑的关键点：
 
-1. **Consistency in Arguments**: Ensure that all positional arguments across <InternalLinks.InputSelectors /> are of the same type for consistency.
+1. **参数的一致性**：确保所有位置参数在<InternalLinks.InputSelectors />中的类型都是一致的。
 
-2. **Selective Argument Usage**: Design each selector to use only its relevant argument(s) and ignore the rest. This is crucial because all <InternalLinks.InputSelectors /> receive the same arguments that are passed to the <InternalLinks.OutputSelector />.
+2. **选择性使用参数**：设计每个选择器只使用其相关的参数，并忽略其余的。这是非常重要的，因为所有的<InternalLinks.InputSelectors />都会接收到传递给<InternalLinks.OutputSelector />的相同参数。
 
-Suppose we have the following state structure:
+假设我们有以下的状态结构：
 
 ```ts
 interface RootState {
@@ -127,52 +127,52 @@ interface RootState {
     category: string
     vendor: { id: number; name: string }
   }[]
-  // ... other state properties ...
+  // ... 其他状态属性 ...
 }
 ```
 
-To create a selector that filters `items` based on a `category` and excludes a specific `id`, you can set up your selectors as follows:
+要创建一个基于`category`过滤`items`并排除特定`id`的选择器，你可以按照以下方式设置你的选择器：
 
 ```ts
 const selectAvailableItems = createSelector(
   [
-    // First input selector extracts items from the state
+    // 第一个输入选择器从状态中提取items
     (state: RootState) => state.items,
-    // Second input selector forwards the category argument
+    // 第二个输入选择器转发category参数
     (state: RootState, category: string) => category,
-    // Third input selector forwards the ID argument
+    // 第三个输入选择器转发ID参数
     (state: RootState, category: string, id: number) => id
   ],
-  // Output selector uses the extracted items, category, and ID
+  // 输出选择器使用提取的items，category和ID
   (items, category, id) =>
     items.filter(item => item.category === category && item.id !== id)
 )
 ```
 
-Internally Reselect is doing this:
+在内部，Reselect正在做这个：
 
 ```ts
-// Input selector #1
+// 输入选择器 #1
 const items = (state: RootState, category: string, id: number) => state.items
-// Input selector #2
+// 输入选择器 #2
 const category = (state: RootState, category: string, id: number) => category
-// Input selector #3
+// 输入选择器 #3
 const id = (state: RootState, category: string, id: number) => id
-// result of output selector
+// 输出选择器的结果
 const finalResult =
-  // The result function
+  // 结果函数
   items.filter(item => item.category === category && item.id !== id)
 ```
 
-In this example, `selectItemId` expects that its second argument will be some simple value, while `selectVendorName` expects that the second argument is an object. If you call `selectItemById(state, 42)`, `selectVendorName` will break because it's trying to access `42.name`. Reselect's TS types should detect this and prevent compilation:
+在这个例子中，`selectItemId`期望它的第二个参数是一些简单的值，而`selectVendorName`期望第二个参数是一个对象。如果你调用`selectItemById(state, 42)`，`selectVendorName`会出错，因为它试图访问`42.name`。Reselect的TS类型应该能检测到这个并阻止编译：
 
 ```ts
 const selectItems = (state: RootState) => state.items
 
-// expects a number as the second argument
+// 期望第二个参数是一个数字
 const selectItemId = (state: RootState, itemId: number) => itemId
 
-// expects an object as the second argument
+// 期望第二个参数是一个对象
 const selectVendorName = (
   state: RootState,
   vendor: { id: number; name: string }
@@ -184,13 +184,13 @@ const selectItemById = createSelector(
 )
 ```
 
-## Can the memoization behavior be customized?
+## 可以自定义 memoization 行为吗？
 
-Yes. The built-in `lruMemoize` memoizer works great for a lot of use cases, but it can be customized or swapped out for a different memoizer. See <Link to='/api/createSelectorCreator#customize-equalitycheck-for-lrumemoize'>these examples</Link>.
+可以。内置的 `lruMemoize` 记忆器对于许多用例都非常有效，但是它可以被自定义或替换为不同的记忆器。请参阅<Link to='/api/createSelectorCreator#customize-equalitycheck-for-lrumemoize'>这些示例</Link>。
 
-## How do I test a selector?
+## 如何测试选择器？
 
-Selectors are pure functions - for a given input, a selector should always produce the same result. For this reason they are simple to unit test: call the selector with a set of inputs, and assert that the result value matches an expected shape.
+选择器是纯函数 - 对于给定的输入，选择器应始终产生相同的结果。因此，它们很容易进行单元测试：用一组输入调用选择器，并断言结果值与预期的形状匹配。
 
 {/* START: FAQ/howToTest.test.ts */}
 
@@ -223,45 +223,45 @@ const state: RootState = {
   ]
 }
 
-// With `Vitest` or `Jest`
-test('selector unit test', () => {
+// 使用 `Vitest` 或 `Jest`
+test('选择器单元测试', () => {
   const selectTodoIds = createSelector(
     [(state: RootState) => state.todos],
     todos => todos.map(({ id }) => id)
   )
   const firstResult = selectTodoIds(state)
   const secondResult = selectTodoIds(state)
-  // Reference equality should pass.
+  // 引用相等应该通过。
   expect(firstResult).toBe(secondResult)
-  // Deep equality should also pass.
+  // 深度相等也应该通过。
   expect(firstResult).toStrictEqual(secondResult)
   selectTodoIds(state)
   selectTodoIds(state)
   selectTodoIds(state)
-  // The result function should not recalculate.
+  // 结果函数不应重新计算。
   expect(selectTodoIds.recomputations()).toBe(1)
-  // input selectors should not recalculate.
+  // 输入选择器不应重新计算。
   expect(selectTodoIds.dependencyRecomputations()).toBe(1)
 })
 
-// With `Chai`
-test('selector unit test', () => {
+// 使用 `Chai`
+test('选择器单元测试', () => {
   const selectTodoIds = createSelector(
     [(state: RootState) => state.todos],
     todos => todos.map(({ id }) => id)
   )
   const firstResult = selectTodoIds(state)
   const secondResult = selectTodoIds(state)
-  // Reference equality should pass.
+  // 引用相等应该通过。
   expect(firstResult).to.equal(secondResult)
-  // Deep equality should also pass.
+  // 深度相等也应该通过。
   expect(firstResult).to.deep.equal(secondResult)
   selectTodoIds(state)
   selectTodoIds(state)
   selectTodoIds(state)
-  // The result function should not recalculate.
+  // 结果函数不应重新计算。
   expect(selectTodoIds.recomputations()).to.equal(1)
-  // input selectors should not recalculate.
+  // 输入选择器不应重新计算。
   expect(selectTodoIds.dependencyRecomputations()).to.equal(1)
 })
 ```
@@ -284,43 +284,43 @@ const state = {
   ]
 }
 
-// With `Vitest` or `Jest`
-test('selector unit test', () => {
+// 使用 `Vitest` 或 `Jest`
+test('选择器单元测试', () => {
   const selectTodoIds = createSelector([state => state.todos], todos =>
     todos.map(({ id }) => id)
   )
   const firstResult = selectTodoIds(state)
   const secondResult = selectTodoIds(state)
-  // Reference equality should pass.
+  // 引用相等应该通过。
   expect(firstResult).toBe(secondResult)
-  // Deep equality should also pass.
+  // 深度相等也应该通过。
   expect(firstResult).toStrictEqual(secondResult)
   selectTodoIds(state)
   selectTodoIds(state)
   selectTodoIds(state)
-  // The result function should not recalculate.
+  // 结果函数不应重新计算。
   expect(selectTodoIds.recomputations()).toBe(1)
-  // input selectors should not recalculate.
+  // 输入选择器不应重新计算。
   expect(selectTodoIds.dependencyRecomputations()).toBe(1)
 })
 
-// With `Chai`
-test('selector unit test', () => {
+// 使用 `Chai`
+test('选择器单元测试', () => {
   const selectTodoIds = createSelector([state => state.todos], todos =>
     todos.map(({ id }) => id)
   )
   const firstResult = selectTodoIds(state)
   const secondResult = selectTodoIds(state)
-  // Reference equality should pass.
+  // 引用相等应该通过。
   expect(firstResult).to.equal(secondResult)
-  // Deep equality should also pass.
+  // 深度相等也应该通过。
   expect(firstResult).to.deep.equal(secondResult)
   selectTodoIds(state)
   selectTodoIds(state)
   selectTodoIds(state)
-  // The result function should not recalculate.
+  // 结果函数不应重新计算。
   expect(selectTodoIds.recomputations()).to.equal(1)
-  // input selectors should not recalculate.
+  // 输入选择器不应重新计算。
   expect(selectTodoIds.dependencyRecomputations()).to.equal(1)
 })
 ```
@@ -330,26 +330,24 @@ test('selector unit test', () => {
 
 {/* END: FAQ/howToTest.test.ts */}
 
-## Can I share a selector across multiple component instances?
+## 我可以在多个组件实例之间共享选择器吗？
 
-Yes, although if they pass in different arguments, you will need to handle that in order for memoization to work consistently:
+可以，尽管如果它们传入不同的参数，你将需要处理这个问题，以便记忆化能够一致地工作：
 
-- Pass a larger `maxSize` if using `lruMemoize` ( as of 4.1.0+)
-- Use <InternalLinks.WeakMapMemoize /> (as of 5.0.0+)
+- 如果使用 `lruMemoize`，传递更大的 `maxSize`（从 4.1.0+ 开始）
+- 使用 <InternalLinks.WeakMapMemoize />（从 5.0.0+ 开始）
 
-## Are there TypeScript Typings?
+## 有 TypeScript 类型定义吗？
 
-Yes! Reselect is now written in TypeScript itself, so they should Just Work™.
+有！Reselect 现在是用 TypeScript 本身编写的，所以它们应该能够正常工作。
 
-## I am seeing a TypeScript error: `Type instantiation is excessively deep and possibly infinite`
+## 我看到一个 TypeScript 错误：`Type instantiation is excessively deep and possibly infinite`
 
-Starting in 5.0.0 you should be able to nest up to 30 selectors, but in case you still run into this issue, you can refer to <Link to='https://github.com/reduxjs/reselect/issues/534#issuecomment-956708953'>this
-comment</Link> for a discussion of the problem, as
-relating to nested selectors.
+从 5.0.0 开始，你应该能够嵌套多达 30 个选择器，但是如果你仍然遇到这个问题，你可以参考<Link to='https://github.com/reduxjs/reselect/issues/534#issuecomment-956708953'>这个评论</Link>，讨论这个问题，因为它与嵌套选择器有关。
 
-## How can I make a <Link to='https://github.com/hemanth/functional-programming-jargon#currying'>curried</Link> selector?
+## 我如何创建一个<Link to='https://github.com/hemanth/functional-programming-jargon#currying'>柯里化</Link>的选择器？
 
-Selectors that take arguments are commonly used inside of React-Redux's `useSelector` by using a closure to pass along the extra arguments:
+接受参数的选择器通常在 React-Redux 的 `useSelector` 中使用闭包来传递额外的参数：
 
 ```ts
 function TodosList({ category }) {
@@ -359,7 +357,7 @@ function TodosList({ category }) {
 }
 ```
 
-If you prefer to use a curried form instead, you can create a curried selector with this recipe:
+如果你更喜欢使用柯里化的形式，你可以使用这个配方创建一个柯里化的选择器：
 
 {/* START: FAQ/currySelector.ts */}
 
@@ -427,7 +425,7 @@ const selectTodoByIdCurried = currySelector(
 
 {/* END: FAQ/currySelector.ts */}
 
-Or for reusability you can do this:
+或者为了重用性，你可以这样做：
 
 {/* START: FAQ/createCurriedSelector.ts */}
 
@@ -481,7 +479,7 @@ export const createCurriedSelector = (...args) => {
 
 {/* END: FAQ/createCurriedSelector.ts */}
 
-This:
+这个:
 
 ```ts
 const selectTodoById = createSelector(
@@ -492,25 +490,25 @@ const selectTodoById = createSelector(
 selectTodoById(state, 0)
 ```
 
-Is the same as this:
+这与下面的代码是一样的：
 
 ```ts
 selectTodoByIdCurried(0)(state)
 ```
 
-As before you had to do this:
+以前你需要这样做：
 
 ```ts
 const todoById = useSelector(state => selectTodoById(state, id))
 ```
 
-Now you can do this:
+现在你可以这样做：
 
 ```ts
 const todoById = useSelector(selectTodoByIdCurried(id))
 ```
 
-Another thing you can do if you are using <ExternalLinks.ReactRedux /> is create a custom hook factory function:
+如果你正在使用 <ExternalLinks.ReactRedux />，你还可以创建一个自定义的钩子工厂函数：
 
 {/* START: FAQ/createParametricSelectorHook.ts */}
 
@@ -624,7 +622,7 @@ export const useSelectTodo = createParametricSelectorHook(selectTodoById)
 
 {/* END: FAQ/createParametricSelectorHook.ts */}
 
-And then inside your component:
+然后在你的组件内部：
 
 {/* START: FAQ/MyComponent.tsx */}
 
@@ -668,11 +666,11 @@ const MyComponent = ({ id }) => {
 
 {/* END: FAQ/MyComponent.tsx */}
 
-## How can I make a pre-typed version of <InternalLinks.CreateSelector>`createSelector`</InternalLinks.CreateSelector> for my root state?
+## 如何为我的根状态创建一个预先输入类型的<InternalLinks.CreateSelector>`createSelector`</InternalLinks.CreateSelector>版本？
 
-When used with Redux, it's typical to have all input selectors take `(state: RootState)` as their first argument. Creating a pre-typed version of `createSelector` can shorten that repetition.
+在使用Redux时，通常所有输入选择器的第一个参数都是`(state: RootState)`。创建一个预先输入类型的`createSelector`可以减少这种重复。
 
-You can create a custom typed version of <InternalLinks.CreateSelector /> by defining a utility type that extends the original <InternalLinks.CreateSelector /> function. Here's an example:
+您可以通过定义一个扩展原始<InternalLinks.CreateSelector />函数的实用类型来创建一个自定义的类型化版本的<InternalLinks.CreateSelector />。以下是一个例子：
 
 ```ts
 import type {
@@ -720,13 +718,13 @@ export const createAppSelector: TypedCreateSelector<RootState> = createSelector
 
 :::warning
 
-This approach currently only supports <InternalLinks.InputSelectors /> provided as a single array.
+当前这种方法只支持以单一数组形式提供的<InternalLinks.InputSelectors />。
 
 :::
 
-## What if I want to use <InternalLinks.CreateSelector>`createSelector`</InternalLinks.CreateSelector> without memoization?
+## 如果我想在不使用记忆化的情况下使用<InternalLinks.CreateSelector>`createSelector`</InternalLinks.CreateSelector>怎么办？
 
-There may be rare cases when you might want to use `createSelector` for its composition syntax, but without any memoization applied. In that case, create an <ExternalLinks.IdentityFunction /> and use it as the memoizers:
+可能在极少数情况下，你可能想要使用`createSelector`的组合语法，但不应用任何记忆化。在这种情况下，创建一个<ExternalLinks.IdentityFunction />并将其用作记忆器：
 
 {/* START: FAQ/identity.ts */}
 
