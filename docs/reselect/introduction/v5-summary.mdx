@@ -1,0 +1,49 @@
+---
+id: v5-summary
+title: 5.0.0版本中有什么新功能？
+sidebar_label: 5.0.0版本中有什么新功能？
+hide_title: true
+description: What's New in 5.0.0?
+---
+
+import { ExternalLinks } from '@site/src/components/ExternalLinks'
+import { InternalLinks } from '@site/src/components/InternalLinks'
+
+# 5.0.0版本有什么新特性？
+
+5.0.0版本引入了一些新的特性和改进：
+
+## 定制增强
+
+- 新增了向<InternalLinks.CreateSelectorCreator />传递选项对象的能力，允许定制`memoize`和`argsMemoize`函数，以及它们各自的选项（`memoizeOptions`和`argsMemoizeOptions`）。
+- <InternalLinks.CreateSelector />函数现在支持在其选项对象中直接定制`memoize`和`argsMemoize`。
+
+## 记忆函数
+
+- 引入了新的实验性记忆函数：`weakMapMemoize`和`unstable_autotrackMemoize`。
+- 将`memoize`和`argsMemoize`集成到<InternalLinks.OutputSelectorFields />中，用于调试目的。
+
+## TypeScript支持和性能
+
+- 停止支持TypeScript 4.7以下的版本，以符合现代TypeScript特性。
+- 显著提高了嵌套<InternalLinks.OutputSelector text="output selectors" />的TypeScript性能。嵌套限制从大约8增加到大约30个<InternalLinks.OutputSelector text="output selectors" />，大大减少了出现臭名昭著的`Type instantiation is excessively deep and possibly infinite`错误的次数。
+
+## 选择器API增强
+
+- 由于容易引发运行时错误，移除了<InternalLinks.CreateStructuredSelector />的第二个重载。
+
+## 其他功能
+
+- 在<InternalLinks.OutputSelectorFields />中添加了`dependencyRecomputations`和`resetDependencyRecomputations`。这些新增功能提供了对<InternalLinks.InputSelectors />更大的控制和洞察力，补充了新的`argsMemoize` API。
+- 引入了`inputStabilityCheck`，这是一个开发工具，它使用相同的参数运行<InternalLinks.InputSelectors />两次，并在它们对同一调用返回不同结果时触发警告。
+- 引入了`identityFunctionCheck`，这是一个开发工具，用于检查<InternalLinks.ResultFunction />是否是<ExternalLinks.IdentityFunction />。
+
+这些更新旨在增强灵活性、性能和开发者体验。有关每个特性的详细使用和示例，请参考每个特性的更新文档部分。
+
+## 破坏性变更
+
+- 将`createSelector`使用的默认记忆函数切换为`weakMapMemoize`。
+- 将`defaultMemoize`重命名为`lruMemoize`，因为它不再是传递给`createSelector`的默认记忆函数。
+- 将`defaultEqualityCheck`重命名为`referenceEqualityCheck`。
+- 将`DefaultMemoizeOptions`重命名为`LruMemoizeOptions`。
+- 移除了`ParametricSelector`和`OutputParametricSelector`类型。它们的功能现在已集成到`Selector`和`OutputSelector`中，这些类型本身支持额外的参数。

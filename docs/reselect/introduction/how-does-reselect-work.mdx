@@ -1,0 +1,140 @@
+---
+id: how-does-reselect-work
+title: Reselect是如何工作的？
+sidebar_label: Reselect是如何工作的？
+hide_title: true
+description: 'How Does Reselect Work?'
+---
+
+import { InternalLinks } from '@site/src/components/InternalLinks'
+import { ExternalLinks } from '@site/src/components/ExternalLinks'
+
+# Reselect 是如何工作的？
+
+Reselect，从本质上讲，是一个用于在 JavaScript 应用中创建 memoized 选择器的库。它的主要角色是根据提供的输入有效地计算派生数据。Reselect 内部机制的一个关键方面是它如何组织从最终选择器到其组成的 <InternalLinks.InputSelectors /> 的参数流。
+
+```ts
+const finalSelector = (...args) => {
+  const extractedValues = inputSelectors.map(inputSelector =>
+    inputSelector(...args)
+  )
+  return resultFunc(...extractedValues)
+}
+```
+
+在这种模式中，`finalSelector` 由几个 <InternalLinks.InputSelectors /> 组成，**所有这些选择器都接收与最终选择器相同的参数**。每个输入选择器处理其数据的一部分，然后结果被组合并由 <InternalLinks.ResultFunction /> 进一步处理。理解这种参数流对于理解 Reselect 如何优化数据计算和最小化不必要的重新计算至关重要。
+
+## 级联 Memoization
+
+Reselect 使用两阶段的 "级联" 方法来 memoizing 函数：
+
+Reselect 的工作方式可以分解为多个部分：
+
+1. **初始运行**：在第一次调用时，Reselect 运行所有的 <InternalLinks.InputSelectors />，收集它们的结果，并将它们传递给 <InternalLinks.ResultFunction />。
+
+2. **后续运行**：对于后续的调用，Reselect 执行两级检查：
+
+   - **第一级**：它将当前的参数与之前的参数进行比较（由 `argsMemoize` 完成）。
+
+     - 如果它们相同，它返回缓存的结果，而不运行 <InternalLinks.InputSelectors /> 或 <InternalLinks.ResultFunction />。
+
+     - 如果它们不同，它继续（"级联"）到第二级。
+
+   - **第二级**：它运行 <InternalLinks.InputSelectors /> 并将它们当前的结果与之前的结果进行比较（由 `memoize` 完成）。
+     :::note
+
+     如果任何一个 <InternalLinks.InputSelectors /> 返回一个不同的结果，所有的 <InternalLinks.InputSelectors /> 都将重新计算。
+
+     :::
+
+     - 如果结果相同，它返回缓存的结果，而不运行 <InternalLinks.ResultFunction />。
+     - 如果结果不同，它运行 <InternalLinks.ResultFunction />。
+
+我们称这种行为为 **_级联 Memoization_**。
+
+### Reselect 与标准 Memoization 的比较
+
+#### 标准 Memoization
+
+![normal-memoization-function](@site/static/img/normal-memoization-function.png)
+
+_标准 memoization 只比较参数。如果它们相同，它返回缓存的结果。_
+
+#### 使用 Reselect 的 Memoization
+
+![reselect-memoization](@site/static/img/reselect-memoization.png)
+
+_Reselect 通过 <InternalLinks.InputSelectors /> 添加了第二层检查。这在 <ExternalLinks.Redux /> 应用中至关重要，其中状态引用经常变化。_
+
+一个正常的 <ExternalLinks.Memoization /> 函数将比较参数，如果它们与上次相同，它将跳过运行函数并返回缓存的结果。然而，Reselect 通过引入其 <InternalLinks.InputSelectors /> 的第二层检查来增强这一点。传递给这些 <InternalLinks.InputSelectors /> 的参数可能会改变，但它们的结果仍然相同。当这种情况发生时，Reselect 避免重新执行 <InternalLinks.ResultFunction />，并返回缓存的结果。
+
+这个特性在 <ExternalLinks.Redux /> 应用中变得至关重要，因为每当派发一个 `action` 时，`state` 都会改变其引用。
+
+:::note
+
+<InternalLinks.InputSelectors /> 接收与 <InternalLinks.OutputSelector /> 相同的参数。
+
+:::
+
+## 为什么 Reselect 经常与 <ExternalLinks.Redux>Redux</ExternalLinks.Redux> 一起使用
+
+虽然 Reselect 可以独立于 Redux 使用，但它是大多数 Redux 应用中用于帮助优化计算和 UI 更新的标准工具：
+
+假设你有一个像这样的选择器：
+
+```ts
+const selectCompletedTodos = (state: RootState) =>
+  state.todos.filter(todo => todo.completed === true)
+```
+
+所以你决定对它进行 memoize：
+
+```ts
+const selectCompletedTodos = someMemoizeFunction((state: RootState) =>
+  state.todos.filter(todo => todo.completed === true)
+)
+```
+
+然后你更新 `state.alerts`：
+
+```ts
+store.dispatch(toggleRead(0))
+```
+
+现在当你调用 `selectCompletedTodos` 时，它重新运行，因为我们实际上已经破坏了 memoization。
+
+```ts
+selectCompletedTodos(store.getState())
+// 不会运行，将返回缓存的结果。
+selectCompletedTodos(store.getState())
+store.dispatch(toggleRead(0))
+// 它重新计算。
+selectCompletedTodos(store.getState())
+```
+
+但为什么？`selectCompletedTodos` 只需要访问 `state.todos`，与 `state.alerts` 无关，所以我们为什么破坏了 memoization？那是因为在 <ExternalLinks.Redux /> 中，每当你对根 `state` 进行更改时，它都会被浅更新，这意味着它的引用会改变，因此一个正常的 memoization 函数将始终在参数上失败检查。
+
+但是使用 Reselect，我们可以这样做：
+
+```ts
+const selectCompletedTodos = createSelector(
+  [(state: RootState) => state.todos],
+  todos => todos.filter(todo => todo.completed === true)
+)
+```
+
+现在我们已经实现了 memoization：
+
+```ts
+selectCompletedTodos(store.getState())
+// 不会运行，将返回缓存的结果。
+selectCompletedTodos(store.getState())
+store.dispatch(toggleRead(0))
+// `input selectors` 将运行，但 `result function` 被
+// 跳过，将返回缓存的结果。
+selectCompletedTodos(store.getState())
+```
+
+即使整体 `state` 发生变化，Reselect 也通过其独特的方法确保了有效的 memoization。如果 `state` 的相关部分（在这种情况下为 `state.todos`）保持不变，<InternalLinks.ResultFunction /> 不会重新运行。这是由于 Reselect 的 <InternalLinks.CascadingMemoization text="级联 Memoization" />。第一层检查整个 `state`，第二层检查 <InternalLinks.InputSelectors /> 的结果。如果第一层失败（由于 `state` 的整体变化）但第二层成功（因为 `state.todos` 未改变），Reselect 将跳过重新计算 <InternalLinks.ResultFunction />。这种双重检查机制使 Reselect 在 <ExternalLinks.Redux /> 应用中特别有效，确保只在真正需要时进行计算。
+
+---

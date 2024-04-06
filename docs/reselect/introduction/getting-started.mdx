@@ -1,0 +1,185 @@
+---
+id: getting-started
+title: 入门指南
+sidebar_label: 入门指南
+sidebar_position: 1
+hide_title: true
+description: 'Getting Started'
+---
+
+import { InternalLinks } from '@site/src/components/InternalLinks'
+import { ExternalLinks } from '@site/src/components/ExternalLinks'
+import PackageTabs from '@site/src/components/PackageManagerTabs'
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+import Link from '@docusaurus/Link'
+
+# 开始使用 Reselect
+
+一个用于创建 memoized "selector" 函数的库。常与 Redux 一起使用，但也可以与任何普通的 JS 不可变数据一起使用。
+
+- Selectors 可以计算派生数据，允许 <ExternalLinks.Redux /> 存储最小可能的状态。
+- Selectors 是高效的。除非其中一个参数发生变化，否则不会重新计算 selector。
+- Selectors 是可组合的。它们可以作为其他 selectors 的输入。
+
+**Redux 文档的 <Link to="https://redux.js.org/usage/deriving-data-selectors">使用 Selectors 派生数据</Link> 页面**涵盖了 selectors 的目的和动机，为什么 memoized selectors 是有用的，典型的 Reselect 使用模式，以及如何与 <ExternalLinks.ReactRedux /> 一起使用 selectors。
+
+## 安装
+
+### Redux Toolkit
+
+虽然 Reselect 不仅限于 <ExternalLinks.Redux />，但它已经默认包含在 <ExternalLinks.ReduxToolkit text='官方的 Redux Toolkit 包' /> 中 - 无需进一步安装。
+
+```ts
+import { createSelector } from '@reduxjs/toolkit'
+```
+
+### 独立使用
+
+对于独立使用，安装 `reselect` 包：
+
+<PackageTabs />
+
+---
+
+## 基本使用
+
+Reselect 导出了一个 `createSelector` API，用于生成 memoized selector 函数。`createSelector` 接受一个或多个输入 selectors，这些 selectors 从参数中提取值，以及一个结果函数，该函数接收提取的值并应返回一个派生值。如果多次调用生成的输出 selector，只有在提取的值发生变化时，输出才会被重新计算。
+
+你可以在以下 **示例** 中尝试 <Link to='https://codesandbox.io/s/reselect-example-g3k9gf?file=/src/index.js'>这个 CodeSandbox</Link>：
+
+{/* START: basicUsage.ts */}
+
+<Tabs
+  groupId='language'
+  defaultValue='ts'
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'},
+  ]}>
+  <TabItem value='ts'>
+
+```ts title="basicUsage.ts"
+import { createSelector } from 'reselect'
+
+interface RootState {
+  todos: { id: number; completed: boolean }[]
+  alerts: { id: number; read: boolean }[]
+}
+
+const state: RootState = {
+  todos: [
+    { id: 0, completed: false },
+    { id: 1, completed: true }
+  ],
+  alerts: [
+    { id: 0, read: false },
+    { id: 1, read: true }
+  ]
+}
+
+const selectCompletedTodos = (state: RootState) => {
+  console.log('selector ran')
+  return state.todos.filter(todo => todo.completed === true)
+}
+
+selectCompletedTodos(state) // selector ran
+selectCompletedTodos(state) // selector ran
+selectCompletedTodos(state) // selector ran
+
+const memoizedSelectCompletedTodos = createSelector(
+  [(state: RootState) => state.todos],
+  todos => {
+    console.log('memoized selector ran')
+    return todos.filter(todo => todo.completed === true)
+  }
+)
+
+memoizedSelectCompletedTodos(state) // memoized selector ran
+memoizedSelectCompletedTodos(state)
+memoizedSelectCompletedTodos(state)
+
+console.log(selectCompletedTodos(state) === selectCompletedTodos(state)) //=> false
+
+console.log(
+  memoizedSelectCompletedTodos(state) === memoizedSelectCompletedTodos(state)
+) //=> true
+```
+
+  </TabItem>
+  <TabItem value='js'>
+
+```js title="basicUsage.js"
+import { createSelector } from 'reselect'
+
+const state = {
+  todos: [
+    { id: 0, completed: false },
+    { id: 1, completed: true }
+  ],
+  alerts: [
+    { id: 0, read: false },
+    { id: 1, read: true }
+  ]
+}
+
+const selectCompletedTodos = state => {
+  console.log('selector ran')
+  return state.todos.filter(todo => todo.completed === true)
+}
+
+selectCompletedTodos(state) // selector ran
+selectCompletedTodos(state) // selector ran
+selectCompletedTodos(state) // selector ran
+
+const memoizedSelectCompletedTodos = createSelector(
+  [state => state.todos],
+  todos => {
+    console.log('memoized selector ran')
+    return todos.filter(todo => todo.completed === true)
+  }
+)
+
+memoizedSelectCompletedTodos(state) // memoized selector ran
+memoizedSelectCompletedTodos(state)
+memoizedSelectCompletedTodos(state)
+
+console.log(selectCompletedTodos(state) === selectCompletedTodos(state)) //=> false
+
+console.log(
+  memoizedSelectCompletedTodos(state) === memoizedSelectCompletedTodos(state)
+) //=> true
+```
+
+  </TabItem>
+</Tabs>
+
+{/* END: basicUsage.ts */}
+
+如上例所示，`memoizedSelectCompletedTodos` 在第二次或第三次运行时不会运行，但我们仍然得到与上次相同的返回值。
+
+除了跳过不必要的重新计算，`memoizedSelectCompletedTodos` 如果没有重新计算，将返回现有的结果引用。这对于像 React-Redux 或 React 这样经常依赖引用相等性检查来优化 UI 更新的库来说非常重要。
+
+---
+
+## 术语
+
+- <InternalLinks.Selector text={<b>Selector 函数</b>} />
+  : 一个接受一个或多个 JavaScript 值作为参数，并派生出结果的函数。当与 <ExternalLinks.Redux /> 一起使用时，第一个参数通常是整个 Redux store 状态。
+- <InternalLinks.InputSelectors text={<b>输入 Selectors</b>} />
+  : 用作创建 memoized selector 的基础构建块的基本 selector 函数。它们作为第一个参数传递给 <InternalLinks.CreateSelector />，并带有所有 selector 参数。它们负责提取和提供必要的值给 <InternalLinks.ResultFunction />。
+- <InternalLinks.OutputSelector text={<b>输出 Selector</b>} />
+  : 由 <InternalLinks.CreateSelector /> 创建的实际 memoized selectors。
+- <InternalLinks.ResultFunction text={<b>结果函数</b>} />
+  : 在 <InternalLinks.InputSelectors /> 之后的函数。它接受 <InternalLinks.InputSelectors /> 的返回值作为参数并返回结果。
+- <InternalLinks.Dependencies text={<b>依赖项</b>} />
+  : 与 <InternalLinks.InputSelectors /> 相同。它们是 <InternalLinks.OutputSelector /> "依赖" 的内容。
+
+下面的例子可以作为一个视觉辅助：
+
+```ts
+const outputSelector = createSelector(
+  [inputSelector1, inputSelector2, inputSelector3], // 与 `依赖项` 同义。
+  resultFunc // 结果函数
+)
+```

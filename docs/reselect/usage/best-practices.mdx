@@ -1,0 +1,39 @@
+---
+id: best-practices
+title: 最佳实践
+sidebar_label: 最佳实践
+hide_title: true
+description: Best Practices
+---
+
+import { InternalLinks } from '@site/src/components/InternalLinks'
+import { ExternalLinks } from '@site/src/components/ExternalLinks'
+
+# 最佳实践
+
+有一些细节可以帮助你尽可能少地运行函数，并从Reselect中获得最佳的性能：
+
+- 由于Reselect中的<InternalLinks.CascadingMemoization />，第一层检查是针对传递给<InternalLinks.OutputSelector />的参数，因此最好尽可能保持参数的相同引用。
+- 在<ExternalLinks.Redux />中，你的状态在更新时会改变引用。但最好保持额外的参数尽可能简单，你可以传入对象或数组，只要它们的引用不改变。或者你可以传入像数字这样的原始值作为id。
+- 保持你的<InternalLinks.InputSelectors />尽可能简单。最好的情况是它们主要由字段访问器组成，如`state => state.todos`或参数提供器，如`(state, id) => id`。你不应该在<InternalLinks.InputSelectors />中进行任何计算，你绝对不应该每次都返回一个具有新引用的对象或数组。
+- <InternalLinks.ResultFunction />只有在最后的手段时才会重新运行。所以确保把所有的计算都放在你的<InternalLinks.ResultFunction />中。这样，只有在所有其他检查都失败时，Reselect才会运行这些计算。
+
+这个：
+
+```ts
+// ✔️ 这是最优的，因为我们在输入选择器中有更少的计算，在结果函数中有更多的计算。
+const selectorGood = createSelector(
+  [(state: RootState) => state.todos],
+  todos => someExpensiveComputation(todos)
+)
+```
+
+比这个更好：
+
+```ts
+// ❌ 这是不优的！
+const selectorBad = createSelector(
+  [(state: RootState) => someExpensiveComputation(state.todos)],
+  someOtherCalculation
+)
+```

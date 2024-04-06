@@ -1,0 +1,33 @@
+---
+id: common-mistakes
+title: 常见错误
+sidebar_label: 常见错误
+hide_title: true
+description: Common Mistakes
+---
+
+import { InternalLinks } from '@site/src/components/InternalLinks'
+
+# 常见错误
+
+一个相对常见的错误是编写一个<InternalLinks.InputSelectors text="输入选择器" />，它提取一个值或进行一些派生，并且一个<InternalLinks.ResultFunction />只是返回其结果：
+
+```ts
+// ❌ 错误：这将无法正确地进行记忆化，而且没有任何用处！
+const brokenSelector = createSelector(
+  [(state: RootState) => state.todos],
+  todos => todos
+)
+```
+
+任何只返回其输入的<InternalLinks.ResultFunction />都是不正确的！<InternalLinks.ResultFunction />应该总是有转换逻辑。
+
+类似地：
+
+```ts
+// ❌ 错误：这将无法正确地进行记忆化！
+const brokenSelector = createSelector(
+  [(state: RootState) => state],
+  state => state.todos
+)
+```

@@ -8,139 +8,135 @@ toc_max_heading_level: 4
 
 &nbsp;
 
-<div className="migration-guide">
+# 迁移到 RTK 2.0 和 Redux 5.0
 
-# Migrating to RTK 2.0 and Redux 5.0
+:::tip 你将学到什么
 
-:::tip What You'll Learn
-
-- What's changed in Redux Toolkit 2.0, Redux core 5.0, Reselect 5.0, and Redux Thunk 3.0, including breaking changes and new features
+- Redux Toolkit 2.0、Redux core 5.0、Reselect 5.0 和 Redux Thunk 3.0 中的变化，包括破坏性变化和新特性
 
 :::
 
-## Introduction
+## 介绍
 
-Redux Toolkit has been available since 2019, and today it's the standard way to write Redux apps. We've gone 4+ years without any breaking changes. Now, RTK 2.0 gives us a chance to modernize the packaging, clean up deprecated options, and tighten up some edge cases.
+Redux Toolkit 自 2019 年以来一直可用，现在它是编写 Redux 应用的标准方式。我们已经过去了 4+ 年没有任何破坏性的变化。现在，RTK 2.0 给我们一个机会来现代化包装，清理已弃用的选项，并收紧一些边缘情况。
 
-**Redux Toolkit 2.0 is accompanied by major versions of all the other Redux packages: Redux core 5.0, React-Redux 9.0, Reselect 5.0, and Redux Thunk 3.0**.
+**Redux Toolkit 2.0 伴随着所有其他 Redux 包的主要版本：Redux core 5.0、React-Redux 9.0、Reselect 5.0 和 Redux Thunk 3.0**。
 
-This page lists known potentially breaking changes in each of those packages, as well as new features in Redux Toolkit 2.0. As a reminder, **you should not need to actually install or use the core `redux` package directly** - RTK wraps that, and re-exports all methods and types.
+此页面列出了每个包中已知的可能的破坏性变化，以及 Redux Toolkit 2.0 中的新特性。作为提醒，**你实际上不应该需要直接安装或使用核心 `redux` 包** - RTK 包装了它，并重新导出所有方法和类型。
 
-In practice, **most of the "breaking" changes should not have an actual effect on end users, and we expect that many projects can just update the package versions with very few code changes needed**.
+实际上，**大多数的 "破坏性" 变化不应该对最终用户产生实际效果，我们预计许多项目只需要更新包版本，需要的代码更改非常少**。
 
-The changes most likely to need app code updates are:
+最有可能需要更新应用代码的变化是：
 
-- [Object syntax removed for `createReducer` and `createSlice.extraReducers`](#object-syntax-for-createsliceextrareducers-and-createreducer-removed)
-- [`configureStore.middleware` must be a callback](#configurestoremiddleware-must-be-a-callback)
-- [`Middleware` type changed - Middleware `action` and `next` are typed as `unknown`](#middleware-type-changed---middleware-action-and-next-are-typed-as-unknown)
+- [为 `createReducer` 和 `createSlice.extraReducers` 移除了对象语法](#object-syntax-for-createsliceextrareducers-and-createreducer-removed)
+- [`configureStore.middleware` 必须是一个回调函数](#configurestoremiddleware-must-be-a-callback)
+- [`Middleware` 类型已改变 - Middleware `action` 和 `next` 被类型化为 `unknown`](#middleware-type-changed---middleware-action-and-next-are-typed-as-unknown)
 
-## Packaging Changes (all)
+## 包装变化（全部）
 
-We've made updates to the build packaging for all of the Redux-related libraries. These are technically "breaking", but _should_ be transparent to end users, and actually enable better support for scenarios such as using Redux via ESM files under Node.
+我们对所有 Redux 相关库的构建包装进行了更新。这些技术上是 "破坏性的"，但 _应该_ 对最终用户透明，并实际上为诸如在 Node 下通过 ESM 文件使用 Redux 的场景提供了更好的支持。
 
-#### Addition of `exports` field in `package.json`
+#### 在 `package.json` 中添加 `exports` 字段
 
-We've migrated the package definitions to include the `exports` field for defining which artifacts to load, with a modern ESM build as the primary artifact (with CJS still included for compatibility purposes).
+我们已经迁移了包定义，以包含 `exports` 字段，用于定义要加载的工件，以现代 ESM 构建为主要工件（为了兼容性目的仍然包含 CJS）。
 
-We've done local testing of the package, but we ask the community to try out this in your own projects and report any breakages you find!
+我们已经对包进行了本地测试，但我们请求社区在你们自己的项目中试用这个，并报告你们发现的任何破坏！
 
-#### Build Artifact Modernization
+#### 构建工件现代化
 
-We've updated the build output in several ways:
+我们以几种方式更新了构建输出：
 
-- **Build output is no longer transpiled!** Instead we target modern JS syntax (ES2020)
-- Moved all build artifacts to live under `./dist/`, instead of separate top-level folders
-- The lowest Typescript version we test against is now **TS 4.7**.
+- **构建输出不再被转译！** 相反，我们针对现代 JS 语法（ES2020）
+- 将所有构建工件移动到 `./dist/` 下，而不是分开的顶级文件夹
+- 我们现在测试的最低 Typescript 版本是 **TS 4.7**。
 
-#### Dropping UMD builds
+#### 放弃 UMD 构建
 
-Redux has always shipped with UMD build artifacts. These are primarily meant for direct import as script tags, such as in a CodePen or a no-bundler build environment.
+Redux 一直都带有 UMD 构建工件。这些主要是为了直接作为脚本标签导入，例如在 CodePen 或无打包器构建环境中。
 
-For now, we're dropping those build artifacts from the published package, on the grounds that the use cases seem pretty rare today.
+现在，我们从发布的包中删除了这些构建工件，理由是今天的使用案例似乎相当罕见。
 
-We do have a browser-ready ESM build artifact included at `dist/$PACKAGE_NAME.browser.mjs`, which can be loaded via a script tag that points to that file on Unpkg.
+我们确实有一个浏览器准备好的 ESM 构建工件，包含在 `dist/$PACKAGE_NAME.browser.mjs` 中，可以通过指向 Unpkg 上该文件的脚本标签来加载。
 
-If you have strong use cases for us continuing to include UMD build artifacts, please let us know!
+如果你有强烈的使用案例让我们继续包含 UMD 构建工件，请告诉我们！
 
-## Breaking Changes
+## 破坏性变化
 
-### Core
+### 核心
 
-#### Action types _must_ be strings
+#### Action 类型 _必须_ 是字符串
 
-We've always specifically told our users that [actions and state _must_ be serializable](https://redux.js.org/style-guide/#do-not-put-non-serializable-values-in-state-or-actions), and that `action.type` _should_ be a string. This is both to ensure that actions are serializable, and to help provide a readable action history in the Redux DevTools.
+我们一直特别告诉我们的用户，[actions 和 state _必须_ 是可序列化的](https://redux.js.org/style-guide/#do-not-put-non-serializable-values-in-state-or-actions)，并且 `action.type` _应该_ 是一个字符串。这既是为了确保 actions 是可序列化的，也是为了在 Redux DevTools 中提供一个可读的 action 历史。
 
-`store.dispatch(action)` now specifically enforces that **`action.type` _must_ be a string** and will throw an error if not, in the same way it throws an error if the action is not a plain object.
+`store.dispatch(action)` 现在特别强制 **`action.type` _必须_ 是一个字符串**，如果不是，就会抛出一个错误，就像如果 action 不是一个普通对象时它会抛出一个错误一样。
 
-In practice, this was already true 99.99% of the time and shouldn't have any effect on users (especially those using Redux Toolkit and `createSlice`), but there may be some legacy Redux codebases that opted to use Symbols as action types.
+实际上，这已经在 99.99% 的时间内是真的，并且不应该对用户产生任何影响（特别是那些使用 Redux Toolkit 和 `createSlice` 的用户），但可能有一些旧的 Redux 代码库选择使用 Symbols 作为 action 类型。
 
-#### `createStore` Deprecation
+#### `createStore` 废弃
 
-In [Redux 4.2.0, we marked the original `createStore` method as `@deprecated`](https://github.com/reduxjs/redux/releases/tag/v4.2.0). Strictly speaking, **this is _not_ a breaking change**, nor is it new in 5.0, but we're documenting it here for completeness.
+在 [Redux 4.2.0 中，我们将原始的 `createStore` 方法标记为 `@deprecated`](https://github.com/reduxjs/redux/releases/tag/v4.2.0)。严格来说，**这 _不是_ 一个破坏性变化**，也不是 5.0 中的新特性，但我们在这里记录它以便完整性。
 
-**This deprecation is solely a _visual_ indicator that is meant to encourage users to [migrate their apps from legacy Redux patterns to use the modern Redux Toolkit APIs](https://redux.js.org/usage/migrating-to-modern-redux)**.
+**这个废弃只是一个 _视觉_ 指示器，旨在鼓励用户 [将他们的应用从旧的 Redux 模式迁移到使用现代 Redux Toolkit API](https://redux.js.org/usage/migrating-to-modern-redux)**。
 
-The deprecation results in a **visual strikethrough** when imported and used, like **~~`createStore`~~**, but with **_no_ runtime errors or warnings**.
+废弃导致在导入和使用时出现 **视觉删除线**，如 **~~`createStore`~~**，但 **_没有_ 运行时错误或警告**。
 
-**`createStore` will continue to work indefinitely, and will _not_ ever be removed**. But, today we want _all_ Redux users to be using Redux Toolkit for all of their Redux logic.
+**`createStore` 将继续无限期工作，并且 _不会_ 被移除**。但是，今天我们希望 _所有_ Redux 用户都使用 Redux Toolkit 来处理他们所有的 Redux 逻辑。
 
-To fix this, there are three options:
+要解决这个问题，有三个选项：
 
-- **[Follow our strong suggestion to switch over to Redux Toolkit and `configureStore`](https://redux.js.org/usage/migrating-to-modern-redux)**
-- Do nothing. It's just a visual strikethrough, and it doesn't affect how your code behaves. Ignore it.
-- Switch to using the `legacy_createStore` API that is now exported, which is the exact same function but with no `@deprecated` tag. The simplest option is to do an aliased import rename, like `import { legacy_createStore as createStore } from 'redux'`
+- **[按照我们的强烈建议，切换到 Redux Toolkit 和 `configureStore`](https://redux.js.org/usage/migrating-to-modern-redux)**
+- 什么都不做。这只是一个视觉删除线，它不影响你的代码的行为。忽略它。
+- 切换到使用现在导出的 `legacy_createStore` API，这是完全相同的函数，但没有 `@deprecated` 标签。最简单的选项是做一个别名导入重命名，如 `import { legacy_createStore as createStore } from 'redux'`
 
-<div class="typescript-only">
+#### Typescript 重写
 
-#### Typescript rewrite
+在2019年，我们开始了由社区驱动的将 Redux 代码库转换为 TypeScript 的工作。最初的努力在 [#3500: Port to TypeScript](https://github.com/reduxjs/redux/issues/3500) 中进行了讨论，并在 PR [#3536: Convert to TypeScript](https://github.com/reduxjs/redux/issues/3536) 中进行了整合。
 
-In 2019, we began a community-powered conversion of the Redux codebase to TypeScript. The original effort was discussed in [#3500: Port to TypeScript](https://github.com/reduxjs/redux/issues/3500), and the work was integrated in PR [#3536: Convert to TypeScript](https://github.com/reduxjs/redux/issues/3536).
+然而，由于对可能与现有生态系统存在兼容性问题的担忧（以及我们的一般惰性），TS 转换后的代码在仓库中闲置了几年，未被使用和发布。
 
-However, the TS-converted code sat around in the repo for several years, unused and unpublished, due to concerns about possible compatibility issues with the existing ecosystem (as well as general inertia on our part).
+现在，Redux 核心 v5 是从那个 TS 转换的源代码构建的。理论上，这应该在运行时行为和类型上与 4.x 构建几乎相同，但很可能一些变化可能会导致类型问题。
 
-Redux core v5 is now built from that TS-converted source code. In theory, this should be almost identical in both runtime behavior and types to the 4.x build, but it's very likely that some of the changes may cause types issues.
+请在 [Github](https://github.com/reduxjs/redux/issues) 上报告任何意外的兼容性问题！
 
-Please report any unexpected compatibility issues on [Github](https://github.com/reduxjs/redux/issues)!
+#### `AnyAction` 已被 `UnknownAction` 取代
 
-#### `AnyAction` deprecated in favour of `UnknownAction`
+Redux 的 TS 类型一直都导出了一个 `AnyAction` 类型，它被定义为具有 `{type: string}` 并将任何其他字段视为 `any`。这使得编写像 `console.log(action.whatever)` 这样的用法变得容易，但不幸的是，它并未提供任何有意义的类型安全性。
 
-The Redux TS types have always exported an `AnyAction` type, which is defined to have `{type: string}` and treat any other field as `any`. This makes it easy to write uses like `console.log(action.whatever)`, but unfortunately does not provide any meaningful type safety.
+我们现在导出一个 `UnknownAction` 类型，它将 `action.type` 以外的所有字段视为 `unknown`。这鼓励用户编写类型保护，检查动作对象并断言其 _特定_ 的 TS 类型。在这些检查中，你可以更安全地访问字段。
 
-We now export an `UnknownAction` type, which treats all fields other than `action.type` as `unknown`. This encourages users to write type guards that check the action object and assert its _specific_ TS type. Inside of those checks, you can access a field with better type safety.
+`UnknownAction` 现在是 Redux 源代码中期望一个动作对象的任何地方的默认值。
 
-`UnknownAction` is now the default any place in the Redux source that expects an action object.
+`AnyAction` 仍然存在以保持兼容性，但已被标记为已弃用。
 
-`AnyAction` still exists for compatibility, but has been marked as deprecated.
-
-Note that [Redux Toolkit's action creators have a `.match()` method](https://ouweiya.github.io/redux-toolkit-zh/api/createAction#actioncreatormatch) that acts as a useful type guard:
+请注意，[Redux Toolkit 的动作创建器有一个 `.match()` 方法](https://ouweiya.github.io/redux-toolkit-zh/api/createAction#actioncreatormatch)，它充当了一个有用的类型保护：
 
 ```ts
 if (todoAdded.match(someUnknownAction)) {
-  // action is now typed as a PayloadAction<Todo>
+  // action 现在被类型化为 PayloadAction<Todo>
 }
 ```
 
-You can also use the new `isAction` util to check if an unknown value is some kind of action object.
+你还可以使用新的 `isAction` 工具来检查一个未知值是否是某种动作对象。
 
-#### `Middleware` type changed - Middleware `action` and `next` are typed as `unknown`
+#### `Middleware` 类型已更改 - Middleware 的 `action` 和 `next` 被类型化为 `unknown`
 
-Previously, the `next` parameter is typed as the `D` type parameter passed, and `action` is typed as the `Action` extracted from the dispatch type. Neither of these are a safe assumption:
+以前，`next` 参数被类型化为传递的 `D` 类型参数，`action` 被类型化为从 dispatch 类型中提取的 `Action`。这两者都不是安全的假设：
 
-- `next` would be typed to have **all** of the dispatch extensions, including the ones earlier in the chain that would no longer apply.
-  - Technically it would be _mostly_ safe to type `next` as the default Dispatch implemented by the base redux store, however this would cause `next(action)` to error (as we cannot promise `action` is actually an `Action`) - and it wouldn't account for any following middlewares that return anything other than the action they're given when they see a specific action.
-- `action` is not necessarily a known action, it can be literally anything - for example a thunk would be a function with no `.type` property (so `AnyAction` would be inaccurate)
+- `next` 将被类型化为具有 **所有** dispatch 扩展，包括那些在链中较早的不再适用的扩展。
+  - 技术上，将 `next` 类型化为基础 redux 存储实现的默认 Dispatch 是 _大部分_ 安全的，然而这将导致 `next(action)` 出错（因为我们不能保证 `action` 实际上是一个 `Action`） - 并且它不会考虑到任何后续的中间件，它们在看到特定动作时返回的不是它们给出的动作。
+- `action` 不一定是一个已知的动作，它可以是任何东西 - 例如，一个 thunk 将是一个没有 `.type` 属性的函数（所以 `AnyAction` 将是不准确的）
 
-We've changed `next` to be `(action: unknown) => unknown` (which is accurate, we have no idea what `next` expects or will return), and changed the `action` parameter to be `unknown` (which as above, is accurate).
+我们已经将 `next` 更改为 `(action: unknown) => unknown`（这是准确的，我们不知道 `next` 期望或将返回什么），并将 `action` 参数更改为 `unknown`（如上所述，这是准确的）。
 
-In order to safely interact with values or access fields inside of the `action` argument, you must first do a type guard check to narrow the type, such as `isAction(action)` or `someActionCreator.match(action)`.
+为了安全地与 `action` 参数中的值进行交互或访问字段，你必须首先进行类型保护检查以缩小类型，如 `isAction(action)` 或 `someActionCreator.match(action)`。
 
-This new type is incompatible with the v4 `Middleware` type, so if a package's middleware is saying it's incompatible, check which version of Redux it's getting its types from! (See [overriding dependencies](#overriding-dependencies) later in this page.)
+这种新类型与 v4 的 `Middleware` 类型不兼容，所以如果一个包的中间件说它不兼容，检查它从哪个版本的 Redux 获取其类型！（参见本页后面的 [覆盖依赖项](#overriding-dependencies)。）
 
-#### `PreloadedState` type removed in favour of `Reducer` generic
+#### `PreloadedState` 类型已被 `Reducer` 泛型取代
 
-We've made tweaks to the TS types to improve type safety and behavior.
+我们对 TS 类型进行了调整以提高类型安全性和行为。
 
-First, the `Reducer` type now has a `PreloadedState` possible generic:
+首先，`Reducer` 类型现在有一个可能的 `PreloadedState` 泛型：
 
 ```ts
 type Reducer<S, A extends Action, PreloadedState = S> = (
@@ -149,33 +145,31 @@ type Reducer<S, A extends Action, PreloadedState = S> = (
 ) => S
 ```
 
-Per the explanation in [#4491](https://github.com/reduxjs/redux/pull/4491):
+根据 [#4491](https://github.com/reduxjs/redux/pull/4491) 中的解释：
 
-Why the need for this change? When the store is first created by `createStore`/`configureStore`, the initial state is set to whatever is passed as the `preloadedState` argument (or `undefined` if nothing is passed). That means that the first time that the reducer is called, it is called with the `preloadedState`. After the first call, the reducer is always passed the current state (which is `S`).
+为什么需要这个变化？当通过 `createStore`/`configureStore` 首次创建存储时，初始状态被设置为传递的 `preloadedState` 参数（如果没有传递任何东西，则为 `undefined`）。这意味着，当 reducer 首次被调用时，它被传递的是 `preloadedState`。在第一次调用之后，reducer 总是传递当前状态（即 `S`）。
 
-For most normal reducers, `S | undefined` accurately describes what can be passed in for the `preloadedState`. However the `combineReducers` function allows for a preloaded state of `Partial<S> | undefined`.
+对于大多数正常的 reducer，`S | undefined` 准确地描述了可以传入 `preloadedState` 的内容。然而 `combineReducers` 函数允许预加载状态为 `Partial<S> | undefined`。
 
-The solution is to have a separate generic that represents what the reducer accepts for its preloaded state. That way `createStore` can then use that generic for its `preloadedState` argument.
+解决方案是有一个单独的泛型，代表 reducer 接受其预加载状态。这样 `createStore` 就可以使用该泛型作为其 `preloadedState` 参数。
 
-Previously, this was handled by a `$CombinedState` type, but that complicated things and led to some user-reported issues. This removes the need for `$CombinedState` altogether.
+以前，这是由 `$CombinedState` 类型处理的，但那复杂化了事情，并导致了一些用户报告的问题。这消除了对 `$CombinedState` 的全部需要。
 
-This change does include some breaking changes, but overall should not have a huge impact on users upgrading in user-land:
+这个变化确实包括一些破坏性的变化，但总体上对于在用户领域升级的用户应该没有太大影响：
 
-- The `Reducer`, `ReducersMapObject`, and `createStore`/`configureStore` types/function take an additional `PreloadedState` generic which defaults to `S`.
-- The overloads for `combineReducers` are removed in favor of a single function definition that takes the `ReducersMapObject` as its generic parameter. Removing the overloads was necessary with these changes, since sometimes it was choosing the wrong overload.
-- Enhancers that explicitly list the generics for the reducer will need to add the third generic.
+- `Reducer`，`ReducersMapObject`，和 `createStore`/`configureStore` 类型/函数接受一个额外的 `PreloadedState` 泛型，它默认为 `S`。
+- `combineReducers` 的重载被移除，取而代之的是一个单一的函数定义，它将 `ReducersMapObject` 作为其泛型参数。这些变化必须移除重载，因为有时它会选择错误的重载。
+- 明确列出 reducer 泛型的增强器需要添加第三个泛型。
 
-</div>
+### 仅限 Toolkit
 
-### Toolkit only
+#### 移除了 `createSlice.extraReducers` 和 `createReducer` 的对象语法
 
-#### Object syntax for `createSlice.extraReducers` and `createReducer` removed
+RTK 的 `createReducer` API 最初被设计为接受一个动作类型字符串到案例 reducer 的查找表，如 `{ "ADD_TODO": (state, action) => {} }`。我们后来添加了 "builder callback" 形式，以便在添加 "matchers" 和默认处理器时提供更多的灵活性，并对 `createSlice.extraReducers` 做了同样的处理。
 
-RTK's `createReducer` API was originally designed to accept a lookup table of action type strings to case reducers, like `{ "ADD_TODO": (state, action) => {} }`. We later added the "builder callback" form to allow more flexibility in adding "matchers" and a default handler, and did the same for `createSlice.extraReducers`.
+我们在 RTK 2.0 中移除了 `createReducer` 和 `createSlice.extraReducers` 的 "object" 形式，因为 builder callback 形式实际上是相同数量的代码行，并且与 TypeScript 一起工作得更好。
 
-We have removed the "object" form for both `createReducer` and `createSlice.extraReducers` in RTK 2.0, as the builder callback form is effectively the same number of lines of code, and works much better with TypeScript.
-
-As an example, this:
+例如，这样：
 
 ```ts
 const todoAdded = createAction('todos/todoAdded')
@@ -188,7 +182,7 @@ createSlice({
   name,
   initialState,
   reducers: {
-    /* case reducers here */
+     /* 这里是案例 reducer */
   },
   extraReducers: {
     [todoAdded]: (state, action) => {},
@@ -196,7 +190,7 @@ createSlice({
 })
 ```
 
-should be migrated to:
+应迁移到：
 
 ```ts
 createReducer(initialState, (builder) => {
@@ -207,7 +201,7 @@ createSlice({
   name,
   initialState,
   reducers: {
-    /* case reducers here */
+    /* 这里是案例 reducer */
   },
   extraReducers: (builder) => {
     builder.addCase(todoAdded, (state, action) => {})
@@ -217,13 +211,13 @@ createSlice({
 
 ##### Codemods
 
-To simplify upgrading codebases, we've published a set of codemods that will automatically transform the deprecated "object" syntax into the equivalent "builder" syntax.
+为了简化代码库的升级，我们发布了一套 codemods，它们会自动将已弃用的 "object" 语法转换为等效的 "builder" 语法。
 
-The codemods package is available on NPM as [`@reduxjs/rtk-codemods`](https://www.npmjs.com/package/@reduxjs/rtk-codemods). More details are available [here](../api/codemods).
+codemods 包在 NPM 上以 [`@reduxjs/rtk-codemods`](https://www.npmjs.com/package/@reduxjs/rtk-codemods) 的形式提供。更多详情请参阅[这里](../api/codemods)。
 
-To run the codemods against your codebase, run `npx @reduxjs/rtk-codemods <TRANSFORM NAME> path/of/files/ or/some**/*glob.js.`
+要在您的代码库中运行 codemods，请运行 `npx @reduxjs/rtk-codemods <TRANSFORM NAME> path/of/files/ or/some**/*glob.js.`
 
-Examples:
+示例：
 
 ```sh
 npx @reduxjs/rtk-codemods createReducerBuilder ./src
@@ -231,39 +225,39 @@ npx @reduxjs/rtk-codemods createReducerBuilder ./src
 npx @reduxjs/rtk-codemods createSliceBuilder ./packages/my-app/**/*.ts
 ```
 
-We also recommend re-running Prettier on the codebase before committing the changes.
+我们还建议在提交更改之前重新运行 Prettier。
 
-These codemods should work, but we would greatly appreciate feedback from more real-world codebases!
+这些 codemods 应该可以工作，但我们非常欢迎来自更多实际代码库的反馈！
 
-#### `configureStore.middleware` must be a callback
+#### `configureStore.middleware` 必须是回调函数
 
-Since the beginning, `configureStore` has accepted a direct array value as the `middleware` option. However, providing an array directly prevents `configureStore` from calling `getDefaultMiddleware()`. So, `middleware: [myMiddleware]` means there is no thunk middleware added (or any of the dev-mode checks).
+从一开始，`configureStore` 就接受了一个直接的数组值作为 `middleware` 选项。然而，直接提供一个数组会阻止 `configureStore` 调用 `getDefaultMiddleware()`。所以，`middleware: [myMiddleware]` 意味着没有添加 thunk 中间件（或任何开发模式检查）。
 
-This is a footgun, and we've had numerous users accidentally do this and cause their apps to fail because the default middleware never got configured.
+这是一个陷阱，我们有很多用户不小心这样做，导致他们的应用程序失败，因为默认的中间件从未被配置。
 
-As a result, we've now made the `middleware` only accept the callback form. _If_ for some reason you still want to replace _all_ of the built-in middleware, do so by returning an array from the callback:
+因此，我们现在只让 `middleware` 接受回调形式。_如果_ 由于某种原因你仍然想要替换 _所有_ 内置的中间件，可以通过从回调中返回一个数组来实现：
 
 ```ts
 const store = configureStore({
   reducer,
   middleware: (getDefaultMiddleware) => {
-    // WARNING: this means that _none_ of the default middleware are added!
+    // 警告：这意味着 _没有_ 默认的中间件被添加！
     return [myMiddleware]
-    // or for TS users, use:
+    // 或者对于 TS 用户，使用：
     // return new Tuple(myMiddleware)
   },
 })
 ```
 
-But note that **we consistently recommend not replacing the default middleware entirely**, and that you should use `return getDefaultMiddleware().concat(myMiddleware)`.
+但请注意，**我们始终建议不要完全替换默认的中间件**，你应该使用 `return getDefaultMiddleware().concat(myMiddleware)`。
 
-#### `configureStore.enhancers` must be a callback
+#### `configureStore.enhancers` 必须是回调函数
 
-Similarly to `configureStore.middleware`, the `enhancers` field must also be a callback, for the same reasons.
+与 `configureStore.middleware` 类似，`enhancers` 字段也必须是回调函数，原因相同。
 
-The callback will receive a `getDefaultEnhancers` function that can be used to customise the batching enhancer [that's now included by default](#configurestore-adds-autobatchenhancer-by-default).
+回调函数将接收一个 `getDefaultEnhancers` 函数，可以用来自定义批处理增强器[现在默认包含](#configurestore-adds-autobatchenhancer-by-default)。
 
-For example:
+例如：
 
 ```ts
 const store = configureStore({
@@ -276,43 +270,43 @@ const store = configureStore({
 })
 ```
 
-It's important to note that the result of `getDefaultEnhancers` will **also** contain the middleware enhancer created with any configured/default middleware. To help prevent mistakes, `configureStore` will log an error to console if middleware was provided and the middleware enhancer wasn't included in the callback result.
+重要的是要注意，`getDefaultEnhancers` 的结果将**也**包含用任何配置的/默认的中间件创建的中间件增强器。为了防止错误，如果提供了中间件并且在回调结果中没有包含中间件增强器，`configureStore` 将在控制台中记录一个错误。
 
 ```ts
 const store = configureStore({
   reducer,
   enhancers: (getDefaultEnhancers) => {
-    return [myEnhancer] // we've lost the  middleware here
-    // instead:
+    return [myEnhancer] // 我们在这里丢失了中间件
+    // 替代方案：
     return getDefaultEnhancers().concat(myEnhancer)
   },
 })
 ```
 
-#### Standalone `getDefaultMiddleware` and `getType` removed
+#### 独立的 `getDefaultMiddleware` 和 `getType` 已被移除
 
-The standalone version of `getDefaultMiddleware` has been deprecated since v1.6.1, and has now been removed. Use the function passed to the `middleware` callback instead, which has the correct types.
+独立版本的 `getDefaultMiddleware` 自 v1.6.1 起已被弃用，并已被移除。请使用传递给 `middleware` 回调的函数，它具有正确的类型。
 
-We have also removed the `getType` export, which was used to extract a type string from action creators made with `createAction`. Instead, use the static property `actionCreator.type`.
+我们还移除了 `getType` 导出，它用于从用 `createAction` 创建的动作创建器中提取类型字符串。相反，使用静态属性 `actionCreator.type`。
 
-#### RTK Query behaviour changes
+#### RTK Query 行为变化
 
-We've had a number of reports where RTK Query had issues around usage of `dispatch(endpoint.initiate(arg, {subscription: false}))`. There were also reports that multiple triggered lazy queries were resolving the promises at the wrong time. Both of these had the same underlying issue, which was that RTKQ wasn't tracking cache entries in these cases (intentionally). We've reworked the logic to always track cache entries (and remove them as needed), which should resolve those behavior issues.
+我们收到了一些报告，其中 RTK Query 在使用 `dispatch(endpoint.initiate(arg, {subscription: false}))` 时遇到了问题。还有报告说多个触发的懒查询在错误的时间解析了 promises。这两者都有相同的底层问题，即 RTKQ 在这些情况下没有跟踪缓存条目（有意为之）。我们重新设计了逻辑，始终跟踪缓存条目（并在需要时删除它们），这应该解决了这些行为问题。
 
-We also have had issues raised about trying to run multiple mutations in a row and how tag invalidation behaves. RTKQ now has internal logic to delay tag invalidation briefly, to allow multiple invalidations to get handled together. This is controlled by a new `invalidationBehavior: 'immediate' | 'delayed'` flag on `createApi`. The new default behavior is `'delayed'`. Set it to `'immediate'` to revert to the behavior in RTK 1.9.
+我们还收到了关于尝试连续运行多个突变以及标签失效行为如何的问题。RTKQ 现在有内部逻辑来短暂延迟标签失效，以允许多个失效一起处理。这由 `createApi` 上的新 `invalidationBehavior: 'immediate' | 'delayed'` 标志控制。新的默认行为是 `'delayed'`。将其设置为 `'immediate'` 以恢复到 RTK 1.9 中的行为。
 
-In RTK 1.9, we reworked RTK Query's internals to keep most of the subscription status inside the RTKQ middleware. The values are still synced to the Redux store state, but this is primarily for display by the Redux DevTools "RTK Query" panel. Related to the cache entry changes above, we've optimized how often those values get synced to the Redux state for perf.
+在 RTK 1.9 中，我们重新设计了 RTK Query 的内部结构，将大部分订阅状态保留在 RTKQ 中间件中。这些值仍然与 Redux 存储状态同步，但这主要是为了由 Redux DevTools "RTK Query" 面板显示。与上述缓存条目更改相关，我们优化了这些值同步到 Redux 状态的频率，以提高性能。
 
-#### `reactHooksModule` custom hook configuration
+#### `reactHooksModule` 自定义钩子配置
 
-Previously, custom versions of React Redux's hooks (`useSelector`, `useDispatch`, and `useStore`) could be passed separately to `reactHooksModule`, usually to enable using a different context to the default `ReactReduxContext`.
+以前，React Redux 的自定义版本钩子（`useSelector`，`useDispatch` 和 `useStore`）可以分别传递给 `reactHooksModule`，通常是为了使用与默认的 `ReactReduxContext` 不同的上下文。
 
-In practicality, the react hooks module needs all three of these hooks to be provided, and it became an easy mistake to only pass `useSelector` and `useDispatch`, without `useStore`.
+实际上，react hooks 模块需要提供所有三个这些钩子，而只传递 `useSelector` 和 `useDispatch`，而不是 `useStore`，很容易出错。
 
-The module has now moved all three of these under the same configuration key, and will check that all three are provided if the key is present.
+该模块现在已将这三个钩子都移到了同一个配置键下，并且如果该键存在，将检查是否都提供了所有三个钩子。
 
 ```ts
-// previously
+// 以前
 const customCreateApi = buildCreateApi(
   coreModule(),
   reactHooksModule({
@@ -322,7 +316,7 @@ const customCreateApi = buildCreateApi(
   }),
 )
 
-// now
+// 现在
 const customCreateApi = buildCreateApi(
   coreModule(),
   reactHooksModule({
@@ -335,23 +329,23 @@ const customCreateApi = buildCreateApi(
 )
 ```
 
-#### Error message extraction
+#### 错误消息提取
 
-Redux 4.1.0 optimized its bundle size by [extracting error message strings out of production builds](https://github.com/reduxjs/redux/releases/tag/v4.1.0), based on React's approach. We've applied the same technique to RTK. This saves about 1000 bytes from prod bundles (actual benefits will depend on which imports are being used).
+Redux 4.1.0 通过[从生产构建中提取错误消息字符串](https://github.com/reduxjs/redux/releases/tag/v4.1.0)来优化其包大小，这种方法基于 React 的方法。我们已将同样的技术应用到 RTK 上。这大约可以从生产包中节省 1000 字节（实际效益将取决于正在使用哪些导入）。
 
-<div class="typescript-only">
 
-#### `configureStore` field order for `middleware` matters
 
-If you are passing _both_ the `middleware` and `enhancers` fields to `configureStore`, the `middleware` field _must_ come first in order for internal TS inference to work properly.
+#### `configureStore` 中 `middleware` 的字段顺序很重要
 
-#### Non-default middleware/enhancers must use `Tuple`
+如果你同时传递 `middleware` 和 `enhancers` 字段给 `configureStore`，那么 `middleware` 字段 _必须_ 首先出现，以便内部 TS 推断能够正确工作。
 
-We've seen many cases where users passing the `middleware` parameter to configureStore have tried spreading the array returned by `getDefaultMiddleware()`, or passed an alternate plain array. This unfortunately loses the exact TS types from the individual middleware, and often causes TS problems down the road (such as `dispatch` being typed as `Dispatch<AnyAction>` and not knowing about thunks).
+#### 非默认的中间件/增强器必须使用 `Tuple`
 
-`getDefaultMiddleware()` already used an internal `MiddlewareArray` class, an `Array` subclass that had strongly typed `.concat/prepend()` methods to correctly capture and retain the middleware types.
+我们已经看到许多用户在将 `middleware` 参数传递给 configureStore 时尝试展开 `getDefaultMiddleware()` 返回的数组，或者传递一个替代的普通数组。不幸的是，这会丢失来自单个中间件的确切 TS 类型，并且通常会导致后续的 TS 问题（例如 `dispatch` 被类型化为 `Dispatch<AnyAction>` 并且不知道关于 thunks 的信息）。
 
-We've renamed that type to `Tuple`, and `configureStore`'s TS types now require that you _must_ use `Tuple` if you want to pass your own array of middleware:
+`getDefaultMiddleware()` 已经使用了一个内部的 `MiddlewareArray` 类，这是一个 `Array` 子类，它具有强类型的 `.concat/prepend()` 方法，用于正确捕获并保留中间件类型。
+
+我们已经将该类型重命名为 `Tuple`，并且 `configureStore` 的 TS 类型现在要求你 _必须_ 使用 `Tuple`，如果你想传递你自己的中间件数组：
 
 ```ts
 import { configureStore, Tuple } from '@reduxjs/toolkit'
@@ -362,27 +356,26 @@ configureStore({
 })
 ```
 
-(Note that this has no effect if you're using RTK with plain JS, and you could still pass a plain array here.)
+（注意，如果你使用纯 JS 的 RTK，这将没有影响，你仍然可以在这里传递一个普通数组。）
 
-This same restriction applies to the `enhancers` field.
+这种同样的限制也适用于 `enhancers` 字段。
 
-#### Entity adapter type updates
+#### 实体适配器类型更新
 
-`createEntityAdapter` now has an `Id` generic argument, which will be used to strongly type the item IDs anywhere those are exposed. Previously, the ID field type was always `string | number`. TS will now try to infer the exact type from either the `.id` field of your entity type, or the `selectId` return type. You could also fall back to passing that generic type directly. **If you use the `EntityState<Data, Id>` type directly, you _must_ supply both generic arguments!**
+`createEntityAdapter` 现在有一个 `Id` 泛型参数，它将被用于强类型化任何地方暴露的项目 ID。以前，ID 字段类型总是 `string | number`。TS 现在将尝试从你的实体类型的 `.id` 字段或 `selectId` 返回类型中推断出确切的类型。你也可以选择回退到直接传递那个泛型类型。**如果你直接使用 `EntityState<Data, Id>` 类型，你 _必须_ 提供两个泛型参数！**
 
-The `.entities` lookup table is now defined to use a standard TS `Record<Id, MyEntityType>`, which assumes that each item lookup exists by default. Previously, it used a `Dictionary<MyEntityType>` type, which assumed the result was `MyEntityType | undefined`. The `Dictionary` type has been removed.
+`.entities` 查找表现在被定义为使用标准的 TS `Record<Id, MyEntityType>`，它默认假设每个项目查找都存在。以前，它使用了一个 `Dictionary<MyEntityType>` 类型，该类型假设结果是 `MyEntityType | undefined`。`Dictionary` 类型已被移除。
 
-If you prefer to assume that the lookups _might_ be undefined, use TypeScript's `noUncheckedIndexedAccess` configuration option to control that.
+如果你更喜欢假设查找 _可能_ 是未定义的，使用 TypeScript 的 `noUncheckedIndexedAccess` 配置选项来控制。
 
-</div>
 
 ### Reselect
 
-#### `createSelector` Uses `weakMapMemoize` As Default Memoizer
+#### `createSelector` 默认使用 `weakMapMemoize` 作为 Memoizer
 
-**`createSelector` now uses a new default memoization function called `weakMapMemoize`**. This memoizer offers an effectively infinite cache size, which should simplify usage with varying arguments, but relies exclusively on reference comparisons.
+**`createSelector` 现在使用一个新的默认 memoization 函数，称为 `weakMapMemoize`**。这个 memoizer 提供了一个实际上无限的缓存大小，这应该简化了对不同参数的使用，但是完全依赖于引用比较。
 
-If you need to customize equality comparisons, customize `createSelector` to use the original `lruMemoize` method instead:
+如果你需要自定义等式比较，自定义 `createSelector` 以使用原始的 `lruMemoize` 方法：
 
 ```ts no-emit
 createSelector(inputs, resultFn, {
@@ -391,24 +384,24 @@ createSelector(inputs, resultFn, {
 })
 ```
 
-#### `defaultMemoize` Renamed to `lruMemoize`
+#### `defaultMemoize` 重命名为 `lruMemoize`
 
-Since the original `defaultMemoize` function is no longer actually the default, we've renamed it to `lruMemoize` for clarity. This only matters if you specifically imported it into your app to customize selectors.
+由于原始的 `defaultMemoize` 函数实际上不再是默认的，我们已经将其重命名为 `lruMemoize` 以便清晰。这只有在你特别将其导入到你的应用程序中以自定义选择器时才有关系。
 
-#### `createSelector` Dev-Mode Checks
+#### `createSelector` 开发模式检查
 
-`createSelector` now does checks in development mode for common mistakes, like input selectors that always return new references, or result functions that immediately return their argument. These checks can be customized at selector creation or globally.
+`createSelector` 现在在开发模式中进行常见错误的检查，比如总是返回新引用的输入选择器，或者立即返回其参数的结果函数。这些检查可以在选择器创建或全局进行自定义。
 
-This is important, as an input selector returning a materially different result with the same parameters means that the output selector will never memoize correctly and be run unnecessarily, thus (potentially) creating a new result and causing rerenders.
+这很重要，因为一个输入选择器返回一个与相同参数材质不同的结果意味着输出选择器将永远不会正确地 memoize 并且会不必要地运行，从而（可能）创建一个新的结果并导致重新渲染。
 
 ```ts
 const addNumbers = createSelector(
-  // this input selector will always return a new reference when run
-  // so cache will never be used
+  // 这个输入选择器将总是在运行时返回一个新的引用
+  // 所以缓存将永远不会被使用
   (a, b) => ({ a, b }),
   ({ a, b }) => ({ total: a + b }),
 )
-// instead, you should have an input selector for each stable piece of data
+// 相反，你应该为每个稳定的数据片段有一个输入选择器
 const addNumbersStable = createSelector(
   (a, b) => a,
   (a, b) => b,
@@ -418,39 +411,36 @@ const addNumbersStable = createSelector(
 )
 ```
 
-This is done the first time the selector is called, unless configured otherwise. More details are available in the [Reselect docs on dev-mode checks](https://reselect.js.org/api/development-only-stability-checks).
+这是在第一次调用选择器时完成的，除非配置了其他方式。更多细节可以在 [Reselect docs on dev-mode checks](https://reselect.js.org/api/development-only-stability-checks) 中找到。
 
-Note that while RTK re-exports `createSelector`, it intentionally does not re-export the function to configure this check globally - if you wish to do so, you should instead depend on `reselect` directly and import it yourself.
+请注意，虽然 RTK 重新导出了 `createSelector`，但它故意没有重新导出全局配置此检查的函数 - 如果你希望这样做，你应该直接依赖 `reselect` 并自己导入它。
 
-<div class="typescript-only">
 
-#### `ParametricSelector` Types Removed
+#### `ParametricSelector` 类型已移除
 
-The `ParametricSelector` and `OutputParametricSelector` types have been removed. Use `Selector` and `OutputSelector` instead.
+已经移除了 `ParametricSelector` 和 `OutputParametricSelector` 类型。请改用 `Selector` 和 `OutputSelector`。
 
-</div>
 
 ### React-Redux
 
-#### Requires React 18
+#### 需要 React 18
 
-React-Redux v7 and v8 worked with all versions of React that supported hooks (16.8+, 17, and 18). v8 switched from internal subscription management to React's new `useSyncExternalStore` hook, but used the "shim" implementation to provide support for React 16.8 and 17, which did not have that hook built in.
+React-Redux v7 和 v8 与所有支持 hooks 的 React 版本（16.8+，17 和 18）都兼容。v8 从内部订阅管理切换到 React 的新 `useSyncExternalStore` hook，但使用了 "shim" 实现以支持没有内置该 hook 的 React 16.8 和 17。
 
-**React-Redux v9 switches to _requiring_ React 18, and does _not_ support React 16 or 17**. This allows us to drop the shim and save a small bit of bundle size.
+**React-Redux v9 切换到 _需要_ React 18，并且 _不支持_ React 16 或 17**。这使我们能够删除 shim 并节省一小部分包大小。
 
-<div class="typescript-only">
 
-#### Custom context typing
+#### 自定义上下文类型
 
-React Redux supports creating `hooks` (and `connect`) with a [custom context](https://react-redux.js.org/api/hooks#custom-context), but typing this has been fairly non-standard. The pre-v9 types required `Context<ReactReduxContextValue>`, but the context default value was usually initialised with `null` (as the hooks use this to make sure they actually have a provided context). This, in "best" cases, would result in something like the below:
+React Redux 支持使用[自定义上下文](https://react-redux.js.org/api/hooks#custom-context)创建 `hooks`（和 `connect`），但是这种类型化一直相当非标准。在 v9 之前的类型需要 `Context<ReactReduxContextValue>`，但是上下文默认值通常会初始化为 `null`（因为 hooks 使用它来确保它们实际上有一个提供的上下文）。在"最好"的情况下，这会导致如下所示的结果：
 
 ```ts title="Pre-v9 custom context"
 import { createContext } from 'react'
 import {
-  ReactReduxContextValue,
-  createDispatchHook,
-  createSelectorHook,
-  createStoreHook,
+    ReactReduxContextValue,
+    createDispatchHook,
+    createSelectorHook,
+    createStoreHook,
 } from 'react-redux'
 import { AppStore, RootState, AppDispatch } from './store'
 
@@ -462,17 +452,17 @@ export const useDispatch = createDispatchHook(context).withTypes<AppDispatch>()
 export const useSelector = createSelectorHook(context).withTypes<RootState>()
 ```
 
-In v9, the types now match the runtime behaviour. The context is typed to hold `ReactReduxContextValue | null`, and the hooks know that if they receive `null` they'll throw an error so it doesn't affect the return type.
+在 v9 中，类型现在匹配运行时行为。上下文被类型化为持有 `ReactReduxContextValue | null`，并且 hooks 知道如果它们接收到 `null`，它们会抛出错误，所以它不影响返回类型。
 
-The above example now becomes:
+上述示例现在变为：
 
 ```ts title="v9+ custom context"
 import { createContext } from 'react'
 import {
-  ReactReduxContextValue,
-  createDispatchHook,
-  createSelectorHook,
-  createStoreHook,
+    ReactReduxContextValue,
+    createDispatchHook,
+    createSelectorHook,
+    createStoreHook,
 } from 'react-redux'
 import { AppStore, RootState, AppDispatch } from './store'
 
@@ -484,43 +474,41 @@ export const useDispatch = createDispatchHook(context).withTypes<AppDispatch>()
 export const useSelector = createSelectorHook(context).withTypes<RootState>()
 ```
 
-</div>
-
 ### Redux Thunk
 
-#### Thunk Uses Named Exports
+#### Thunk 使用命名导出
 
-The `redux-thunk` package previously used a single default export that was the middleware, with an attached field named `withExtraArgument` that allowed customization.
+`redux-thunk` 包以前使用了一个单一的默认导出，这是中间件，带有一个名为 `withExtraArgument` 的附加字段，允许自定义。
 
-The default export has been removed. There are now two named exports: `thunk` (the basic middleware) and `withExtraArgument`.
+默认导出已被移除。现在有两个命名导出：`thunk`（基本中间件）和 `withExtraArgument`。
 
-If you are using Redux Toolkit, this should have no effect, as RTK already handles this inside of `configureStore`.
+如果你正在使用 Redux Toolkit，这应该没有影响，因为 RTK 已经在 `configureStore` 内部处理了这个。
 
-## New Features
+## 新特性
 
-These features are new in Redux Toolkit 2.0, and help cover additional use cases that we've seen users ask for in the ecosystem.
+这些特性是 Redux Toolkit 2.0 的新特性，帮助覆盖我们在生态系统中看到用户请求的额外用例。
 
-### `combineSlices` API with slice reducer injection for code-splitting
+### `combineSlices` API 与切片 reducer 注入用于代码分割
 
-The Redux core has always included `combineReducers`, which takes an object full of "slice reducer" functions and generates a reducer that calls those slice reducers. RTK's `createSlice` generates slice reducers + associated action creators, and we've taught the pattern of exporting individual action creators as named exports and the slice reducer as a default export. Meanwhile, we've never had official support for lazy-loading reducers, although we've had [sample code for some "reducer injection" patterns in our docs](https://redux.js.org/usage/code-splitting).
+Redux 核心一直包含 `combineReducers`，它接受一个充满 "切片 reducer" 函数的对象，并生成一个调用这些切片 reducers 的 reducer。RTK 的 `createSlice` 生成切片 reducers + 相关的 action creators，我们已经教授了导出单个 action creators 作为命名导出和切片 reducer 作为默认导出的模式。同时，我们从未对懒加载 reducers 有过官方支持，尽管我们在我们的文档中有一些 "reducer 注入" 模式的[示例代码](https://redux.js.org/usage/code-splitting)。
 
-This release includes a new [`combineSlices`](../api/combineSlices) API that is designed to enable lazy-loading of reducers at runtime. It accepts individual slices or an object full of slices as arguments, and automatically calls `combineReducers` using the `sliceObject.name` field as the key for each state field. The generated reducer function has an additional `.inject()` method attached that can be used to dynamically inject additional slices at runtime. It also includes a `.withLazyLoadedSlices()` method that can be used to generate TS types for reducers that will be added later. See [#2776](https://github.com/reduxjs/redux-toolkit/issues/2776) for the original discussion around this idea.
+此版本包含一个新的 [`combineSlices`](../api/combineSlices) API，旨在在运行时启用 reducers 的懒加载。它接受单个切片或一个充满切片的对象作为参数，并自动调用 `combineReducers`，使用 `sliceObject.name` 字段作为每个状态字段的键。生成的 reducer 函数有一个额外的 `.inject()` 方法附加，可以用来在运行时动态注入额外的切片。它还包括一个 `.withLazyLoadedSlices()` 方法，可以用来为稍后添加的 reducers 生成 TS 类型。参见 [#2776](https://github.com/reduxjs/redux-toolkit/issues/2776) 以获取关于这个想法的原始讨论。
 
-For now, we are not building this into `configureStore`, so you'll need to call `const rootReducer = combineSlices(.....)` yourself and pass that to `configureStore({reducer: rootReducer})`.
+目前，我们没有将这个构建到 `configureStore` 中，所以你需要自己调用 `const rootReducer = combineSlices(.....)` 并将其传递给 `configureStore({reducer: rootReducer})`。
 
-**Basic usage: a mixture of slices and standalone reducers passed to `combineSlices`**
+**基本使用：将切片和独立的 reducers 混合传递给 `combineSlices`**
 
 ```ts
 const stringSlice = createSlice({
-  name: 'string',
-  initialState: '',
-  reducers: {},
+    name: 'string',
+    initialState: '',
+    reducers: {},
 })
 
 const numberSlice = createSlice({
-  name: 'number',
-  initialState: 0,
-  reducers: {},
+    name: 'number',
+    initialState: 0,
+    reducers: {},
 })
 
 const booleanReducer = createReducer(false, () => {})
@@ -528,89 +516,89 @@ const booleanReducer = createReducer(false, () => {})
 const api = createApi(/*  */)
 
 const combinedReducer = combineSlices(
-  stringSlice,
-  {
-    num: numberSlice.reducer,
-    boolean: booleanReducer,
-  },
-  api,
+    stringSlice,
+    {
+        num: numberSlice.reducer,
+        boolean: booleanReducer,
+    },
+    api,
 )
 expect(combinedReducer(undefined, dummyAction())).toEqual({
-  string: stringSlice.getInitialState(),
-  num: numberSlice.getInitialState(),
-  boolean: booleanReducer.getInitialState(),
-  api: api.reducer.getInitialState(),
+    string: stringSlice.getInitialState(),
+    num: numberSlice.getInitialState(),
+    boolean: booleanReducer.getInitialState(),
+    api: api.reducer.getInitialState(),
 })
 ```
 
-**Basic slice reducer injection**
+**基本的切片 reducer 注入**
 
 ```ts
-// Create a reducer with a TS type that knows `numberSlice` will be injected
+// 创建一个 reducer，其 TS 类型知道 `numberSlice` 将被注入
 const combinedReducer =
-  combineSlices(stringSlice).withLazyLoadedSlices<
-    WithSlice<typeof numberSlice>
-  >()
+    combineSlices(stringSlice).withLazyLoadedSlices<
+        WithSlice<typeof numberSlice>
+    >()
 
-// `state.number` doesn't exist initially
+// `state.number` 最初不存在
 expect(combinedReducer(undefined, dummyAction()).number).toBe(undefined)
 
-// Create a version of the reducer with `numberSlice` injected (mainly useful for types)
+// 创建一个带有 `numberSlice` 注入的 reducer 版本（主要用于类型）
 const injectedReducer = combinedReducer.inject(numberSlice)
 
-// `state.number` now exists, and injectedReducer's type no longer marks it as optional
+// `state.number` 现在存在，且 injectedReducer 的类型不再将其标记为可选
 expect(injectedReducer(undefined, dummyAction()).number).toBe(
-  numberSlice.getInitialState(),
+    numberSlice.getInitialState(),
 )
 
-// original reducer has also been changed (type is still optional)
+// 原始 reducer 也已被改变（类型仍然是可选的）
 expect(combinedReducer(undefined, dummyAction()).number).toBe(
-  numberSlice.getInitialState(),
+    numberSlice.getInitialState(),
 )
 ```
 
-### `selectors` field in `createSlice`
+### `createSlice` 中的 `selectors` 字段
 
-The existing `createSlice` API now has support for defining [`selectors`](../api/createSlice#selectors) directly as part of the slice. By default, these will be generated with the assumption that the slice is mounted in the root state using `slice.name` as the field, such as `name: "todos"` -> `rootState.todos`. Additionally, there's now a `slice.selectSlice` method that does that default root state lookup.
+现有的 `createSlice` API 现在支持直接作为切片的一部分定义 [`selectors`](../api/createSlice#selectors)。默认情况下，这些将假定切片在根状态下挂载，使用 `slice.name` 作为字段，例如 `name: "todos"` -> `rootState.todos`。此外，现在有一个 `slice.selectSlice` 方法，它执行默认的根状态查找。
 
-You can call `sliceObject.getSelectors(selectSliceState)` to generate the selectors with an alternate location, similar to how `entityAdapter.getSelectors()` works.
+你可以调用 `sliceObject.getSelectors(selectSliceState)` 来生成带有替代位置的选择器，类似于 `entityAdapter.getSelectors()` 的工作方式。
 
 ```ts
 const slice = createSlice({
-  name: 'counter',
-  initialState: 42,
-  reducers: {},
-  selectors: {
-    selectSlice: (state) => state,
-    selectMultiple: (state, multiplier: number) => state * multiplier,
-  },
+    name: 'counter',
+    initialState: 42,
+    reducers: {},
+    selectors: {
+        selectSlice: (state) => state,
+        selectMultiple: (state, multiplier: number) => state * multiplier,
+    },
 })
 
-// Basic usage
+// 基本使用
 const testState = {
-  [slice.name]: slice.getInitialState(),
+    [slice.name]: slice.getInitialState(),
 }
 const { selectSlice, selectMultiple } = slice.selectors
 expect(selectSlice(testState)).toBe(slice.getInitialState())
 expect(selectMultiple(testState, 2)).toBe(slice.getInitialState() * 2)
 
-// Usage with the slice reducer mounted under a different key
+// 使用切片 reducer 挂载在不同的键下
 const customState = {
-  number: slice.getInitialState(),
+    number: slice.getInitialState(),
 }
 const { selectSlice, selectMultiple } = slice.getSelectors(
-  (state: typeof customState) => state.number,
+    (state: typeof customState) => state.number,
 )
 expect(selectSlice(customState)).toBe(slice.getInitialState())
 expect(selectMultiple(customState, 2)).toBe(slice.getInitialState() * 2)
 ```
 
-### `createSlice.reducers` callback syntax and thunk support
+### `createSlice.reducers` 回调语法和 thunk 支持
 
-One of the oldest feature requests we've had is the ability to declare thunks directly inside of `createSlice`. Until now, you've always had to declare them separately, give the thunk a string action prefix, and handle the actions via `createSlice.extraReducers`:
+我们收到的最早的功能请求之一是能够直接在 `createSlice` 中声明 thunks。到目前为止，你总是需要单独声明它们，给 thunk 一个字符串动作前缀，并通过 `createSlice.extraReducers` 处理动作：
 
 ```ts
-// Declare the thunk separately
+// 单独声明 thunk
 const fetchUserById = createAsyncThunk(
   'users/fetchByIdStatus',
   async (userId: number, thunkAPI) => {
@@ -623,10 +611,14 @@ const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-    // standard reducer logic, with auto-generated action types per reducer
+    // 标准
+
+的
+
+ reducer 逻辑，每个 reducer 都自动生成动作类型
   },
   extraReducers: (builder) => {
-    // Add reducers for additional action types here, and handle loading state as needed
+    // 在这里添加额外的动作类型的 reducers，并根据需要处理加载状态
     builder.addCase(fetchUserById.fulfilled, (state, action) => {
       state.entities.push(action.payload)
     })
@@ -634,23 +626,23 @@ const usersSlice = createSlice({
 })
 ```
 
-Many users have told us that this separation feels awkward.
+许多用户告诉我们，这种分离感觉很尴尬。
 
-We've _wanted_ to include a way to define thunks directly inside of `createSlice`, and have played around with various prototypes. There were always two major blocking issues, and a secondary concern:
+我们一直_希望_能够包含一种方式，直接在 `createSlice` 中定义 thunks，并且已经尝试了各种原型。总是有两个主要的阻碍问题，和一个次要的关注点：
 
-1. It wasn't clear what the syntax for declaring a thunk inside should look like.
-2. Thunks have access to `getState` and `dispatch`, but the `RootState` and `AppDispatch` types are normally inferred from the store, which in turn infers it from the slice state types. Declaring thunks inside `createSlice` would cause circular type inference errors, as the store needs the slice types but the slice needs the store types. We weren't willing to ship an API that would work okay for our JS users but not for our TS users, especially since we _want_ people to use TS with RTK.
-3. You can't do synchronous conditional imports in ES modules, and there's no good way to make the `createAsyncThunk` import optional. Either `createSlice` always depends on it (and adds that to the bundle size), or it can't use `createAsyncThunk` at all.
+1. 不清楚在内部声明 thunk 应该看起来像什么样的语法。
+2. Thunks 可以访问 `getState` 和 `dispatch`，但 `RootState` 和 `AppDispatch` 类型通常是从 store 中推断出来的，而 store 又从 slice state 类型中推断出来。在 `createSlice` 中声明 thunks 会导致循环类型推断错误，因为 store 需要 slice 类型，但 slice 需要 store 类型。我们不愿意发布一个 API，对我们的 JS 用户来说工作得还可以，但对我们的 TS 用户来说却不行，尤其是我们_希望_人们使用 TS 和 RTK。
+3. 你不能在 ES 模块中进行同步条件导入，并且没有好的方式来使 `createAsyncThunk` 导入变为可选。要么 `createSlice` 总是依赖它（并将其添加到包大小中），要么就不能完全使用 `createAsyncThunk`。
 
-We've settled on these compromises:
+我们已经达成了以下妥协：
 
-- **In order to create async thunks with `createSlice`, you specifically need to [set up a custom version of `createSlice` that has access to `createAsyncThunk`](../api/createSlice#createasyncthunk)**.
-- You can declare thunks inside of `createSlice.reducers`, by using a "creator callback" syntax for the `reducers` field that is similar to the `build` callback syntax in RTK Query's `createApi` (using typed functions to create fields in an object). Doing this does look a bit different than the existing "object" syntax for the `reducers` field, but is still fairly similar.
-- You can customize _some_ of the types for thunks inside of `createSlice`, but you _cannot_ customize the `state` or `dispatch` types. If those are needed, you can manually do an `as` cast, like `getState() as RootState`.
+- **为了使用 `createSlice` 创建异步 thunks，你特别需要[设置一个有权访问 `createAsyncThunk` 的 `createSlice` 的自定义版本](../api/createSlice#createasyncthunk)**。
+- 你可以在 `createSlice.reducers` 中声明 thunks，通过使用一个类似于 RTK Query 的 `createApi` 中的 `build` 回调语法的 "creator callback" 语法来创建 `reducers` 字段（使用类型化的函数来在对象中创建字段）。这样做看起来确实与现有的 `reducers` 字段的 "对象" 语法有些不同，但仍然相当相似。
+- 你可以自定义 `createSlice` 中 thunks 的_一些_类型，但你_不能_自定义 `state` 或 `dispatch` 类型。如果需要这些，你可以手动进行 `as` 转换，如 `getState() as RootState`。
 
-In practice, we hope these are reasonable tradeoffs. Creating thunks inside of `createSlice` has been widely asked for, so we think it's an API that will see usage. If the TS customization options are a limitation, you can still declare thunks outside of `createSlice` as always, and most async thunks don't need `dispatch` or `getState` - they just fetch data and return. And finally, setting up a custom `createSlice` allows you to opt into `createAsyncThunk` being included in your bundle size (though it may already be included if used directly or as part of RTK Query - in either of these cases there's no _additional_ bundle size).
+实际上，我们希望这些是合理的妥协。在 `createSlice` 中创建 thunks 的需求很广泛，所以我们认为这是一个会被使用的 API。如果 TS 自定义选项是一个限制，你仍然可以像以前一样在 `createSlice` 外部声明 thunks，而且大多数异步 thunks 不需要 `dispatch` 或 `getState` - 它们只是获取数据并返回。最后，设置一个自定义的 `createSlice` 允许你选择是否将 `createAsyncThunk` 包含在你的包大小中（尽管如果直接使用或作为 RTK Query 的一部分使用，它可能已经被包含在内 - 在这些情况下，没有_额外_的包大小）。
 
-Here's what the new callback syntax looks like:
+以下是新的回调语法看起来的样子：
 
 ```ts
 const createAppSlice = buildCreateSlice({
@@ -665,29 +657,29 @@ const todosSlice = createAppSlice({
     error: null,
   } as TodoState,
   reducers: (create) => ({
-    // A normal "case reducer", same as always
+    // 一个正常的 "case reducer"，和以前一样
     deleteTodo: create.reducer((state, action: PayloadAction<number>) => {
       state.todos.splice(action.payload, 1)
     }),
-    // A case reducer with a "prepare callback" to customize the action
+    // 一个带有 "prepare callback" 的 case reducer，用于自定义动作
     addTodo: create.preparedReducer(
       (text: string) => {
         const id = nanoid()
         return { payload: { id, text } }
       },
-      // action type is inferred from prepare callback
+      // 动作类型是从 prepare callback 中推断出来的
       (state, action) => {
         state.todos.push(action.payload)
       },
     ),
-    // An async thunk
+    // 一个异步 thunk
     fetchTodo: create.asyncThunk(
-      // Async payload function as the first argument
+      // 异步负载函数作为第一个参数
       async (id: string, thunkApi) => {
         const res = await fetch(`myApi/todos?id=${id}`)
         return (await res.json()) as Item
       },
-      // An object containing `{pending?, rejected?, fulfilled?, settled?, options?}` second
+      // 包含 `{pending?, rejected?, fulfilled?, settled?, options?}` 的对象作为第二个参数
       {
         pending: (state) => {
           state.loading = true
@@ -698,7 +690,7 @@ const todosSlice = createAppSlice({
         fulfilled: (state, action) => {
           state.todos.push(action.payload)
         },
-        // settled is called for both rejected and fulfilled actions
+        // settled 会在 rejected 和 fulfilled 动作都被调用
         settled: (state, action) => {
           state.loading = false
         },
@@ -707,24 +699,24 @@ const todosSlice = createAppSlice({
   }),
 })
 
-// `addTodo` and `deleteTodo` are normal action creators.
-// `fetchTodo` is the async thunk
+// `addTodo` 和 `deleteTodo` 是正常的动作创建者。
+// `fetchTodo` 是异步 thunk
 export const { addTodo, deleteTodo, fetchTodo } = todosSlice.actions
 ```
 
 #### Codemod
 
-**Using the new callback syntax is entirely optional (the object syntax is still standard)**, but an existing slice would need to be converted before it can take advantage of the new capabilities this syntax provides. To make this easier, a [codemod](../api/codemods) is provided.
+**使用新的回调语法完全是可选的（对象语法仍然是标准的）**，但是现有的 slice 需要在它可以利用这种语法提供的新功能之前进行转换。为了使这更容易，提供了一个 [codemod](../api/codemods)。
 
 ```sh
 npx @reduxjs/rtk-codemods createSliceReducerBuilder ./src/features/todos/slice.ts
 ```
 
-### "Dynamic middleware" middleware
+### "动态中间件"中间件
 
-A Redux store's middleware pipeline is fixed at store creation time and can't be changed later. We _have_ seen ecosystem libraries that tried to allow dynamically adding and removing middleware, potentially useful for things like code splitting.
+Redux存储的中间件管道在创建存储时固定，后续无法更改。我们_已经_看到生态系统库试图允许动态添加和删除中间件，这对于代码分割等可能有用。
 
-This is a relatively niche use case, but we've built [our own version of a "dynamic middleware" middleware](../api/createDynamicMiddleware). Add it to the Redux store at setup time, and it lets you add middleware later at runtime. It also comes with a [React hook integration that will automatically add a middleware to the store and return the updated dispatch method.](../api/createDynamicMiddleware#react-integration).
+这是一个相对小众的用例，但我们已经构建了[我们自己版本的"动态中间件"中间件](../api/createDynamicMiddleware)。在设置Redux存储时将其添加，它允许您在运行时后添加中间件。它还带有一个[React hook集成，将自动向存储添加中间件并返回更新的dispatch方法。](../api/createDynamicMiddleware#react-integration)。
 
 ```ts
 import { createDynamicMiddleware, configureStore } from '@reduxjs/toolkit'
@@ -743,45 +735,45 @@ const store = configureStore({
 dynamicMiddleware.addMiddleware(someOtherMiddleware)
 ```
 
-### `configureStore` adds `autoBatchEnhancer` by default
+### `configureStore`默认添加`autoBatchEnhancer`
 
-[In v1.9.0, we added a new `autoBatchEnhancer`](https://github.com/reduxjs/redux-toolkit/releases/tag/v1.9.0) that delays notifying subscribers briefly when multiple "low-priority" actions are dispatched in a row. This improves perf, as UI updates are typically the most expensive part of the update process. RTK Query marks most of its own internal actions as "low-pri" by default, but you have to have the `autoBatchEnhancer` added to the store to benefit from that.
+[在v1.9.0中，我们添加了一个新的`autoBatchEnhancer`](https://github.com/reduxjs/redux-toolkit/releases/tag/v1.9.0)，当连续派发多个"低优先级"动作时，它会稍微延迟通知订阅者。这提高了性能，因为UI更新通常是更新过程中最昂贵的部分。RTK Query默认将其大部分自身的内部动作标记为"低优先级"，但您必须将`autoBatchEnhancer`添加到存储中才能从中受益。
 
-We've updated `configureStore` to add the `autoBatchEnhancer` to the store setup by default, so that users can benefit from the improved perf without needing to manually tweak the store config themselves.
+我们已经更新了`configureStore`，默认在存储设置中添加`autoBatchEnhancer`，这样用户可以在不需要手动调整存储配置的情况下受益于改进的性能。
 
-### `entityAdapter.getSelectors` accepts a `createSelector` function
+### `entityAdapter.getSelectors`接受一个`createSelector`函数
 
-[`entityAdapter.getSelectors()`](../api/createEntityAdapter#selector-functions) now accepts an options object as its second argument. This allows you to pass in your own preferred `createSelector` method, which will be used to memoize the generated selectors. This could be useful if you want to use one of Reselect's new alternate memoizers, or some other memoization library with an equivalent signature.
+[`entityAdapter.getSelectors()`](../api/createEntityAdapter#selector-functions)现在接受一个选项对象作为其第二个参数。这允许您传入自己首选的`createSelector`方法，该方法将用于记忆生成的选择器。如果您想使用Reselect的新的备用记忆器之一，或者具有等效签名的其他记忆库，这可能会很有用。
 
 ### Immer 10.0
 
-[Immer 10.0](https://github.com/immerjs/immer/releases/tag/v10.0.0) is now final, and has several major improvements and updates:
+[Immer 10.0](https://github.com/immerjs/immer/releases/tag/v10.0.0)现在已经最终确定，并有几个主要的改进和更新：
 
-- Much faster update perf
-- Much smaller bundle size
-- Better ESM/CJS package formatting
-- No default export
-- No ES5 fallback
+- 更快的更新性能
+- 更小的包大小
+- 更好的ESM/CJS包格式
+- 没有默认导出
+- 没有ES5回退
 
-We've updated RTK to depend on the final Immer 10.0 release.
+我们已经更新了RTK以依赖最终的Immer 10.0版本。
 
-### Next.js Setup Guide
+### Next.js设置指南
 
-We now have a docs page that covers [how to set up Redux properly with Next.js](https://redux.js.org/usage/nextjs). We've seen a lot of questions around using Redux, Next, and the App Router together, and this guide should help provide advice.
+我们现在有一个文档页面，涵盖了[如何正确设置Next.js与Redux](https://redux.js.org/usage/nextjs)。我们看到了很多关于使用Redux、Next和App Router的问题，这个指南应该可以提供帮助。
 
-(At this time, the Next.js `with-redux` example is still showing outdated patterns - we're going to file a PR shortly to update that to match our docs guide.)
+（目前，Next.js的`with-redux`示例仍然显示过时的模式 - 我们将很快提交一个PR来更新它以匹配我们的文档指南。）
 
-## Overriding dependencies
+## 覆盖依赖
 
-It will take a while for packages to update their peer dependencies to allow for Redux core 5.0, and in the meantime changes like the [Middleware type](#middleware-type-changed---middleware-action-and-next-are-typed-as-unknown) will result in perceived incompatibilities.
+更新包的对等依赖以允许Redux core 5.0需要一段时间，在此期间，像[中间件类型](#middleware-type-changed---middleware-action-and-next-are-typed-as-unknown)这样的更改将导致感知的不兼容性。
 
-It's likely that most libraries will not actually have any practices that are incompatible with 5.0, but due to the peer dependency on 4.0 they end up pulling in old type declarations.
+大多数库可能实际上没有与5.0不兼容的实践，但由于对4.0的对等依赖，它们最终拉入了旧的类型声明。
 
-This can be solved by manually overriding the dependency resolution, which is supported by both `npm` and `yarn`.
+这可以通过手动覆盖依赖解析来解决，这是`npm`和`yarn`都支持的。
 
 ### `npm` - `overrides`
 
-NPM supports this through an [`overrides`](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#overrides) field in your `package.json`. You can override the dependency for a specific package, or make sure that every package that pulls in Redux receives the same version.
+NPM通过`package.json`中的[`overrides`](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#overrides)字段支持这一点。您可以覆盖特定包的依赖，或确保每个拉入Redux的包都收到相同的版本。
 
 ```json title="Individual override - redux-persist"
 {
@@ -803,7 +795,7 @@ NPM supports this through an [`overrides`](https://docs.npmjs.com/cli/v9/configu
 
 ### `yarn` - `resolutions`
 
-Yarn supports this through a [`resolutions`](https://classic.yarnpkg.com/lang/en/docs/selective-version-resolutions/) field in your `package.json`. Just like with NPM, you can override the dependency for a specific package, or make sure that every package that pulls in Redux receives the same version.
+Yarn通过`package.json`中的[`resolutions`](https://classic.yarnpkg.com/lang/en/docs/selective-version-resolutions/)字段支持这一点。就像NPM一样，您可以覆盖特定包的依赖，或确保每个拉入Redux的包都收到相同的版本。
 
 ```json title="Individual override - redux-persist"
 {
@@ -821,112 +813,112 @@ Yarn supports this through a [`resolutions`](https://classic.yarnpkg.com/lang/en
 }
 ```
 
-## Recommendations
+## 推荐
 
-Based on changes in 2.0 and previous versions, there have been some shifts in thinking that are good to know about, if non-essential.
+基于2.0和以前版本的变化，有一些思维转变是值得了解的，即使不是必要的。
 
-### Alternatives to `actionCreator.toString()`
+### `actionCreator.toString()`的替代方案
 
-As part of RTK's original API, action creators made with `createAction` have a custom `toString()` override that returns the action type.
+作为RTK原始API的一部分，使用`createAction`创建的动作创建器具有一个自定义的`toString()`覆盖，它返回动作类型。
 
-This was primarily useful for the ([now removed](#object-syntax-for-createsliceextrareducers-and-createreducer-removed)) object syntax for `createReducer`:
+这主要用于`createReducer`的（[现已移除](#object-syntax-for-createsliceextrareducers-and-createreducer-removed)）对象语法：
 
 ```ts
 const todoAdded = createAction<Todo>('todos/todoAdded')
 
 createReducer(initialState, {
-  [todoAdded]: (state, action) => {}, // toString called here, 'todos/todoAdded'
+  [todoAdded]: (state, action) => {}, // 这里调用了toString，'todos/todoAdded'
 })
 ```
 
-While this was convenient (and other libraries in the Redux ecosystem such as `redux-saga` and `redux-observable` have supported this to various capacities), it didn't play well with Typescript and was generally a bit too "magic".
+虽然这很方便（Redux生态系统中的其他库，如`redux-saga`和`redux-observable`，在不同程度上支持了这一点），但它与Typescript的兼容性不好，而且通常有点过于"神奇"。
 
 ```ts
 const test = todoAdded.toString()
-//    ^? typed as string, rather than specific action type
+//    ^? 类型为字符串，而不是特定的动作类型
 ```
 
-Over time, the action creator also gained a static `type` property and `match` method which were more explicit and worked better with Typescript.
+随着时间的推移，动作创建器还获得了一个静态的`type`属性和`match`方法，这些方法更加明确，与Typescript的兼容性更好。
 
 ```ts
 const test = todoAdded.type
 //    ^? 'todos/todoAdded'
 
-// acts as a type predicate
+// 作为类型谓词
 if (todoAdded.match(unknownAction)) {
   unknownAction.payload
-  // ^? now typed as PayloadAction<Todo>
+  // ^? 现在类型为PayloadAction<Todo>
 }
 ```
 
-For compatibility, this override is still in place, but we encourage considering using either of the static properties for more understandable code.
+为了兼容性，这个覆盖仍然存在，但我们建议考虑使用其中任何一个静态属性以编写更易理解的代码。
 
-For example, with `redux-observable`:
+例如，使用`redux-observable`：
 
 ```ts
-// before (works in runtime, will not filter types properly)
+// 之前（在运行时工作，但不会正确过滤类型）
 const epic = (action$: Observable<Action>) =>
   action$.pipe(
     ofType(todoAdded),
     map((action) => action),
-    //   ^? still Action<any>
+    //   ^? 仍然是Action<any>
   )
 
-// consider (better type filtering)
+// 考虑（更好的类型过滤）
 const epic = (action$: Observable<Action>) =>
   action$.pipe(
     filter(todoAdded.match),
     map((action) => action),
-    //   ^? now PayloadAction<Todo>
+    //   ^? 现在是PayloadAction<Todo>
   )
 ```
 
-With `redux-saga`:
+使用`redux-saga`：
 
 ```ts
-// before (still works)
+// 之前（仍然有效）
 yield takeEvery(todoAdded, saga)
 
-// consider
+// 考虑
 yield takeEvery(todoAdded.match, saga)
-// or
+// 或者
 yield takeEvery(todoAdded.type, saga)
 ```
 
-## Future plans
+## 未来计划
 
-### Custom slice reducer creators
+### 自定义切片reducer创建器
 
-With the addition of the [callback syntax for createSlice](#callback-syntax-for-createslicereducers), the [suggestion](https://github.com/reduxjs/redux-toolkit/issues/3837) was made to enable custom slice reducer creators. These creators would be able to:
+随着[为createSlice添加回调语法](#callback-syntax-for-createslicereducers)，[提出了](https://github.com/reduxjs/redux-toolkit/issues/3837)启用自定义切片reducer创建器的建议。这些创建器将能够：
 
-- Modify reducer behaviour by adding case or matcher reducers
-- Attach actions (or any other useful functions) to `slice.actions`
-- Attach provided case reducers to `slice.caseReducers`
+- 通过添加case或matcher reducer来修改reducer行为
+- 将动作（或任何其他有用的函数）附加到`slice.actions`
+- 将提供的case reducer附加到`slice.caseReducers`
 
-The creator would need to first return a "definition" shape when `createSlice` is first called, which it then handles by adding any necessary reducers and/or actions.
+创建器首次调用`createSlice`时需要首先返回一个"定义"形状，然后它通过添加任何必要的reducer和/或动作来处理。
 
-An API for this is not set in stone, but the existing `create.asyncThunk` creator implemented with a potential API could look like:
+这个API还没有确定，但是现有的`create.asyncThunk`创建器实现了一个可能的API，可能看起来像这样：
 
-```js
+```ts
 const asyncThunkCreator = {
   type: ReducerType.asyncThunk,
   define(payloadCreator, config) {
     return {
-      type: ReducerType.asyncThunk, // needs to match reducer type, so correct handler can be called
+      type: ReducerType.asyncThunk, // 需要匹配reducer类型，以便可以调用正确的处理器
       payloadCreator,
       ...config,
     }
   },
   handle(
     {
-      // the key the reducer was defined under
+      // 定义reducer的键
       reducerName,
-      // the autogenerated action type, i.e. `${slice.name}/${reducerName}`
+      // 自动生成的动作类型，即`${slice.name}/${reducerName}`
       type,
     },
-    // the definition from define()
+    // 来自define()的定义
     definition,
-    // methods to modify slice
+    // 修改slice的方法
     context,
   ) {
     const { payloadCreator, options, pending, fulfilled, rejected, settled } =
@@ -955,11 +947,11 @@ const createSlice = buildCreateSlice({
 })
 ```
 
-We're not sure how many people/libraries would actually make use of this though, so any feedback over on the [Github issue](https://github.com/reduxjs/redux-toolkit/issues/3837) is welcome!
+我们不确定有多少人/库会真正使用这个，所以欢迎在[Github issue](https://github.com/reduxjs/redux-toolkit/issues/3837)上提供任何反馈！
 
-### `createSlice.selector` selector factories
+### `createSlice.selector` 选择器工厂
 
-There have been some concerns raised internally about whether `createSlice.selectors` supports memoized selectors sufficiently. You can provide a memoized selector to your `createSlice.selectors` configuration, but you're stuck with that one instance.
+关于 `createSlice.selectors` 是否足够支持记忆选择器，我们内部提出了一些疑虑。你可以向你的 `createSlice.selectors` 配置提供一个记忆选择器，但你只能使用那一个实例。
 
 ```ts
 const todoSlice = createSlice({
@@ -969,7 +961,7 @@ const todoSlice = createSlice({
   },
   reducers: {},
   selectors: {
-    selectTodosByAuthor = createSelector(
+    selectTodosByAuthor: createSelector(
       (state: TodoState) => state.todos,
       (state: TodoState, author: string) => author,
       (todos, author) => todos.filter((todo) => todo.author === author),
@@ -980,7 +972,7 @@ const todoSlice = createSlice({
 export const { selectTodosByAuthor } = todoSlice.selectors
 ```
 
-With `createSelector`'s default cache size of 1, this can cause caching issues if called in multiple components with different arguments. One typical solution for this (without `createSlice`) is a [selector factory](https://redux.js.org/usage/deriving-data-selectors#creating-unique-selector-instances):
+使用 `createSelector` 的默认缓存大小为1，如果在多个组件中使用不同的参数调用，可能会导致缓存问题。对此的一个典型解决方案（不使用 `createSlice`）是[选择器工厂](https://redux.js.org/usage/deriving-data-selectors#creating-unique-selector-instances)：
 
 ```ts
 export const makeSelectTodosByAuthor = () =>
@@ -996,14 +988,12 @@ function AuthorTodos({ author }: { author: string }) {
 }
 ```
 
-Of course, with `createSlice.selectors` this is no longer possible, as you need the selector instance when creating your slice.
+当然，使用 `createSlice.selectors`，这就不再可能了，因为你在创建切片时需要选择器实例。
 
-In 2.0.0 we have no set solution for this - a few APIs have been floated ([PR 1](https://github.com/reduxjs/redux-toolkit/pull/3671), [PR 2](https://github.com/reduxjs/redux-toolkit/pull/3836)) but nothing was decided upon. If this is something you'd like to see supported, consider providing feedback in the [Github discussion](https://github.com/reduxjs/redux-toolkit/discussions/3387)!
+在2.0.0版本中，我们没有为此设置解决方案 - 提出了一些API（[PR 1](https://github.com/reduxjs/redux-toolkit/pull/3671)，[PR 2](https://github.com/reduxjs/redux-toolkit/pull/3836)），但没有做出决定。如果你希望看到对此的支持，请考虑在 [Github 讨论](https://github.com/reduxjs/redux-toolkit/discussions/3387)中提供反馈！
 
-### 3.0 - RTK Query
+### 3.0 - RTK 查询
 
-RTK 2.0 was largely focused on core and toolkit changes. Now that 2.0 is released, we would like to shift our focus to RTK Query, as there are still some rough edges to iron out - some of which may require breaking changes, necessitating a 3.0 release.
+RTK 2.0 主要关注核心和工具箱的变化。现在2.0已经发布，我们希望将注意力转向 RTK 查询，因为还有一些需要解决的粗糙边缘 - 其中一些可能需要破坏性的变化，需要发布3.0版本。
 
-If you have any feedback for what that could look like, please consider chiming in at the [RTK Query API pain points and rough spots feedback thread](https://github.com/reduxjs/redux-toolkit/issues/3692)!
-
-</div>
+如果你对这可能是什么样的有任何反馈，请考虑在 [RTK 查询 API 痛点和粗糙点反馈线程](https://github.com/reduxjs/redux-toolkit/issues/3692)中发表意见！

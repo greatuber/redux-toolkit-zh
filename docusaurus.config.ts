@@ -32,7 +32,7 @@ const config: Config = {
           editUrl:
             "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
           include: [
-            "{api,assets,introduction,migrations,rtk-query,tutorials,usage}/**/*.{md,mdx}",
+            "{api,assets,introduction,migrations,rtk-query,tutorials,usage,reselect}/**/*.{md,mdx}",
           ],
           remarkPlugins: [
             [
@@ -88,6 +88,12 @@ const config: Config = {
           href: "https://github.com/ouweiya/redux-toolkit-zh",
           label: "GitHub",
           position: "right",
+        },
+        {
+          type: 'docSidebar',
+          position: 'right',
+          sidebarId: 'reselect',
+          label: 'Reselect',
         },
       ],
     },
