@@ -28,15 +28,15 @@ const sidebars: SidebarsConfig = {
       label: "使用 Redux Toolkit",
       collapsed: false,
       items: [
+        "usage/usage-guide",
+        "usage/usage-with-typescript",
+        "usage/immer-reducers",
+        "usage/nextjs",
         {
           type: "category",
           label: "迁移",
           items: ["usage/migrating-to-modern-redux", "usage/migrating-rtk-2"],
         },
-        "usage/usage-guide",
-        "usage/usage-with-typescript",
-        "usage/immer-reducers",
-        "usage/nextjs",
       ],
     },
     {
@@ -154,7 +154,7 @@ const sidebars: SidebarsConfig = {
     {
       type: "category",
       collapsed: false,
-      label: "Introduction",
+      label: "介绍",
       items: [
         "reselect/introduction/getting-started",
         "reselect/introduction/how-does-reselect-work",
@@ -163,7 +163,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Using Reselect",
+      label: "使用 Reselect",
       collapsed: false,
       items: [
         "reselect/usage/best-practices",
@@ -183,7 +183,7 @@ const sidebars: SidebarsConfig = {
         {
           type: "category",
           collapsed: false,
-          label: "Memoization Functions",
+          label: "记忆化函数",
           items: [
             "reselect/api/lruMemoize",
             "reselect/api/weakMapMemoize",
