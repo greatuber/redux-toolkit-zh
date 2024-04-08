@@ -24,7 +24,7 @@ console.log(nanoid())
 
 ### `miniSerializeError`
 
-`createAsyncThunk` 使用的默认错误序列化函数，基于 https://github.com/sindresorhus/serialize-error。如果其参数是一个对象（如 `Error` 实例），它返回一个复制了任何列出字段的普通 JS `SerializedError` 对象。否则，它返回值的字符串形式：`{ message: String(value) }`。
+`createAsyncThunk` 使用的默认错误序列化函数，基于 https://github.com/sindresorhus/serialize-error 。如果其参数是一个对象（如 `Error` 实例），它返回一个复制了任何列出字段的普通 JS `SerializedError` 对象。否则，它返回值的字符串形式：`{ message: String(value) }`。
 
 ```ts no-transpile
 export interface SerializedError {
