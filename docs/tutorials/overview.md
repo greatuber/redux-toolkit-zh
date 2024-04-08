@@ -13,7 +13,7 @@ import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 
 # 教程概览
 
-**Redux核心文档网站[cn.redux.js.org](https://cn.cn.redux.js.org)包含了学习Redux的主要教程**，包括如何将Redux Toolkit和React-Redux一起使用。
+**Redux核心文档网站[cn.redux.js.org](https://cn.redux.js.org)包含了学习Redux的主要教程**，包括如何将Redux Toolkit和React-Redux一起使用。
 
 :::tip
 
