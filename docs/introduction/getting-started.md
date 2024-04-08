@@ -110,8 +110,7 @@ RTK 查询包含在核心 Redux Toolkit 包的安装中。它可以通过以下�
 ```ts no-transpile
 import { createApi } from '@reduxjs/toolkit/query'
 
-/* React-specific entry point that automatically generates
-   hooks corresponding to the defined endpoints */
+/* React 特定的入口点，自动生成对应于定义的端点的钩子 */
 import { createApi } from '@reduxjs/toolkit/query/react'
 ```
 

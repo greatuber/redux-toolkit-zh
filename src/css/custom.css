@@ -289,18 +289,18 @@ nav.menu {
 }
 
 .thin-scrollbar {
-  scrollbar-width: auto;
+  scrollbar-width: auto !important;
 }
 
-::-webkit-scrollbar-thumb {
+.thin-scrollbar::-webkit-scrollbar-thumb {
   border-radius: 0 !important;
 }
 
-::-webkit-scrollbar-track {
+.thin-scrollbar::-webkit-scrollbar-track {
   border-radius: 0 !important;
 }
 
-::-webkit-scrollbar {
+.thin-scrollbar::-webkit-scrollbar {
   width: 13px !important;
 }
 
