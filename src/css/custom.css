@@ -308,3 +308,8 @@ nav.menu {
   --ifm-scrollbar-thumb-background-color: #d4d4d4;
   --ifm-scrollbar-thumb-hover-background-color: #c4c4c4;
 }
+
+html[data-theme="dark"] {
+  --ifm-scrollbar-thumb-background-color: #575757;
+  --ifm-scrollbar-thumb-hover-background-color: #666666;
+}
