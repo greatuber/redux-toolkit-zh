@@ -19,7 +19,7 @@ hide_title: true
 
 - 熟悉 [ES6 语法和特性](https://www.taniarascia.com/es6-syntax-and-feature-overview/)
 - 了解 React 术语：[JSX](https://reactjs.org/docs/introducing-jsx.html)，[State](https://reactjs.org/docs/state-and-lifecycle.html)，[函数组件，Props](https://reactjs.org/docs/components-and-props.html) 和 [Hooks](https://reactjs.org/docs/hooks-intro.html)
-- 理解 [Redux 术语和概念](https://redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow)
+- 理解 [Redux 术语和概念](https://cn.redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow)
 
 :::
 
@@ -108,7 +108,7 @@ ReactDOM.render(
 
 创建一个 slice 需要一个字符串名来标识 slice，一个初始状态值，以及一个或多个 reducer 函数来定义状态如何被更新。一旦创建了一个 slice，我们可以导出生成的 Redux action 创建器和整个 slice 的 reducer 函数。
 
-Redux 要求我们[通过复制数据并更新副本来不可变地编写所有状态更新](https://redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow#immutability)。然而，Redux Toolkit 的 `createSlice` 和 `createReducer` API 内部使用 [Immer](https://immerjs.github.io/immer/)，允许我们[编写"变异"更新逻辑，这将变成正确的不可变更新](https://redux.js.org/tutorials/fundamentals/part-8-modern-redux#immutable-updates-with-immer)。
+Redux 要求我们[通过复制数据并更新副本来不可变地编写所有状态更新](https://cn.redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow#immutability)。然而，Redux Toolkit 的 `createSlice` 和 `createReducer` API 内部使用 [Immer](https://immerjs.github.io/immer/)，允许我们[编写"变异"更新逻辑，这将变成正确的不可变更新](https://cn.redux.js.org/tutorials/fundamentals/part-8-modern-redux#immutable-updates-with-immer)。
 
 ```ts title="features/counter/counterSlice.js"
 import { createSlice } from '@reduxjs/toolkit'
@@ -304,4 +304,4 @@ export function Counter() {
 
 ## 下一步是什么？
 
-我们建议你阅读 [**Redux 核心文档中的 "Redux Essentials" 和 "Redux Fundamentals" 教程**](https://redux.js.org/tutorials/index)，这将给你一个完整的理解 Redux 如何工作，Redux Toolkit 是什么，以及如何正确使用它。
+我们建议你阅读 [**Redux 核心文档中的 "Redux Essentials" 和 "Redux Fundamentals" 教程**](https://cn.redux.js.org/tutorials/index)，这将给你一个完整的理解 Redux 如何工作，Redux Toolkit 是什么，以及如何正确使用它。

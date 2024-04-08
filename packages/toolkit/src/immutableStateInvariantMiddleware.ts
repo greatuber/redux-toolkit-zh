@@ -135,12 +135,12 @@ export interface ImmutableStateInvariantMiddlewareOptions {
   /**
     Callback function to check if a value is considered to be immutable.
     This function is applied recursively to every value contained in the state.
-    The default implementation will return true for primitive types 
+    The default implementation will return true for primitive types
     (like numbers, strings, booleans, null and undefined).
    */
   isImmutable?: IsImmutableFunc
-  /** 
-    An array of dot-separated path strings that match named nodes from 
+  /**
+    An array of dot-separated path strings that match named nodes from
     the root state to ignore when checking for immutability.
     Defaults to undefined
    */
@@ -230,7 +230,7 @@ export function createImmutableStateInvariantMiddleware(
             throw new Error(
               `A state mutation was detected between dispatches, in the path '${
                 result.path || ''
-              }'.  This may cause incorrect behavior. (https://redux.js.org/style-guide/style-guide#do-not-mutate-state)`,
+              }'.  This may cause incorrect behavior. (https://cn.redux.js.org/style-guide/style-guide#do-not-mutate-state)`,
             )
           }
         })
@@ -250,7 +250,7 @@ export function createImmutableStateInvariantMiddleware(
                 result.path || ''
               }. Take a look at the reducer(s) handling the action ${stringify(
                 action,
-              )}. (https://redux.js.org/style-guide/style-guide#do-not-mutate-state)`,
+              )}. (https://cn.redux.js.org/style-guide/style-guide#do-not-mutate-state)`,
             )
           }
         })

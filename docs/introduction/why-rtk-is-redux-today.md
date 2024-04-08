@@ -7,22 +7,22 @@ description: 'Introduction > Why RTK is Redux Today: details on how RTK replaces
 
 ## 什么是 Redux Toolkit？
 
-[**Redux Toolkit**](https://ouweiya.github.io/redux-toolkit-zh)（也被简称为 **"RTK"**）是我们官方推荐的编写 Redux 逻辑的方法。`@reduxjs/toolkit` 包装了核心的 `redux` 包，并包含我们认为构建 Redux 应用所必需的 API 方法和常见依赖。Redux Toolkit 内置了我们建议的最佳实践，简化了大多数 Redux 任务，防止了常见错误，使编写 Redux 应用更加容易。
+[**Redux Toolkit**](/redux-toolkit-zh)（也被简称为 **"RTK"**）是我们官方推荐的编写 Redux 逻辑的方法。`@reduxjs/toolkit` 包装了核心的 `redux` 包，并包含我们认为构建 Redux 应用所必需的 API 方法和常见依赖。Redux Toolkit 内置了我们建议的最佳实践，简化了大多数 Redux 任务，防止了常见错误，使编写 Redux 应用更加容易。
 
 **如果你今天正在编写任何 Redux 逻辑，你应该使用 Redux Toolkit 来编写那些代码！**
 
-RTK 包含了帮助简化许多常见用例的实用工具，包括[设置 store](https://ouweiya.github.io/redux-toolkit-zh/api/configureStore)，
-[创建 reducers 和编写不可变的更新逻辑](https://ouweiya.github.io/redux-toolkit-zh/api/createreducer)，
-甚至[一次性创建整个 "slices" 的状态](https://ouweiya.github.io/redux-toolkit-zh/api/createslice)。
+RTK 包含了帮助简化许多常见用例的实用工具，包括[设置 store](/redux-toolkit-zh/api/configureStore)，
+[创建 reducers 和编写不可变的更新逻辑](/redux-toolkit-zh/api/createreducer)，
+甚至[一次性创建整个 "slices" 的状态](/redux-toolkit-zh/api/createslice)。
 
-无论你是刚开始使用 Redux 的新用户，还是想要简化现有应用的经验丰富的用户，**[Redux Toolkit](https://ouweiya.github.io/redux-toolkit-zh/)** 都可以帮助你改进你的 Redux 代码。
+无论你是刚开始使用 Redux 的新用户，还是想要简化现有应用的经验丰富的用户，**[Redux Toolkit](/redux-toolkit-zh/)** 都可以帮助你改进你的 Redux 代码。
 
 :::tip
 
 查看这些页面，了解如何使用 Redux Toolkit 进行 "现代 Redux" 编程：
 
-- [**"Redux 基础" 教程**](https://redux.js.org/tutorials/essentials/part-1-overview-concepts)，教你如何在实际应用中使用 Redux Toolkit 进行 "正确的" Redux 编程，
-- [**Redux 基础，第8部分：使用 Redux Toolkit 的现代 Redux**](https://redux.js.org/tutorials/fundamentals/part-8-modern-redux)，展示如何将教程前面部分的低级示例转换为现代 Redux Toolkit 等效项
+- [**"Redux 基础" 教程**](https://cn.redux.js.org/tutorials/essentials/part-1-overview-concepts)，教你如何在实际应用中使用 Redux Toolkit 进行 "正确的" Redux 编程，
+- [**Redux 基础，第8部分：使用 Redux Toolkit 的现代 Redux**](https://cn.redux.js.org/tutorials/fundamentals/part-8-modern-redux)，展示如何将教程前面部分的低级示例转换为现代 Redux Toolkit 等效项
 - [**使用 Redux：迁移到现代 Redux**](../usage/migrating-to-modern-redux.mdx)，介绍如何将不同类型的旧版 Redux 逻辑迁移到现代 Redux 等效项
 
 :::
@@ -39,7 +39,7 @@ Redux 实际上是：
 - 当应用发生某些事情时，向 store 分发纯对象操作
 - 纯 reducer 函数查看这些操作并返回不可变更新的状态
 
-虽然不是必需的，但[你的 Redux 代码通常也包括](https://redux.js.org/tutorials/fundamentals/part-7-standard-patterns)：
+虽然不是必需的，但[你的 Redux 代码通常也包括](https://cn.redux.js.org/tutorials/fundamentals/part-7-standard-patterns)：
 
 - 生成这些操作对象的操作创建器
 - 启用副作用的中间件
@@ -231,7 +231,7 @@ export const store = configureStore({
 
 **`redux` 核心包仍然可以工作，但今天我们认为它已经过时**。所有的 API 也都从 `@reduxjs/toolkit` 中重新导出，`configureStore` 做了 `createStore` 所做的所有事情，但具有更好的默认行为和可配置性。
 
-理解低级概念 _是_ 有用的，这样你就能更好地理解 Redux Toolkit 为你做了什么。这就是为什么[“Redux 基础”教程展示了 Redux 如何工作，没有任何抽象](https://redux.js.org/tutorials/fundamentals/part-1-overview)。_但是_，它仅仅作为一个学习工具展示了这些例子，并最后展示了 Redux Toolkit 如何简化旧的手写 Redux 代码。
+理解低级概念 _是_ 有用的，这样你就能更好地理解 Redux Toolkit 为你做了什么。这就是为什么[“Redux 基础”教程展示了 Redux 如何工作，没有任何抽象](https://cn.redux.js.org/tutorials/fundamentals/part-1-overview)。_但是_，它仅仅作为一个学习工具展示了这些例子，并最后展示了 Redux Toolkit 如何简化旧的手写 Redux 代码。
 
 如果你正在单独使用 `redux` 核心包，你的代码将继续工作。**但是，我们强烈建议你切换到 `@reduxjs/toolkit`，并更新你的代码以使用 Redux Toolkit API！**
 
@@ -239,8 +239,8 @@ export const store = configureStore({
 
 查看这些文档页面和博客文章以获取更多详细信息
 
-- [Redux 基础：Redux Toolkit 应用结构](https://redux.js.org/tutorials/essentials/part-2-app-structure)
-- [Redux 基础：现代 Redux 与 Redux Toolkit](https://redux.js.org/tutorials/fundamentals/part-8-modern-redux)
-- [Redux 风格指南：最佳实践和推荐](https://redux.js.org/style-guide/)
+- [Redux 基础：Redux Toolkit 应用结构](https://cn.redux.js.org/tutorials/essentials/part-2-app-structure)
+- [Redux 基础：现代 Redux 与 Redux Toolkit](https://cn.redux.js.org/tutorials/fundamentals/part-8-modern-redux)
+- [Redux 风格指南：最佳实践和推荐](https://cn.redux.js.org/style-guide/)
 - [演示：现代 Redux 与 Redux Toolkit](https://blog.isquaredsoftware.com/2022/06/presentations-modern-redux-rtk/)
 - [Mark Erikson：Redux Toolkit 1.0 公告和开发历史](https://blog.isquaredsoftware.com/2019/10/redux-toolkit-1.0/)

@@ -213,7 +213,7 @@ const api = createApi({
 
 ### 通用更新
 
-如果你发现自己想在应用程序的其他地方更新缓存数据，只要你能访问到 `store.dispatch` 方法，包括在 React 组件中通过 [useDispatch](https://react-redux.js.org/api/hooks#usedispatch) 钩子（或者对于 TypeScript 用户，如 [useAppDispatch](https://react-redux.js.org/using-react-redux/usage-with-typescript#define-typed-hooks) 的类型版本）就可以做到。
+如果你发现自己想在应用程序的其他地方更新缓存数据，只要你能访问到 `store.dispatch` 方法，包括在 React 组件中通过 [useDispatch](https://react-cn.redux.js.org/api/hooks#usedispatch) 钩子（或者对于 TypeScript 用户，如 [useAppDispatch](https://react-cn.redux.js.org/using-react-redux/usage-with-typescript#define-typed-hooks) 的类型版本）就可以做到。
 
 :::info
 你应该通常避免在 `onQueryStarted` 回调之外的变异中手动更新缓存，除非有充分的理由，因为 RTK Query 的使用方式是将你的缓存数据视为服务器端状态的反映。

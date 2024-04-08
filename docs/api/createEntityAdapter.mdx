@@ -11,14 +11,14 @@ hide_title: true
 
 ## 概述
 
-一个生成一组预构建的 reducers 和 selectors 的函数，用于对包含特定类型数据对象实例的[规范化状态结构](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape)进行 CRUD 操作。这些 reducer 函数可以作为 case reducers 传递给 `createReducer` 和 `createSlice`。它们也可以在 `createReducer` 和 `createSlice` 内部用作 "mutating" 辅助函数。
+一个生成一组预构建的 reducers 和 selectors 的函数，用于对包含特定类型数据对象实例的[规范化状态结构](https://cn.redux.js.org/recipes/structuring-reducers/normalizing-state-shape)进行 CRUD 操作。这些 reducer 函数可以作为 case reducers 传递给 `createReducer` 和 `createSlice`。它们也可以在 `createReducer` 和 `createSlice` 内部用作 "mutating" 辅助函数。
 
 此 API 是从由 NgRx 维护者创建的 [`@ngrx/entity` 库](https://ngrx.io/guide/entity)移植过来的，但已经为 Redux Toolkit 的使用进行了大幅修改。我们要感谢 NgRx 团队最初创建了这个 API，并允许我们移植和适应它以满足我们的需求。
 
 :::note
 术语 "Entity" 用于指代应用中的一种独特类型的数据对象。例如，在一个博客应用中，你可能有 `User`、`Post` 和 `Comment` 数据对象，每种对象都有许多实例存储在客户端并持久化在服务器上。`User` 就是一个 "entity" - 应用使用的一种独特类型的数据对象。每个独特的实体实例都被假定在特定字段中有一个独特的 ID 值。
 
-与所有 Redux 逻辑一样，[_只有_普通的 JS 对象和数组应该被传入到 store - **不要使用类实例！**](https://redux.js.org/style-guide/style-guide#do-not-put-non-serializable-values-in-state-or-actions)
+与所有 Redux 逻辑一样，[_只有_普通的 JS 对象和数组应该被传入到 store - **不要使用类实例！**](https://cn.redux.js.org/style-guide/style-guide#do-not-put-non-serializable-values-in-state-or-actions)
 
 为了这个参考的目的，我们将使用 `Entity` 来指代由 Redux 状态树的特定部分的 reducer 逻辑管理的特定数据类型，使用 `entity` 来指代该类型的单个实例。例如：在 `state.users` 中，`Entity` 将指代 `User` 类型，`state.users.entities[123]` 将是一个 `entity`。
 :::

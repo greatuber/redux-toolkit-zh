@@ -110,7 +110,7 @@ interface CombinedSliceReducer<InitialState, DeclaredState = InitialState>
 
 ### `withLazyLoadedSlices`
 
-建议从你的 store [推断你的 RootState 类型](https://redux.js.org/usage/usage-with-typescript#define-root-state-and-dispatch-types)，这是从 reducer 推断出来的。然而，如果切片是懒加载的，那么就无法从中推断出来。
+建议从你的 store [推断你的 RootState 类型](https://cn.redux.js.org/usage/usage-with-typescript#define-root-state-and-dispatch-types)，这是从 reducer 推断出来的。然而，如果切片是懒加载的，那么就无法从中推断出来。
 
 `withLazyLoadedSlices` 允许你声明将在后面添加到状态的切片，这将包含在最终的状态类型中。
 

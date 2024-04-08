@@ -30,7 +30,7 @@ Redux Toolkit 导出了几个你可以在你的应用程序中使用的单独函
 
 ### 手动存储设置
 
-以下示例来自 Redux 文档的 [配置你的存储](https://redux.js.org/recipes/configuring-your-store) 页面，显示了一个典型的存储设置过程：
+以下示例来自 Redux 文档的 [配置你的存储](https://cn.redux.js.org/recipes/configuring-your-store) 页面，显示了一个典型的存储设置过程：
 
 ```js
 import { applyMiddleware, createStore } from 'redux'
@@ -92,7 +92,7 @@ const store = configureStore({
 export default store
 ```
 
-你也可以传递一个充满 ["slice reducers"](https://redux.js.org/recipes/structuring-reducers/splitting-reducer-logic) 的对象，`configureStore` 将为你调用 [`combineReducers`](https://redux.js.org/api/combinereducers)：
+你也可以传递一个充满 ["slice reducers"](https://cn.redux.js.org/recipes/structuring-reducers/splitting-reducer-logic) 的对象，`configureStore` 将为你调用 [`combineReducers`](https://cn.redux.js.org/api/combinereducers)：
 
 ```js
 import { configureStore } from '@reduxjs/toolkit'
@@ -146,14 +146,14 @@ export default function configureAppStore(preloadedState) {
 
 ## 编写 Reducers
 
-[Reducers](https://redux.js.org/basics/reducers) 是 Redux 最重要的概念。典型的 reducer 函数需要：
+[Reducers](https://cn.redux.js.org/basics/reducers) 是 Redux 最重要的概念。典型的 reducer 函数需要：
 
 - 查看 action 对象的 `type` 字段以了解如何响应
 - 通过复制需要更改的状态部分并仅修改这些副本，以不可变的方式更新其状态
 
-虽然你可以在 reducer 中[使用任何你想要的条件逻辑](https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-2/#switch-statements)，但最常见的方法是 `switch` 语句，因为它是处理单个字段的多个可能值的直接方式。然而，许多人不喜欢 switch 语句。Redux 文档展示了一个[编写一个基于 action 类型的查找表函数](https://redux.js.org/recipes/reducing-boilerplate#generating-reducers)的例子，但将自定义该函数的方式留给了用户。
+虽然你可以在 reducer 中[使用任何你想要的条件逻辑](https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-2/#switch-statements)，但最常见的方法是 `switch` 语句，因为它是处理单个字段的多个可能值的直接方式。然而，许多人不喜欢 switch 语句。Redux 文档展示了一个[编写一个基于 action 类型的查找表函数](https://cn.redux.js.org/recipes/reducing-boilerplate#generating-reducers)的例子，但将自定义该函数的方式留给了用户。
 
-编写 reducers 的其他常见痛点与不可变地更新状态有关。JavaScript 是一种可变语言，[手动更新嵌套的不可变数据很难](https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns)，而且很容易犯错误。
+编写 reducers 的其他常见痛点与不可变地更新状态有关。JavaScript 是一种可变语言，[手动更新嵌套的不可变数据很难](https://cn.redux.js.org/recipes/structuring-reducers/immutable-update-patterns)，而且很容易犯错误。
 
 ### 使用 `createReducer` 简化 Reducers
 
@@ -522,14 +522,14 @@ export default reducer
 
 本身，Redux存储并不知道任何关于异步逻辑的事情。它只知道如何同步地分派动作，通过调用根reducer函数更新状态，并通知UI有些东西已经改变。任何异步性都必须在存储之外发生。
 
-但是，如果你想让异步逻辑通过分派或检查当前存储状态与存储进行交互呢？这就是[Redux中间件](https://redux.js.org/advanced/middleware)的作用。它们扩展了存储，并允许你：
+但是，如果你想让异步逻辑通过分派或检查当前存储状态与存储进行交互呢？这就是[Redux中间件](https://cn.redux.js.org/advanced/middleware)的作用。它们扩展了存储，并允许你：
 
 - 当任何动作被分派时执行额外的逻辑（如记录动作和状态）
 - 暂停、修改、延迟、替换或阻止分派的动作
 - 编写有权访问 `dispatch` 和 `getState` 的额外代码
 - 通过拦截它们并分派真正的动作对象，教 `dispatch` 如何接受除纯动作对象之外的其他值，如函数和承诺
 
-[使用中间件的最常见原因是允许不同类型的异步逻辑与存储进行交互](https://redux.js.org/faq/actions#how-can-i-represent-side-effects-such-as-ajax-calls-why-do-we-need-things-like-action-creators-thunks-and-middleware-to-do-async-behavior)。这允许你编写可以分派动作和检查存储状态的代码，同时将该逻辑与你的UI保持分离。
+[使用中间件的最常见原因是允许不同类型的异步逻辑与存储进行交互](https://cn.redux.js.org/faq/actions#how-can-i-represent-side-effects-such-as-ajax-calls-why-do-we-need-things-like-action-creators-thunks-and-middleware-to-do-async-behavior)。这允许你编写可以分派动作和检查存储状态的代码，同时将该逻辑与你的UI保持分离。
 
 Redux有许多种异步中间件，每种都让你使用不同的语法编写你的逻辑。最常见的异步中间件有：
 
@@ -537,7 +537,7 @@ Redux有许多种异步中间件，每种都让你使用不同的语法编写你
 - [`redux-saga`](https://github.com/redux-saga/redux-saga)，它使用生成器函数返回行为描述，以便中间件可以执行
 - [`redux-observable`](https://github.com/redux-observable/redux-observable/)，它使用RxJS可观察库创建处理动作的函数链
 
-[这些库各有不同的用例和权衡](https://redux.js.org/faq/actions#what-async-middleware-should-i-use-how-do-you-decide-between-thunks-sagas-observables-or-something-else)。
+[这些库各有不同的用例和权衡](https://cn.redux.js.org/faq/actions#what-async-middleware-should-i-use-how-do-you-decide-between-thunks-sagas-observables-or-something-else)。
 
 :::tip
 
@@ -604,7 +604,7 @@ Redux 的数据获取逻辑通常遵循一个可预测的模式：
 - 执行异步请求
 - 根据请求结果，异步逻辑会派发一个包含结果数据的 "success" 动作，或者一个包含错误详情的 "failure" 动作。在这两种情况下，reducer 逻辑都会清除加载状态，并处理成功情况下的结果数据，或者存储错误值以供可能的显示。
 
-这些步骤不是必需的，但是[在 Redux 教程中推荐作为建议的模式](https://redux.js.org/advanced/async-actions)。
+这些步骤不是必需的，但是[在 Redux 教程中推荐作为建议的模式](https://cn.redux.js.org/advanced/async-actions)。
 
 一个典型的实现可能看起来像这样：
 
@@ -696,7 +696,7 @@ interface ThunkAPI {
 
 ## 管理规范化数据
 
-大多数应用程序通常处理的数据是深层嵌套的或关系型的。规范化数据的目标是有效地组织你的状态中的数据。这通常是通过将集合存储为带有 `id` 键的对象，同时存储那些 `ids` 的排序数组来完成的。关于更深入的解释和更多的例子，[Redux 文档页面上的 "Normalizing State Shape"](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape) 是一个很好的参考。
+大多数应用程序通常处理的数据是深层嵌套的或关系型的。规范化数据的目标是有效地组织你的状态中的数据。这通常是通过将集合存储为带有 `id` 键的对象，同时存储那些 `ids` 的排序数组来完成的。关于更深入的解释和更多的例子，[Redux 文档页面上的 "Normalizing State Shape"](https://cn.redux.js.org/recipes/structuring-reducers/normalizing-state-shape) 是一个很好的参考。
 
 ### 手动规范化
 
@@ -1017,7 +1017,7 @@ export const usersAdapter = createEntityAdapter({
 
 ## 处理非序列化数据
 
-Redux 的一个核心使用原则是[你不应该在状态或动作中放入非序列化的值](https://redux.js.org/style-guide/#do-not-put-non-serializable-values-in-state-or-actions)。
+Redux 的一个核心使用原则是[你不应该在状态或动作中放入非序列化的值](https://cn.redux.js.org/style-guide/#do-not-put-non-serializable-values-in-state-or-actions)。
 
 然而，像大多数规则一样，总有例外。可能有时候你需要处理需要接受非序列化数据的动作。这应该非常少见，只有在必要时才这样做，而且这些非序列化的有效载荷不应该通过 reducer 进入你的应用状态。
 

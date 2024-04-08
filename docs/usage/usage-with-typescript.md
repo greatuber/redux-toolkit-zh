@@ -149,7 +149,7 @@ configureStore({
 
 ### 使用提取的 `Dispatch` 类型与 React Redux
 
-默认情况下，React Redux 的 `useDispatch` 钩子不包含考虑到中间件的任何类型。如果你在分派时需要 `dispatch` 函数的更具体类型，你可以指定返回的 `dispatch` 函数的类型，或创建一个自定义类型的 `useSelector`。详见 [React Redux 文档](https://react-redux.js.org/using-react-redux/static-typing#typing-the-usedispatch-hook)。
+默认情况下，React Redux 的 `useDispatch` 钩子不包含考虑到中间件的任何类型。如果你在分派时需要 `dispatch` 函数的更具体类型，你可以指定返回的 `dispatch` 函数的类型，或创建一个自定义类型的 `useSelector`。详见 [React Redux 文档](https://react-cn.redux.js.org/using-react-redux/static-typing#typing-the-usedispatch-hook)。
 
 ## `createAction`
 
@@ -462,7 +462,7 @@ reducers: (create) => {
 
 ### 包装 `createSlice`
 
-如果你需要重用 reducer 逻辑，通常会编写["高阶 reducers"](https://redux.js.org/recipes/structuring-reducers/reusing-reducer-logic#customizing-behavior-with-higher-order-reducers) 来用额外的公共行为包装一个 reducer 函数。这也可以用 `createSlice` 来完成，但由于 `createSlice` 的类型复杂性，你必须以非常特定的方式使用 `SliceCaseReducers` 和 `ValidateSliceCaseReducers` 类型。
+如果你需要重用 reducer 逻辑，通常会编写["高阶 reducers"](https://cn.redux.js.org/recipes/structuring-reducers/reusing-reducer-logic#customizing-behavior-with-higher-order-reducers) 来用额外的公共行为包装一个 reducer 函数。这也可以用 `createSlice` 来完成，但由于 `createSlice` 的类型复杂性，你必须以非常特定的方式使用 `SliceCaseReducers` 和 `ValidateSliceCaseReducers` 类型。
 
 下面是一个这样的"通用"包装 `createSlice` 调用的例子：
 

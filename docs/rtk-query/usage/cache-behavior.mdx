@@ -399,7 +399,7 @@ RTK Query 故意**不实现一个可以在多个请求之间去重相同项目�
 
 在一个完全规范化的去重缓存中，只会存储这个 Todo 对象的一个副本。然而，RTK Query 在缓存中独立保存每个查询结果。所以，这会导致在 Redux 存储中缓存三个独立的 Todo 副本。然而，如果所有的端点都一致地提供相同的标签（如 `{type: 'Todo', id: 1}`），那么使该标签无效将强制所有匹配的端点重新获取他们的数据以保持一致性。
 
-Redux 文档一直推荐[在规范化的查找表中保持数据](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape)，以便轻松地通过 ID 找到项目并在存储中更新它们，而 [RTK 的 `createEntityAdapter`](../../api/createEntityAdapter.mdx) 被设计用来帮助管理规范化的状态。这些概念仍然有价值，不会消失。然而，如果你正在使用 RTK Query 来管理缓存数据，那么你自己操作数据的需求就会减少。
+Redux 文档一直推荐[在规范化的查找表中保持数据](https://cn.redux.js.org/recipes/structuring-reducers/normalizing-state-shape)，以便轻松地通过 ID 找到项目并在存储中更新它们，而 [RTK 的 `createEntityAdapter`](../../api/createEntityAdapter.mdx) 被设计用来帮助管理规范化的状态。这些概念仍然有价值，不会消失。然而，如果你正在使用 RTK Query 来管理缓存数据，那么你自己操作数据的需求就会减少。
 
 这里还有一些可以帮助的额外点：
 

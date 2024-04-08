@@ -16,7 +16,7 @@ import TabItem from '@theme/TabItem';
 
 ## 目的
 
-**Redux Toolkit** 包旨在成为编写 [Redux](https://redux.js.org) 逻辑的标准方式。它最初是为了解决 Redux 的三个常见问题而创建的：
+**Redux Toolkit** 包旨在成为编写 [Redux](https://cn.redux.js.org) 逻辑的标准方式。它最初是为了解决 Redux 的三个常见问题而创建的：
 
 - "配置 Redux 商店太复杂"
 - "我必须添加很多包才能让 Redux 做出有用的事情"
@@ -103,7 +103,7 @@ Redux Toolkit 包含以下 API：
 
 [**RTK 查询**](../rtk-query/overview.md) 是作为 `@reduxjs/toolkit` 包内的可选插件提供的。它专为解决数据获取和缓存的用例而构建，为你的应用提供一个定义 API 接口层的紧凑而强大的工具集。它旨在简化在 web 应用中加载数据的常见情况，消除手动编写数据获取和缓存逻辑的需要。
 
-RTK 查询基于 Redux Toolkit 核心进行构建，内部使用 [Redux](https://redux.js.org/) 作为其架构。虽然使用 RTK 查询不需要了解 Redux 和 RTK，但你应该探索它们提供的所有额外的全局存储管理能力，以及安装 [Redux DevTools 浏览器扩展](https://github.com/reduxjs/redux-devtools)，它与 RTK 查询完美配合，可以遍历和重播你的请求和缓存行为的时间线。
+RTK 查询基于 Redux Toolkit 核心进行构建，内部使用 [Redux](https://cn.redux.js.org/) 作为其架构。虽然使用 RTK 查询不需要了解 Redux 和 RTK，但你应该探索它们提供的所有额外的全局存储管理能力，以及安装 [Redux DevTools 浏览器扩展](https://github.com/reduxjs/redux-devtools)，它与 RTK 查询完美配合，可以遍历和重播你的请求和缓存行为的时间线。
 
 RTK 查询包含在核心 Redux Toolkit 包的安装中。它可以通过以下两个入口点之一使用：
 
@@ -132,11 +132,11 @@ RTK 查询包括以下 API：
 
 ### Redux 基础教程
 
-[**Redux 基础教程**](https://redux.js.org/tutorials/essentials/part-1-overview-concepts) 是一个"自上而下"的教程，教授"如何正确使用 Redux"，使用我们最新推荐的 API 和最佳实践。我们建议从这里开始。
+[**Redux 基础教程**](https://cn.redux.js.org/tutorials/essentials/part-1-overview-concepts) 是一个"自上而下"的教程，教授"如何正确使用 Redux"，使用我们最新推荐的 API 和最佳实践。我们建议从这里开始。
 
 ### Redux 基础教程
 
-[**Redux 基础教程**](https://redux.js.org/tutorials/fundamentals/part-1-overview) 是一个"自下而上"的教程，从第一原则和没有任何抽象的情况下教授"Redux 如何工作"，以及为什么存在标准的 Redux 使用模式。
+[**Redux 基础教程**](https://cn.redux.js.org/tutorials/fundamentals/part-1-overview) 是一个"自下而上"的教程，从第一原则和没有任何抽象的情况下教授"Redux 如何工作"，以及为什么存在标准的 Redux 使用模式。
 
 ### 学习现代 Redux 直播
 

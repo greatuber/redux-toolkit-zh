@@ -99,7 +99,7 @@ function configureStore<
 
 如果它是一个切片 reducer 的对象，如 `{users : usersReducer, posts : postsReducer}`，
 `configureStore` 将自动通过将此对象传递给
-[Redux `combineReducers` 实用程序](https://redux.js.org/api/combinereducers) 创建根 reducer。
+[Redux `combineReducers` 实用程序](https://cn.redux.js.org/api/combinereducers) 创建根 reducer。
 
 ### `middleware`
 
@@ -155,7 +155,7 @@ Redux DevTools 扩展最近添加了[支持显示操作堆栈跟踪](https://git
 
 一个回调函数，用于自定义增强器数组。
 
-此回调返回的增强器将被传递给 [Redux 的 `compose` 函数](https://redux.js.org/api/compose)，并且组合的增强器将被传递给 `createStore`。
+此回调返回的增强器将被传递给 [Redux 的 `compose` 函数](https://cn.redux.js.org/api/compose)，并且组合的增强器将被传递给 `createStore`。
 
 :::tip Dev Tools
 这不应该包括 Redux DevTools 扩展的 `composeWithDevTools`，因为这已经由 `configureStore` 处理了。

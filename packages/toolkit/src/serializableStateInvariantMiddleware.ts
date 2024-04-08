@@ -243,7 +243,7 @@ export function createSerializableStateInvariantMiddleware(
               value,
               '\nTake a look at the logic that dispatched this action: ',
               action,
-              '\n(See https://redux.js.org/faq/actions#why-should-type-be-a-string-or-at-least-serializable-why-should-my-action-types-be-constants)',
+              '\n(See https://cn.redux.js.org/faq/actions#why-should-type-be-a-string-or-at-least-serializable-why-should-my-action-types-be-constants)',
               '\n(To allow non-serializable values see: https://ouweiya.github.io/redux-toolkit-zh/usage/usage-guide#working-with-non-serializable-data)',
             )
           }
@@ -271,7 +271,7 @@ export function createSerializableStateInvariantMiddleware(
               value,
               `
 Take a look at the reducer(s) handling this action type: ${action.type}.
-(See https://redux.js.org/faq/organizing-state#can-i-put-functions-promises-or-other-non-serializable-items-in-my-store-state)`,
+(See https://cn.redux.js.org/faq/organizing-state#can-i-put-functions-promises-or-other-non-serializable-items-in-my-store-state)`,
             )
           }
         })

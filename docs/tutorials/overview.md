@@ -13,7 +13,7 @@ import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 
 # 教程概览
 
-**Redux核心文档网站[redux.js.org](https://cn.redux.js.org)包含了学习Redux的主要教程**，包括如何将Redux Toolkit和React-Redux一起使用。
+**Redux核心文档网站[cn.redux.js.org](https://cn.cn.redux.js.org)包含了学习Redux的主要教程**，包括如何将Redux Toolkit和React-Redux一起使用。
 
 :::tip
 
@@ -35,7 +35,7 @@ import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 
 ## Redux基础知识：一个真实世界的例子
 
-[**Redux基础教程**](https://redux.js.org/tutorials/essentials/part-1-overview-concepts)教你"如何正确使用Redux"，使用Redux Toolkit作为编写Redux逻辑的标准方法。
+[**Redux基础教程**](https://cn.redux.js.org/tutorials/essentials/part-1-overview-concepts)教你"如何正确使用Redux"，使用Redux Toolkit作为编写Redux逻辑的标准方法。
 
 它展示了如何构建一个"真实世界"风格的示例应用程序，并在此过程中教授Redux概念。
 
@@ -43,7 +43,7 @@ import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 
 ## Redux基础知识：从零开始的Redux
 
-[**Redux基础教程**](https://redux.js.org/tutorials/fundamentals/part-1-overview)通过展示如何手动编写Redux代码以及为什么存在标准使用模式来教授"Redux如何从底层工作"。然后它展示了Redux Toolkit如何简化这些Redux使用模式。
+[**Redux基础教程**](https://cn.redux.js.org/tutorials/fundamentals/part-1-overview)通过展示如何手动编写Redux代码以及为什么存在标准使用模式来教授"Redux如何从底层工作"。然后它展示了Redux Toolkit如何简化这些Redux使用模式。
 
 由于Redux Toolkit是一个包裹在Redux核心周围的抽象层，所以了解RTK的API实际上为你做了什么是有帮助的。**如果你想理解Redux真正如何工作，以及为什么RTK是推荐的方法，请阅读Redux基础教程。**
 
@@ -63,7 +63,7 @@ Redux维护者Mark Erikson出现在"Learn with Jason"节目中，解释我们今
 
 RTK的[**使用指南**文档页面](../usage/usage-guide.md)解释了RTK的每个API的标准使用模式。[API参考](../api/configureStore.mdx)部分描述了每个API函数，并提供了额外的使用示例。
 
-[Redux基础教程](https://redux.js.org/tutorials/essentials/part-1-overview-concepts)也展示了如何在构建应用程序时使用每个API。
+[Redux基础教程](https://cn.redux.js.org/tutorials/essentials/part-1-overview-concepts)也展示了如何在构建应用程序时使用每个API。
 
 ## RTK Query视频课程
 
@@ -81,7 +81,7 @@ RTK的[**使用指南**文档页面](../usage/usage-guide.md)解释了RTK的每�
 
 ## 将Vanilla Redux迁移到Redux Toolkit
 
-如果你已经了解Redux，只想知道如何将现有的应用程序迁移到Redux Toolkit，[**"Redux基础教程中的现代Redux与Redux Toolkit"页面**](https://redux.js.org/tutorials/fundamentals/part-8-modern-redux)展示了RTK的API如何简化Redux的使用模式，以及如何处理这种迁移。
+如果你已经了解Redux，只想知道如何将现有的应用程序迁移到Redux Toolkit，[**"Redux基础教程中的现代Redux与Redux Toolkit"页面**](https://cn.redux.js.org/tutorials/fundamentals/part-8-modern-redux)展示了RTK的API如何简化Redux的使用模式，以及如何处理这种迁移。
 
 ## 使用Redux Toolkit与TypeScript
 

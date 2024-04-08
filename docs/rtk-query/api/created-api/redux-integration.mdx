@@ -9,7 +9,7 @@ hide_title: true
 
 # API切片：Redux集成
 
-在内部，`createApi`会调用[Redux Toolkit的`createSlice` API](https://ouweiya.github.io/redux-toolkit-zh/api/createSlice)来生成一个切片reducer和相应的action创建器，这些创建器具有缓存获取的数据的适当逻辑。它还自动生成一个自定义的Redux中间件，该中间件管理订阅计数和缓存生命周期。
+在内部，`createApi`会调用[Redux Toolkit的`createSlice` API](/redux-toolkit-zh/api/createSlice)来生成一个切片reducer和相应的action创建器，这些创建器具有缓存获取的数据的适当逻辑。它还自动生成一个自定义的Redux中间件，该中间件管理订阅计数和缓存生命周期。
 
 生成的切片reducer和中间件都需要添加到你的Redux store设置中的`configureStore`中，以便正确工作：
 

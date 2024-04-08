@@ -50,7 +50,7 @@ export const ExternalLinks = {
     </Link>
   )),
   Redux: memo(({ text = 'Redux' }) => (
-    <Link to="https://redux.js.org" title="Redux">
+    <Link to="https://cn.redux.js.org" title="Redux">
       {text}
     </Link>
   )),
@@ -60,7 +60,7 @@ export const ExternalLinks = {
     </Link>
   )),
   ReactRedux: memo(({ text = 'React-Redux' }) => (
-    <Link to="https://react-redux.js.org" title="React-Redux">
+    <Link to="https://react-cn.redux.js.org" title="React-Redux">
       {text}
     </Link>
   )),

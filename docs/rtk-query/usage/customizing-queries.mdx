@@ -168,7 +168,7 @@ transformResponse: (response: Posts, meta, arg) => {
 }
 ```
 
-虽然使用 RTK Query 管理缓存数据时，将响应存储在 [标准化查找表](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape) 中的需求较少，但如果需要，可以利用 `transformResponse` 来实现。
+虽然使用 RTK Query 管理缓存数据时，将响应存储在 [标准化查找表](https://cn.redux.js.org/recipes/structuring-reducers/normalizing-state-shape) 中的需求较少，但如果需要，可以利用 `transformResponse` 来实现。
 
 ```ts title="标准化响应数据" no-transpile
 transformResponse: (response) =>

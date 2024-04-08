@@ -16,7 +16,7 @@ import Link from '@docusaurus/Link'
 
 ## 为什么当输入状态改变时，我的选择器没有重新计算？
 
-请检查你的记忆化函数是否与你的状态更新函数（例如，如果你正在使用 <ExternalLinks.Redux />，那就是减速器）兼容。例如，使用 <InternalLinks.CreateSelector /> 创建的选择器将无法与一个状态更新函数一起工作，该函数会改变现有对象，而不是每次都创建一个新的对象。<InternalLinks.CreateSelector /> 使用身份检查（`===`）来检测输入是否已经改变，所以改变一个现有的对象不会触发选择器重新计算，因为改变一个对象并不会改变它的身份。请注意，如果你正在使用 <ExternalLinks.Redux />，改变状态对象几乎肯定是一个错误，详情请参考 <Link to='http://redux.js.org/docs/Troubleshooting.html'>这里</Link>。
+请检查你的记忆化函数是否与你的状态更新函数（例如，如果你正在使用 <ExternalLinks.Redux />，那就是减速器）兼容。例如，使用 <InternalLinks.CreateSelector /> 创建的选择器将无法与一个状态更新函数一起工作，该函数会改变现有对象，而不是每次都创建一个新的对象。<InternalLinks.CreateSelector /> 使用身份检查（`===`）来检测输入是否已经改变，所以改变一个现有的对象不会触发选择器重新计算，因为改变一个对象并不会改变它的身份。请注意，如果你正在使用 <ExternalLinks.Redux />，改变状态对象几乎肯定是一个错误，详情请参考 <Link to='http://cn.redux.js.org/docs/Troubleshooting.html'>这里</Link>。
 
 ## 为什么当输入状态保持不变时，我的选择器正在重新计算？
 

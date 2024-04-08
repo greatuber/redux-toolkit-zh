@@ -85,7 +85,7 @@ const otherLibraries = [
   {
     content: "一个可预测的JavaScript应用状态容器",
     title: "Redux 中文",
-    link: "https://cn.redux.js.org",
+    link: "https://cn.cn.redux.js.org",
     image: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +101,7 @@ const otherLibraries = [
   {
     content: "Redux的官方React绑定",
     title: "React-Redux 中文",
-    link: "https://cn.react-redux.js.org",
+    link: "https://cn.react-cn.redux.js.org",
     image: (
       <svg
         xmlns="http://www.w3.org/2000/svg"

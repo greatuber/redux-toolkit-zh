@@ -115,7 +115,7 @@ describe('serializableStateInvariantMiddleware', () => {
         "payload": Symbol(SOME_CONSTANT),
         "type": "an-action",
       }
-      (See https://redux.js.org/faq/actions#why-should-type-be-a-string-or-at-least-serializable-why-should-my-action-types-be-constants)
+      (See https://cn.redux.js.org/faq/actions#why-should-type-be-a-string-or-at-least-serializable-why-should-my-action-types-be-constants)
       (To allow non-serializable values see: https://ouweiya.github.io/redux-toolkit-zh/usage/usage-guide#working-with-non-serializable-data)"
     `)
   })
@@ -156,7 +156,7 @@ describe('serializableStateInvariantMiddleware', () => {
     expect(getLog().log).toMatchInlineSnapshot(`
       "A non-serializable value was detected in the state, in the path: \`testSlice.a\`. Value: Map {}
       Take a look at the reducer(s) handling this action type: TEST_ACTION.
-      (See https://redux.js.org/faq/organizing-state#can-i-put-functions-promises-or-other-non-serializable-items-in-my-store-state)"
+      (See https://cn.redux.js.org/faq/organizing-state#can-i-put-functions-promises-or-other-non-serializable-items-in-my-store-state)"
     `)
   })
 
@@ -217,7 +217,7 @@ describe('serializableStateInvariantMiddleware', () => {
       expect(getLog().log).toMatchInlineSnapshot(`
         "A non-serializable value was detected in the state, in the path: \`testSlice.a.entries\`. Value: [Function entries]
         Take a look at the reducer(s) handling this action type: TEST_ACTION.
-        (See https://redux.js.org/faq/organizing-state#can-i-put-functions-promises-or-other-non-serializable-items-in-my-store-state)"
+        (See https://cn.redux.js.org/faq/organizing-state#can-i-put-functions-promises-or-other-non-serializable-items-in-my-store-state)"
       `)
     })
 
@@ -264,7 +264,7 @@ describe('serializableStateInvariantMiddleware', () => {
       expect(getLog().log).toMatchInlineSnapshot(`
         "A non-serializable value was detected in the state, in the path: \`testSlice.a.third.bad-map-instance\`. Value: Map {}
         Take a look at the reducer(s) handling this action type: TEST_ACTION.
-        (See https://redux.js.org/faq/organizing-state#can-i-put-functions-promises-or-other-non-serializable-items-in-my-store-state)"
+        (See https://cn.redux.js.org/faq/organizing-state#can-i-put-functions-promises-or-other-non-serializable-items-in-my-store-state)"
       `)
     })
   })
@@ -374,7 +374,7 @@ describe('serializableStateInvariantMiddleware', () => {
           },
           "type": "test",
         }
-        (See https://redux.js.org/faq/actions#why-should-type-be-a-string-or-at-least-serializable-why-should-my-action-types-be-constants)
+        (See https://cn.redux.js.org/faq/actions#why-should-type-be-a-string-or-at-least-serializable-why-should-my-action-types-be-constants)
         (To allow non-serializable values see: https://ouweiya.github.io/redux-toolkit-zh/usage/usage-guide#working-with-non-serializable-data)"
       `)
     })
@@ -501,7 +501,7 @@ describe('serializableStateInvariantMiddleware', () => {
     expect(getLog().log).toMatchInlineSnapshot(`
       "A non-serializable value was detected in the state, in the path: \`testSlice.b.d\`. Value: Map {}
       Take a look at the reducer(s) handling this action type: TEST_ACTION.
-      (See https://redux.js.org/faq/organizing-state#can-i-put-functions-promises-or-other-non-serializable-items-in-my-store-state)"
+      (See https://cn.redux.js.org/faq/organizing-state#can-i-put-functions-promises-or-other-non-serializable-items-in-my-store-state)"
     `)
   })
 

@@ -10,7 +10,7 @@ description: 'RTK Query > Comparison: Compares features and tradeoffs vs other s
 
 # 与其他工具的比较
 
-**RTK Query从生态系统中的许多其他数据获取库中汲取灵感**。就像[Redux核心库受到Flux和Elm等工具的启发](https://redux.js.org/understanding/history-and-design/prior-art)一样，RTK Query基于[React Query](https://react-query.tanstack.com/)、[SWR](https://swr.vercel.app/)、[Apollo](https://www.apollographql.com/)和[Urql](https://formidable.com/open-source/urql/)等库普及的API设计模式和功能概念。RTK Query从头开始编写，但试图使用这些库和其他数据获取工具的最佳概念，同时着眼于利用Redux的独特优势和能力。
+**RTK Query从生态系统中的许多其他数据获取库中汲取灵感**。就像[Redux核心库受到Flux和Elm等工具的启发](https://cn.redux.js.org/understanding/history-and-design/prior-art)一样，RTK Query基于[React Query](https://react-query.tanstack.com/)、[SWR](https://swr.vercel.app/)、[Apollo](https://www.apollographql.com/)和[Urql](https://formidable.com/open-source/urql/)等库普及的API设计模式和功能概念。RTK Query从头开始编写，但试图使用这些库和其他数据获取工具的最佳概念，同时着眼于利用Redux的独特优势和能力。
 
 我们认为所有这些工具都很棒！如果你正在使用其中的一个，对它感到满意，并且它解决了你在应用中面临的问题，那就继续使用那个工具。此页面上的信息旨在帮助展示**在功能、实现方法和API设计上存在哪些差异**。目标是帮助你**做出明智的决策并理解权衡**，而不是争论工具X比工具Y更好。
 

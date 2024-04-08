@@ -66,7 +66,7 @@ Redux 一直都带有 UMD 构建工件。这些主要是为了直接作为脚本
 
 #### Action 类型 _必须_ 是字符串
 
-我们一直特别告诉我们的用户，[actions 和 state _必须_ 是可序列化的](https://redux.js.org/style-guide/#do-not-put-non-serializable-values-in-state-or-actions)，并且 `action.type` _应该_ 是一个字符串。这既是为了确保 actions 是可序列化的，也是为了在 Redux DevTools 中提供一个可读的 action 历史。
+我们一直特别告诉我们的用户，[actions 和 state _必须_ 是可序列化的](https://cn.redux.js.org/style-guide/#do-not-put-non-serializable-values-in-state-or-actions)，并且 `action.type` _应该_ 是一个字符串。这既是为了确保 actions 是可序列化的，也是为了在 Redux DevTools 中提供一个可读的 action 历史。
 
 `store.dispatch(action)` 现在特别强制 **`action.type` _必须_ 是一个字符串**，如果不是，就会抛出一个错误，就像如果 action 不是一个普通对象时它会抛出一个错误一样。
 
@@ -76,7 +76,7 @@ Redux 一直都带有 UMD 构建工件。这些主要是为了直接作为脚本
 
 在 [Redux 4.2.0 中，我们将原始的 `createStore` 方法标记为 `@deprecated`](https://github.com/reduxjs/redux/releases/tag/v4.2.0)。严格来说，**这 _不是_ 一个破坏性变化**，也不是 5.0 中的新特性，但我们在这里记录它以便完整性。
 
-**这个废弃只是一个 _视觉_ 指示器，旨在鼓励用户 [将他们的应用从旧的 Redux 模式迁移到使用现代 Redux Toolkit API](https://redux.js.org/usage/migrating-to-modern-redux)**。
+**这个废弃只是一个 _视觉_ 指示器，旨在鼓励用户 [将他们的应用从旧的 Redux 模式迁移到使用现代 Redux Toolkit API](https://cn.redux.js.org/usage/migrating-to-modern-redux)**。
 
 废弃导致在导入和使用时出现 **视觉删除线**，如 **~~`createStore`~~**，但 **_没有_ 运行时错误或警告**。
 
@@ -84,7 +84,7 @@ Redux 一直都带有 UMD 构建工件。这些主要是为了直接作为脚本
 
 要解决这个问题，有三个选项：
 
-- **[按照我们的强烈建议，切换到 Redux Toolkit 和 `configureStore`](https://redux.js.org/usage/migrating-to-modern-redux)**
+- **[按照我们的强烈建议，切换到 Redux Toolkit 和 `configureStore`](https://cn.redux.js.org/usage/migrating-to-modern-redux)**
 - 什么都不做。这只是一个视觉删除线，它不影响你的代码的行为。忽略它。
 - 切换到使用现在导出的 `legacy_createStore` API，这是完全相同的函数，但没有 `@deprecated` 标签。最简单的选项是做一个别名导入重命名，如 `import { legacy_createStore as createStore } from 'redux'`
 
@@ -108,7 +108,7 @@ Redux 的 TS 类型一直都导出了一个 `AnyAction` 类型，它被定义为
 
 `AnyAction` 仍然存在以保持兼容性，但已被标记为已弃用。
 
-请注意，[Redux Toolkit 的动作创建器有一个 `.match()` 方法](https://ouweiya.github.io/redux-toolkit-zh/api/createAction#actioncreatormatch)，它充当了一个有用的类型保护：
+请注意，[Redux Toolkit 的动作创建器有一个 `.match()` 方法](/redux-toolkit-zh/api/createAction#actioncreatormatch)，它充当了一个有用的类型保护：
 
 ```ts
 if (todoAdded.match(someUnknownAction)) {
@@ -411,7 +411,7 @@ const addNumbersStable = createSelector(
 )
 ```
 
-这是在第一次调用选择器时完成的，除非配置了其他方式。更多细节可以在 [Reselect docs on dev-mode checks](https://reselect.js.org/api/development-only-stability-checks) 中找到。
+这是在第一次调用选择器时完成的，除非配置了其他方式。更多细节可以在 [Reselect docs on dev-mode checks](/redux-toolkit-zh/reselect/api/development-only-stability-checks) 中找到。
 
 请注意，虽然 RTK 重新导出了 `createSelector`，但它故意没有重新导出全局配置此检查的函数 - 如果你希望这样做，你应该直接依赖 `reselect` 并自己导入它。
 
@@ -432,7 +432,7 @@ React-Redux v7 和 v8 与所有支持 hooks 的 React 版本（16.8+，17 和 18
 
 #### 自定义上下文类型
 
-React Redux 支持使用[自定义上下文](https://react-redux.js.org/api/hooks#custom-context)创建 `hooks`（和 `connect`），但是这种类型化一直相当非标准。在 v9 之前的类型需要 `Context<ReactReduxContextValue>`，但是上下文默认值通常会初始化为 `null`（因为 hooks 使用它来确保它们实际上有一个提供的上下文）。在"最好"的情况下，这会导致如下所示的结果：
+React Redux 支持使用[自定义上下文](https://react-cn.redux.js.org/api/hooks#custom-context)创建 `hooks`（和 `connect`），但是这种类型化一直相当非标准。在 v9 之前的类型需要 `Context<ReactReduxContextValue>`，但是上下文默认值通常会初始化为 `null`（因为 hooks 使用它来确保它们实际上有一个提供的上下文）。在"最好"的情况下，这会导致如下所示的结果：
 
 ```ts title="Pre-v9 custom context"
 import { createContext } from 'react'
@@ -490,7 +490,7 @@ export const useSelector = createSelectorHook(context).withTypes<RootState>()
 
 ### `combineSlices` API 与切片 reducer 注入用于代码分割
 
-Redux 核心一直包含 `combineReducers`，它接受一个充满 "切片 reducer" 函数的对象，并生成一个调用这些切片 reducers 的 reducer。RTK 的 `createSlice` 生成切片 reducers + 相关的 action creators，我们已经教授了导出单个 action creators 作为命名导出和切片 reducer 作为默认导出的模式。同时，我们从未对懒加载 reducers 有过官方支持，尽管我们在我们的文档中有一些 "reducer 注入" 模式的[示例代码](https://redux.js.org/usage/code-splitting)。
+Redux 核心一直包含 `combineReducers`，它接受一个充满 "切片 reducer" 函数的对象，并生成一个调用这些切片 reducers 的 reducer。RTK 的 `createSlice` 生成切片 reducers + 相关的 action creators，我们已经教授了导出单个 action creators 作为命名导出和切片 reducer 作为默认导出的模式。同时，我们从未对懒加载 reducers 有过官方支持，尽管我们在我们的文档中有一些 "reducer 注入" 模式的[示例代码](https://cn.redux.js.org/usage/code-splitting)。
 
 此版本包含一个新的 [`combineSlices`](../api/combineSlices) API，旨在在运行时启用 reducers 的懒加载。它接受单个切片或一个充满切片的对象作为参数，并自动调用 `combineReducers`，使用 `sliceObject.name` 字段作为每个状态字段的键。生成的 reducer 函数有一个额外的 `.inject()` 方法附加，可以用来在运行时动态注入额外的切片。它还包括一个 `.withLazyLoadedSlices()` 方法，可以用来为稍后添加的 reducers 生成 TS 类型。参见 [#2776](https://github.com/reduxjs/redux-toolkit/issues/2776) 以获取关于这个想法的原始讨论。
 
@@ -759,7 +759,7 @@ dynamicMiddleware.addMiddleware(someOtherMiddleware)
 
 ### Next.js设置指南
 
-我们现在有一个文档页面，涵盖了[如何正确设置Next.js与Redux](https://redux.js.org/usage/nextjs)。我们看到了很多关于使用Redux、Next和App Router的问题，这个指南应该可以提供帮助。
+我们现在有一个文档页面，涵盖了[如何正确设置Next.js与Redux](https://cn.redux.js.org/usage/nextjs)。我们看到了很多关于使用Redux、Next和App Router的问题，这个指南应该可以提供帮助。
 
 （目前，Next.js的`with-redux`示例仍然显示过时的模式 - 我们将很快提交一个PR来更新它以匹配我们的文档指南。）
 
@@ -972,7 +972,7 @@ const todoSlice = createSlice({
 export const { selectTodosByAuthor } = todoSlice.selectors
 ```
 
-使用 `createSelector` 的默认缓存大小为1，如果在多个组件中使用不同的参数调用，可能会导致缓存问题。对此的一个典型解决方案（不使用 `createSlice`）是[选择器工厂](https://redux.js.org/usage/deriving-data-selectors#creating-unique-selector-instances)：
+使用 `createSelector` 的默认缓存大小为1，如果在多个组件中使用不同的参数调用，可能会导致缓存问题。对此的一个典型解决方案（不使用 `createSlice`）是[选择器工厂](https://cn.redux.js.org/usage/deriving-data-selectors#creating-unique-selector-instances)：
 
 ```ts
 export const makeSelectTodosByAuthor = () =>

@@ -46,7 +46,7 @@ The package includes a precompiled ESM build that can be used as a [`<script typ
 
 The Redux Toolkit docs are available at **https://ouweiya.github.io/redux-toolkit-zh**, including API references and usage guides for all of the APIs included in Redux Toolkit.
 
-The Redux core docs at https://redux.js.org includes the full Redux tutorials, as well usage guides on general Redux patterns.
+The Redux core docs at https://cn.redux.js.org includes the full Redux tutorials, as well usage guides on general Redux patterns.
 
 ## Purpose
 
@@ -82,7 +82,7 @@ For details, see [the Redux Toolkit API Reference section in the docs](https://o
 
 **RTK Query** is provided as an optional addon within the `@reduxjs/toolkit` package. It is purpose-built to solve the use case of data fetching and caching, supplying a compact, but powerful toolset to define an API interface layer for your app. It is intended to simplify common cases for loading data in a web application, eliminating the need to hand-write data fetching & caching logic yourself.
 
-RTK Query is built on top of the Redux Toolkit core for its implementation, using [Redux](https://redux.js.org/) internally for its architecture. Although knowledge of Redux and RTK are not required to use RTK Query, you should explore all of the additional global store management capabilities they provide, as well as installing the [Redux DevTools browser extension](https://github.com/reduxjs/redux-devtools), which works flawlessly with RTK Query to traverse and replay a timeline of your request & cache behavior.
+RTK Query is built on top of the Redux Toolkit core for its implementation, using [Redux](https://cn.redux.js.org/) internally for its architecture. Although knowledge of Redux and RTK are not required to use RTK Query, you should explore all of the additional global store management capabilities they provide, as well as installing the [Redux DevTools browser extension](https://github.com/reduxjs/redux-devtools), which works flawlessly with RTK Query to traverse and replay a timeline of your request & cache behavior.
 
 RTK Query is included within the installation of the core Redux Toolkit package. It is available via either of the two entry points below:
 
