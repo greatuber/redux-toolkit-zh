@@ -305,6 +305,6 @@ nav.menu {
 }
 
 :root {
-  --ifm-scrollbar-thumb-background-color: #ddd;
-  --ifm-scrollbar-thumb-hover-background-color: #ccc;
+  --ifm-scrollbar-thumb-background-color: #d4d4d4;
+  --ifm-scrollbar-thumb-hover-background-color: #c4c4c4;
 }
