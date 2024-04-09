@@ -103,7 +103,7 @@ export const todosReducer = (state = [], action) => {
 }
 ```
 
-这段代码并没有特别依赖 `redux` 核心库的任何 API。但是，这是需要编写的大量代码。不可变的更新需要大量的手写对象扩展和数组操作，而且很容易在过程中犯错误并意外地改变状态（这总是 Redux bugs 的一大原因！）。虽然不是严格要求，但通常会将一个特性的代码分散在多个文件中，如 `actions/todos.js`，`constants/todos.js` 和 `reducers/todos.js`。
+这段代码并没有特别依赖 `redux` 核心库的任何 API。但是，这是需要编写的大量代码。不可变的更新需要大量的手写对象扩展和数组操作，而且很容易在过程中犯错误并意外地改变状态（这总是 Redux bugs 的第一大原因！）。虽然不是严格要求，但通常会将一个特性的代码分散在多个文件中，如 `actions/todos.js`，`constants/todos.js` 和 `reducers/todos.js`。
 
 此外，store 的设置通常需要一系列步骤来添加常用的中间件，如 thunks，并启用 Redux DevTools 扩展的支持，尽管这些都是几乎每个 Redux 应用都会使用的标准工具。
 
