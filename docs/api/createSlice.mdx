@@ -296,7 +296,7 @@ create.asyncThunk(
 
 `create.asyncThunk` 的类型工作方式与 [`createAsyncThunk`](../usage/usage-with-typescript#createasyncthunk) 相同，但有一个关键的区别。
 
-`state` 和/或 `dispatch` 的类型 _不能_ 作为 `ThunkApiConfig` 的一部分提供，因为这会导致循环类型。
+`state` 和 `dispatch` 的类型不能作为 `ThunkApiConfig` 的一部分提供，因为这会导致循环类型。
 
 相反，需要在需要的时候断言类型 - `getState() as RootState`。你也可以为 payload 函数包含一个明确的返回类型，以打破循环类型推断周期。
 
