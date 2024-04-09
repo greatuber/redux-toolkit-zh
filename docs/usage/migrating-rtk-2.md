@@ -432,7 +432,7 @@ React-Redux v7 和 v8 与所有支持 hooks 的 React 版本（16.8+，17 和 18
 
 #### 自定义上下文类型
 
-React Redux 支持使用[自定义上下文](https://react-cn.redux.js.org/api/hooks#custom-context)创建 `hooks`（和 `connect`），但是这种类型化一直相当非标准。在 v9 之前的类型需要 `Context<ReactReduxContextValue>`，但是上下文默认值通常会初始化为 `null`（因为 hooks 使用它来确保它们实际上有一个提供的上下文）。在"最好"的情况下，这会导致如下所示的结果：
+React Redux 支持使用[自定义上下文](https://cn.react-redux.js.org/api/hooks#custom-context)创建 `hooks`（和 `connect`），但是这种类型化一直相当非标准。在 v9 之前的类型需要 `Context<ReactReduxContextValue>`，但是上下文默认值通常会初始化为 `null`（因为 hooks 使用它来确保它们实际上有一个提供的上下文）。在"最好"的情况下，这会导致如下所示的结果：
 
 ```ts title="Pre-v9 custom context"
 import { createContext } from 'react'

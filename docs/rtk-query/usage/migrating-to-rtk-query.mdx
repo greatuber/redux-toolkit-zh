@@ -167,7 +167,7 @@ export const store = configureStore({
 export type RootState = ReturnType<typeof store.getState>
 ```
 
-为了让我们的应用能够访问到store，我们将用`react-redux`的[`Provider`](https://react-cn.redux.js.org/api/provider)组件来包裹我们的`App`组件。
+为了让我们的应用能够访问到store，我们将用`react-redux`的[`Provider`](https://cn.react-redux.js.org/api/provider)组件来包裹我们的`App`组件。
 
 ```tsx no-transpile title="src/index.ts"
 import { render } from 'react-dom'
@@ -193,7 +193,7 @@ render(
 
 ### 自定义钩子
 
-下面我们创建一个钩子来管理在适当的时间发送我们的请求，以及从store获取适当的数据和状态。[`useDispatch`](https://react-cn.redux.js.org/api/hooks#usedispatch) 和 [`useSelector`](https://react-cn.redux.js.org/api/hooks#useselector) 是从 [`react-redux`](https://react-cn.redux.js.org/introduction/getting-started) 中使用的，以便与Redux store进行通信。在我们的钩子的最后，我们返回一个整洁的，打包的对象，以便在组件中访问。
+下面我们创建一个钩子来管理在适当的时间发送我们的请求，以及从store获取适当的数据和状态。[`useDispatch`](https://cn.react-redux.js.org/api/hooks#usedispatch) 和 [`useSelector`](https://cn.react-redux.js.org/api/hooks#useselector) 是从 [`react-redux`](https://cn.react-redux.js.org/introduction/getting-started) 中使用的，以便与Redux store进行通信。在我们的钩子的最后，我们返回一个整洁的，打包的对象，以便在组件中访问。
 
 ```ts title="src/hooks.ts"
 // 文件: src/services/pokemonSlice.ts noEmit

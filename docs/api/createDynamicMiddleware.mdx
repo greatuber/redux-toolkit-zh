@@ -147,7 +147,7 @@ interface ReactDynamicMiddlewareInstance<
 
 ### `createDispatchWithMiddlewareHook`
 
-接受一组中间件，并返回一个 [`useDispatch`](https://react-cn.redux.js.org/api/hooks#usedispatch) 钩子，返回一个 `dispatch`，类型化以包含来自提供的中间件的扩展。
+接受一组中间件，并返回一个 [`useDispatch`](https://cn.react-redux.js.org/api/hooks#usedispatch) 钩子，返回一个 `dispatch`，类型化以包含来自提供的中间件的扩展。
 
 ```ts no-transpile
 const useListenerDispatch = createDispatchWithMiddlewareHook(
@@ -178,4 +178,4 @@ const createDispatchWithMiddlewareHook =
   createDispatchWithMiddlewareHookFactory(context)
 ```
 
-如果你正在使用 [custom context](https://react-cn.redux.js.org/using-react-redux/accessing-store#providing-custom-context) for React Redux，这将很有用。
+如果你正在使用 [custom context](https://cn.react-redux.js.org/using-react-redux/accessing-store#providing-custom-context) for React Redux，这将很有用。

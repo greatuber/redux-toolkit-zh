@@ -31,7 +31,7 @@ hide_title: true
 
 Redux Toolkit 已经用 TypeScript 编写，所以它的 TS 类型定义是内置的。
 
-[React Redux](https://react-cn.redux.js.org) 在 NPM 上有一个单独的 [`@types/react-redux` 类型定义包](https://npm.im/@types/react-redux)。除了对库函数进行类型化外，类型还导出了一些帮助器，使得在你的 Redux store 和你的 React 组件之间编写类型安全的接口更加容易。
+[React Redux](https://cn.react-redux.js.org) 在 NPM 上有一个单独的 [`@types/react-redux` 类型定义包](https://npm.im/@types/react-redux)。除了对库函数进行类型化外，类型还导出了一些帮助器，使得在你的 Redux store 和你的 React 组件之间编写类型安全的接口更加容易。
 
 从 React Redux v7.2.3 开始，`react-redux` 包依赖于 `@types/react-redux`，所以类型定义将与库一起自动安装。否则，你需要手动自己安装它们（通常是 `npm install @types/react-redux`）。
 

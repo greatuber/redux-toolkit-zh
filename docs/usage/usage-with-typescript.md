@@ -149,7 +149,7 @@ configureStore({
 
 ### 使用提取的 `Dispatch` 类型与 React Redux
 
-默认情况下，React Redux 的 `useDispatch` 钩子不包含考虑到中间件的任何类型。如果你在分派时需要 `dispatch` 函数的更具体类型，你可以指定返回的 `dispatch` 函数的类型，或创建一个自定义类型的 `useSelector`。详见 [React Redux 文档](https://react-cn.redux.js.org/using-react-redux/static-typing#typing-the-usedispatch-hook)。
+默认情况下，React Redux 的 `useDispatch` 钩子不包含考虑到中间件的任何类型。如果你在分派时需要 `dispatch` 函数的更具体类型，你可以指定返回的 `dispatch` 函数的类型，或创建一个自定义类型的 `useSelector`。详见 [React Redux 文档](https://cn.react-redux.js.org/using-react-redux/static-typing#typing-the-usedispatch-hook)。
 
 ## `createAction`
 
