@@ -14,7 +14,7 @@ description: 'RTK Query > Usage > Examples: sandboxes with runnable apps'
 
 我们有各种示例，展示了使用 RTK Query 的各个方面。
 
-这些示例并不意味着你应该以此为基础来构建你的应用程序，而是存在于展示你在应用程序中可能不需要或不想要的_非常特定_的行为。对于大多数用户来说，[查询](./queries)和[变异](./mutations)部分的基本示例将覆盖你的大部分需求。
+这些示例并不意味着你应该以此为基础来构建你的应用程序，而是存在于展示你在应用程序中可能不需要或不想要的非常特定的行为。对于大多数用户来说，[查询](./queries)和[变异](./mutations)部分的基本示例将覆盖你的大部分需求。
 
 :::tip
 
@@ -22,7 +22,7 @@ description: 'RTK Query > Usage > Examples: sandboxes with runnable apps'
 
 :::
 
-## 厨房水槽
+## 完整示例
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/kitchen-sink?fontsize=12&hidenavigation=1&theme=dark&runonclick=1"
@@ -40,7 +40,7 @@ description: 'RTK Query > Usage > Examples: sandboxes with runnable apps'
 
 ## React 乐观更新
 
-在下面的示例中，你会注意到一些事情。侧边栏上有两个 `Posts` 列表。顶部的那个只有在成功的变异和与服务器重新同步 _之后_ 才会更新。_订阅_ 的那个由于乐观更新会立即更新。在出现错误的情况下，你会看到这个操作被回滚。
+在下面的示例中，你会注意到一些事情。侧边栏上有两个 `Posts` 列表。顶部的那个只有在成功的变异和与服务器重新同步之后才会更新。订阅的那个由于乐观更新会立即更新。在出现错误的情况下，你会看到这个操作被回滚。
 
 :::info
 示例中有一些故意设置的奇怪行为... 当编辑帖子的名称时，你很可能会遇到随机错误。

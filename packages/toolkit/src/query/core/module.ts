@@ -52,12 +52,12 @@ import { enablePatches } from 'immer'
 import { createSelector as _createSelector } from './rtkImports'
 
 /**
- * `ifOlderThan` - (default: `false` | `number`) - _number is value in seconds_
- * - If specified, it will only run the query if the difference between `new Date()` and the last `fulfilledTimeStamp` is greater than the given value
+ * `ifOlderThan` - (默认值：`false` | `number`) - _数字表示秒数_
+ * - 如果指定，只有当`new Date()`与上次`fulfilledTimeStamp`之间的差值大于给定值时，才会运行查询
  *
  * @overloadSummary
  * `force`
- * - If `force: true`, it will ignore the `ifOlderThan` value if it is set and the query will be run even if it exists in the cache.
+ * - 如果`force: true`，即使在缓存中存在查询，也会忽略`ifOlderThan`的值并运行查询。
  */
 export type PrefetchOptions =
   | {
