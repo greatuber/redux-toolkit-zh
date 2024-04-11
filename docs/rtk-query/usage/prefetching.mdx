@@ -21,7 +21,7 @@ description: 'RTK Query > Usage > Prefetching: fetching before user interaction'
 
 ## 使用 React Hooks 进行预取
 
-类似于 [`useMutation`](./mutations) 钩子，`usePrefetch` 钩子不会自动运行 - 它返回一个"触发函数"，可以用来启动行为。
+类似于 [`useMutation`](./mutations) 钩子，`usePrefetch` 钩子不会自动运行，它返回一个"触发函数"，可以用来启动行为。
 
 它接受两个参数：第一个是你在 API 服务中定义的查询操作的键，第二个是两个可选参数的对象：
 
@@ -47,10 +47,10 @@ usePrefetch<EndpointName extends QueryKeys<Definitions>>(
 
 ### 触发函数行为
 
-1. 触发函数 _总是_ 返回 `void`。
+1. 触发函数总是返回 `void`。
 2. 如果在声明或调用站点设置了 `force: true`，无论如何都会运行查询。唯一的例外是如果相同的查询已经在进行中。
 3. 如果没有指定选项并且查询存在于缓存中，将不会执行查询。
-4. 如果没有指定选项并且查询 _不存在于_ 缓存中，将会执行查询。
+4. 如果没有指定选项并且查询不存在于缓存中，将会执行查询。
    - **假设** 你在树中有一个订阅了你正在预取的相同查询的 `useQuery` 钩子：
      - `useQuery` 将返回 `{isLoading: true, isFetching: true, ...rest}`
 5. 如果指定了 `ifOlderThan` 但计算结果为 false 并且查询在缓存中，将不会执行查询。
@@ -63,7 +63,7 @@ function User() {
   const prefetchUser = usePrefetch('getUser')
 
   // 低优先级的悬停将不会触发，除非上次请求发生在35s前
-  // 高优先级的悬停将 _总是_ 触发
+  // 高优先级的悬停将总是触发
   return (
     <div>
       <button onMouseEnter={() => prefetchUser(4, { ifOlderThan: 35 })}>
@@ -121,7 +121,7 @@ dispatch(api.endpoints[endpointName].initiate(arg, { forceRefetch: true }))
 
 ### 基本预取
 
-这是一个非常基本的示例，展示了当用户悬停在下一个箭头上时，你可以如何预取。这可能不是最优的解决方案，因为如果他们悬停，点击，然后在不移动鼠标的情况下更改页面，我们不会知道要预取下一页，因为我们不会看到下一个 `onMouseEnter` 事件。在这种情况下，你需要自己处理这个问题。你也可以考虑自动预取下一页...
+这是一个非常基本的示例，展示了当用户悬停在下一个箭头上时，你可以如何预取。这可能不是最优的解决方案，因为如果他们悬停，点击，然后在不移动鼠标的情况下更改页面，我们不会知道要预取下一页，因为我们不会看到下一个 `onMouseEnter` 事件。在这种情况下，你需要自己处理这个问题。你也可以考虑自动预取下一页.
 
 <iframe
   src="https://codesandbox.io/embed/github/reduxjs/redux-toolkit/tree/master/examples/query/react/prefetching?fontsize=12&runonclick=1&hidenavigation=1&theme=dark"

@@ -29,8 +29,7 @@ const config: Config = {
           path: "./docs",
           sidebarPath: "./sidebars.ts",
           routeBasePath: "/",
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+          editUrl: "https://github.com/ouweiya/redux-toolkit-zh/tree/master/",
           include: [
             "{api,assets,introduction,migrations,rtk-query,tutorials,usage,reselect}/**/*.{md,mdx}",
           ],
@@ -90,10 +89,10 @@ const config: Config = {
           position: "right",
         },
         {
-          type: 'docSidebar',
-          position: 'right',
-          sidebarId: 'reselect',
-          label: 'Reselect',
+          type: "docSidebar",
+          position: "right",
+          sidebarId: "reselect",
+          label: "Reselect",
         },
       ],
     },
