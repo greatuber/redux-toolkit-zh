@@ -972,7 +972,7 @@ const todoSlice = createSlice({
 export const { selectTodosByAuthor } = todoSlice.selectors
 ```
 
-使用 `createSelector` 的默认缓存大小为1，如果在多个组件中使用不同的参数调用，可能会导致缓存问题。对此的一个典型解决方案（不使用 `createSlice`）是[选择器工厂](https://cn.redux.js.org/usage/deriving-data-selectors#creating-unique-selector-instances)：
+使用 `createSelector` 的默认缓存大小为1，如果在多个组件中使用不同的参数调用，可能会导致缓存问题。对此的一个典型解决方案（不使用 `createSlice`）是使用[选择器工厂](https://cn.redux.js.org/usage/deriving-data-selectors#创建唯一的-selector-实例)：
 
 ```ts
 export const makeSelectTodosByAuthor = () =>
